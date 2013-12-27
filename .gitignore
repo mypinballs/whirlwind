@@ -1,0 +1,9 @@
+/dmd/*
+/sound/*
+/music/*
+/speech/*
+/xtra/*
+/config/settings.yaml
+/config/game_data.yaml
+*.pyc
+_notes/

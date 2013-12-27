@@ -1,0 +1,46 @@
+# This file is a template for all of the statistical data to be kept for the game.# The game code will load this file along with a game_data.yaml file.  
+# Any items not present in the game_data.yaml file will default to the 
+# value specified here.  When game ends or when defaults are restored, 
+# game_data will be written and will then contain every item here.
+
+Audits:
+  Average Ball Time: 0
+  Average Game Time: 0
+  Average Score: 0
+  Games Played: 0
+  Games Started: 0
+  Balls Played: 0
+  Left Flippers: 0
+  Right Flippers: 0
+  Left Inlanes: 0
+  Right Inlanes: 0
+  Left Outlane Drains: 0
+  Right Outlane Drains: 0
+  Lower Jet Hits: 0
+  Upper Jet Hits: 0
+  Saucers: 0
+  Credits: 0
+  Skyway Tolls: 0
+  Cellar Visits: 0
+  Tornados: 0
+  Left Ramps: 0
+  3-Bank Drop Targets Hits: 0
+Time Stamps:
+  First Boot-Up: 'Not Set'
+  Last Boot-Up: 'Not Set'
+  Overall Time On: 0
+  Overall Game Time: 0
+  Last Game Start: 'Not Set'
+  Last GC Score Entry: 'Not Set'
+  Last High Score Entry: 'Not Set'
+  Last Replay: 'Not Set'
+ClassicHighScoreData:
+- {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 5000000}
+- {date: 'Sun Oct  3 17:44:49 2010', inits: TOM, score: 4000000}
+- {date: 'Sun Oct  3 16:22:47 2010', inits: PLA, score: 3000000}
+- {date: 'Sun Oct  3 15:04:27 2010', inits: JDK, score: 2000000}
+- {date: 'Sun Oct  3 22:05:01 2010', inits: RAA, score: 1000000}
+SuperJetsChampion:
+- {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 200}
+Hidden:
+  Total Score: 0

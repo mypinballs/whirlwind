@@ -1,0 +1,653 @@
+#Whirlwind P-ROC Game Description file
+#Using Atom Motherboard, Marks Sys 11 Driver board and myPinballs Display Interface Driver
+#Configured as a WPC Alphanumeric type game
+
+PRGame:
+    machineType: wpcAlphanumeric
+    numBalls: 3
+PRFlippers:
+    - flipperLwR
+    - flipperLwL
+PRBumpers:
+    - leftSlingshot
+    - rightSlingshot
+    - lowerLeftJet
+    - lowerRightJet
+    - lowerTopJet
+    - upperLeftJet
+    - upperRightJet
+    - upperBottomJet
+PRSwitches:
+    # **** Format ****
+    # name:
+    #   number: <number>
+    #   type: <type>
+    #
+    #   <number> can be: SFx (Flipper switch, labeled Fx in WPC manual
+    #                    SDx (Dedicated switch, labeled SDx in WPC manual
+    #                    Sx  (Matrix switch, labeled x in WPC manual
+    #   <type> can be: 'NO' (normally open.  This is the default; so no need to use this)
+    #    'NC' (normally closed.  Common for optos)
+
+    #dedicated
+    flipperLwL:
+        number: SD1
+        label: 'LL Flipper'
+    flipperLwR:
+        number: SD2
+        label: 'LR Flipper'
+    coinDoor:
+        number: SD5
+        label: 'Coin Door'
+    flipperUpR:
+        number: SD6
+        label: 'UR Flipper'
+    tilt:
+        number: SD7
+        label: 'Tilt'
+    coin:
+        number: SD8
+        label: 'Coin'
+    enter:
+        number: SD9
+        label: 'Diag Enter'
+    up:
+        number: SD10
+        label: 'Diag Up'
+    down:
+        number: SD11
+        label: 'Diag Down'
+    exit:
+        number: SD12
+        label: 'Diag Exit'
+
+    #matrix
+    #col1
+    plumbBobTilt:
+        number: S11
+        label: 'Plumb Bob Tilt'
+    csidePower:
+        number: S12
+        label: 'C Side Power A/C Relay'
+    start:
+        number: S13
+        label: 'Start Button'
+    rightCoinChute:
+        number: S14
+        label: 'Right Coin Chute'
+    centerCoinChute:
+        number: S15
+        label: 'Center Coin Chute'
+    leftCoinChute:
+        number: S16
+        label: 'Left Coin Chute'
+    slamTilt:
+        number: S17
+        label: 'Slam Tilt'
+    highScoreReset:
+        number: S18
+        label: 'High Score Reset'
+    #col2
+    outhole:
+        number: S22
+        tags: outhole
+        label: 'Outhole'
+    trough1:
+        number: S23
+        tags: trough
+        label: 'Ball Trough 1 (Left)'
+    trough2:
+        number: S24
+        tags: trough
+        label: 'Ball Trough 2 (Middle)'
+    trough3:
+        number: S25
+        tags: trough,trough_eject
+        label: 'Ball Trough 3 (Right)'
+    rightInlane:
+        number: S27
+        label: 'Right Inlane'
+    rightOutlane:
+        number: S28
+        tags: outlane,early_save
+        label: 'Right Outlane'
+    #col3
+    leftOutlane:
+        number: S31
+        tags: outlane,early_save
+        label: 'Left Outlane'
+    leftInlane:
+        number: S32
+        label: 'Left Inlane'
+    rightCellar:
+        number: S33
+        label: 'Right Cellar'
+    leftCellar:
+        number: S34
+        label: 'Left Cellar'
+    leftStandup:
+        number: S35
+        label: 'Left Standup'
+    lock1:
+        number: S36
+        label: 'Lock 1 (Lower)'
+    lock2:
+        number: S37
+        label: 'Lock 2 (Middle)'
+    lock3:
+        number: S38
+        label: 'Lock 3 (Top)'
+    #col4
+    rightStandup:
+        number: S41
+        label: 'Right Standup'
+    topSingleDropTarget:
+        number: S42
+        #type: 'NC'
+        label: 'Top Single Drop Target'
+    bottomDropTarget:
+        number: S43
+        #type: 'NC'
+        label: 'Lower Drop Target (3 Bank)'
+    middleDropTarget:
+        number: S44
+        #type: 'NC'
+        label: 'Middle Drop Target (3 Bank)'
+    topDropTarget:
+        number: S45
+        #type: 'NC'
+        label: 'Top Drop Target (3 Bank)'
+    middleStandup:
+        number: S46
+        label: 'Middle Standup'
+    #col5
+    leftRampEnter:
+        number: S51
+        label: 'Left Ramp Enter'
+    leftRampMadeTop:
+        number: S52
+        label: 'Left Ramp Made Top'
+    leftRampMadeBottom:
+        number: S53
+        label: 'Left Ramp Made Bottom'
+    leftLoopTop:
+        number: S54
+        label: 'Left Loop Top'
+    leftLoopBottom:
+        number: S55
+        label: 'Left Loop Bottom'
+    rightLoopTop:
+        number: S56
+        label: 'Right Loop Top'
+    rightLoopBottom:
+        number: S57
+        label: 'Right Loop Bottom'
+    innerLoop:
+        number: S58
+        label: 'Right Loop Bottom'
+    #col6
+    spinner:
+        number: S61
+        label: 'Spinner'
+    rightRampDown:
+        number: S62
+        label: 'Right Ramp Down'
+    topRightEject:
+        number: S63
+        label: 'Top Right Eject'
+    rightRampMadeTop:
+        number: S64
+        label: 'Right Ramp Made Top'
+    rightRampMadeBottom:
+        number: S65
+        label: 'Right Ramp Made Bottom'
+    leftStandupRightRamp:
+        number: S67
+        label: 'Left Standup Right Ramp'
+    rightStandupRightRamp:
+        number: S68
+        label: 'Right Standup Right Ramp'
+    #col 7
+    upperLeftJet:
+        number: S71
+        label: 'Upper Left Jet'
+    upperRightJet:
+        number: S72
+        label: 'Upper Right Jet'
+    upperBottomJet:
+        number: S73
+        label: 'Upper Bottom Jet'
+    lowerLeftJet:
+        number: S74
+        label: 'Lower Left Jet'
+    lowerRightJet:
+        number: S75
+        label: 'Lower Right Jet'
+    lowerTopJet:
+        number: S76
+        label: 'Lower Top Jet'
+    leftSlingshot:
+        number: S77
+        label: 'Left Slingshot'
+    rightSlingshot:
+        number: S78
+        label: 'Right Slingshot'
+    #col 8
+    flipperLwR:
+        number: S81
+        label: 'Right Flipper'
+    flipperLwL:
+        number: S82
+        label: 'Left Flipper'
+    shooterLane:
+        number: S83
+        tags: shooter_lane
+        label: 'Shooter Lane'
+    leftRebound:
+        number: S84
+        label: 'Left Single Rebound'
+    rightRebound:
+        number: S85
+        label: 'Right Single Rebound'
+        
+PRCoils:
+    #virtual
+    flipperLwRMain:
+        number: FLRM
+    flipperLwRHold:
+        number: FLRH
+    flipperLwLMain:
+        number: FLLM
+    flipperLwLHold:
+        number: FLLH
+    #switched
+    outhole:
+        number: C01
+        pulseTime: 30
+        tags: A,outhole
+        label: 'Outhole'
+#    bottomRightFlasher:
+#        number: C01
+#        tags: C
+#        label: 'Bottom Right Flasher'
+    shooterLaneFeeder:
+        number: C02
+        pulseTime: 30
+        tags: A,trough_eject
+        label: 'Shooter Lane Feeder'
+#    spinnerFlasher:
+#        number: C02
+#        tags: C
+#        label: 'Spinner Flasher'
+    rampLifter:
+        number: C03
+        pulseTime: 30
+        tags: A
+        label: 'Right Ramp Lifter'
+#    rampTopFlasher:
+#        number: C03
+#        tags: C
+#        label: 'Right Ramp Top/Upper Jets Flasher'
+    leftLockKickback:
+        number: C04
+        pulseTime: 60
+        tags: A
+        label: 'Left Lock Kickback'
+#    rampUMFlasher:
+#        number: C04
+#        tags: C
+#        label: 'Right Ramp Upper Middle/Million Flasher'
+    topEject:
+        number: C05
+        pulseTime: 30
+        tags: A
+        label: 'Left Lock Kickback'
+#    rampLMFlasher:
+#        number: C05
+#        tags: C
+#        label: 'Right Ramp Lower Middle/Lower Jets Flasher'
+    knocker:
+        number: C06
+        pulseTime: 30
+        tags: A
+        label: 'Left Lock Kickback'
+#    rampBottomFlasher:
+#        number: C06
+#        tags: C
+#        label: 'Right Ramp BottomFlasher'
+    dropTargetReset:
+        number: C07
+        pulseTime: 50
+        tags: A
+        label: '3-Bank Drop target Reset'
+#    dropTargetFlasher:
+#        number: C07
+#        tags: C
+#        label: 'Drop Target/M Target Flasher'
+    singleDropTargetReset:
+        number: C08
+        tags: A
+        pulseTime: 50
+        label: 'Single Drop Target Reset'
+#    compassFlasher:
+#        number: C08
+#        tags: C
+#        label: 'Million Plus/Compass Flasher'
+    #controlled
+    lowerLeftJet:
+        number: C09
+        pulseTime: 30
+        label: 'Lower Left Jet'
+    lowerTopJet:
+        number: C10
+        pulseTime: 30
+        label: 'Lower Top Jet'
+    upperPlayfieldGIOff:
+        number: C11
+        pulseTime: 10
+        label: 'Upper Playfield GI Relay'
+    acSelect:
+        number: C12
+        pulseTime: 20
+        label: 'A/C Select Relay'
+    divertor:
+        number: C13
+        pulseTime: 30
+        label: 'Ramp Divertor'
+    cellarKickout:
+        number: C14
+        pulseTime: 30
+        label: 'Cellar Kickout'
+    lowerRightJet:
+        number: C15
+        pulseTime: 30
+        label: 'Cellar Kickout'
+    lowerPlayfieldGIOff:
+        number: C16
+        pulseTime: 10
+        label: 'Lower Playfield GI Relay'
+    #special
+    upperLeftJet:
+        number: C17
+        pulseTime: 30
+        label: 'Upper Left Jet'
+    leftSlingshot:
+        number: C18
+        pulseTime: 20
+        label: 'Left Slingshot'
+    upperRightJet:
+        number: C19
+        pulseTime: 30
+        label: 'Upper Right Jet'
+    rightSlingshot:
+        number: C20
+        pulseTime: 20
+        label: 'Right Slingshot'
+    upperBottomJet:
+        number: C21
+        pulseTime: 30
+        label: 'Upper Top Jet'
+    rampDown:
+        number: C22
+        pulseTime: 20
+        label: 'Ramp Down'
+    flipperEnable:
+        number: C23
+        pulseTime: 30
+        label: 'Flipper Enable Relay'
+    diagnostics:
+        number: C24
+        pulseTime: 30
+        label: 'Diagnostics LED'
+    #extra
+    lightningLeftFlasher:
+        number: C25
+        pulseTime: 30
+        label: 'BP Lightning Left Flasher'
+    blowerMotor:
+        number: C26
+        pulseTime: 30
+        label: 'Blower Motor'
+    lightningMiddleFlasher:
+        number: C27
+        pulseTime: 30
+        label: 'BP Lightning Middle Flasher'
+    lightningRightFlasher:
+        number: C28
+        pulseTime: 30
+        label: 'BP Lightning Right Flasher'
+    spinWheelsMotor:
+        number: S35
+        #speial config for top 4 drives on enable line 1 - S35-S38
+        pulseTime: 120
+        label: 'Spin Wheels Motor'
+        
+PRLamps:
+    #col1
+    middleStandup:
+        number: L11
+        label: 'Middle Standup'
+    scUpperJetsOn:
+        number: L12
+        label: 'Upper Jets On (Super Cellar)'
+    sc250k:
+        number: L13
+        label: '250K (Super Cellar)'
+    scExtraBall:
+        number: L14
+        label: 'Lite Extra Ball (Super Cellar)'
+    sc3Bank100k:
+        number: L15
+        label: '3-Bank 100K (Super Cellar)'
+    sc500k:
+        number: L16
+        label: '500K (Super Cellar)'
+    scMillion:
+        number: L17
+        label: 'Lite Million (Super Cellar)'
+    scLowerJetsOn:
+        number: L18
+        label: 'Lower Jets On (Super Cellar)'
+    #col2
+    specialLeftOutlane:
+        number: L21
+        label: 'Special (Left Outlane)'
+    specialRightOutlane:
+        number: L22
+        label: 'Special (Right Outlane)'
+    topDrop50k:
+        number: L23
+        label: 'Top Drop 50K'
+    topDrop75k:
+        number: L24
+        label: 'Top Drop 75K'
+    topDrop100k:
+        number: L25
+        label: 'Top Drop 100K'
+    topDrop150k:
+        number: L26
+        label: 'Top Drop 150K'
+    topDropQuickMB:
+        number: L27
+        label: 'Top Drop Quick Multiball'
+    topDropEB:
+        number: L28
+        label: 'Top Drop Extra Ball'
+    #col3
+    sCompass:
+        number: L31
+        label: 'South Compass'
+    swCompass:
+        number: L32
+        label: 'South West Compass'
+    wCompass:
+        number: L33
+        label: 'West Compass'
+    nwCompass:
+        number: L34
+        label: 'North West Compass'
+    nCompass:
+        number: L35
+        label: 'North Compass'
+    neCompass:
+        number: L36
+        label: 'North East Compass'
+    eCompass:
+        number: L37
+        label: 'East Compass'
+    seCompass:
+        number: L38
+        label: 'South East Compass'
+    #col4
+    toll1:
+        number: L41
+        label: 'Toll 1'
+    toll2:
+        number: L42
+        label: 'Toll 2'
+    toll3:
+        number: L43
+        label: 'Toll 3'
+    toll4:
+        number: L44
+        label: 'Toll 4'
+    toll5:
+        number: L45
+        label: 'Toll 5'
+    toll30:
+        number: L46
+        label: 'Toll 30'
+    toll20:
+        number: L47
+        label: 'Toll 20'
+    toll10:
+        number: L48
+        label: 'Toll 10'
+    #col5
+    lowerLeftJet:
+        number: L51
+        label: 'Lower Left Jet'
+    lowerTopJet:
+        number: L52
+        label: 'Lower Top Jet'
+    lowerRightJet:
+        number: L53
+        label: 'Lower Right Jet'
+    upperLeftJet:
+        number: L54
+        label: 'Upper Left Jet'
+    upperRightJet:
+        number: L55
+        label: 'Upper Right Jet'
+    upperBottomJet:
+        number: L56
+        label: 'Upper Bottom Jet'
+    leftCellarSign:
+        number: L57
+        label: 'Left Cellar Sign'
+    rightCellarSign:
+        number: L58
+        label: 'Right Cellar Sign'
+    #col6
+    lock:
+        number: L61
+        label: 'Lock'
+    2tolls:
+        number: L62
+        label: '2 Tolls'
+    millionPlus:
+        number: L63
+        label: 'Million Plus'
+    million:
+        number: L64
+        label: 'Million'
+    release:
+        number: L65
+        label: 'Release'
+    shot:
+        number: L66
+        tags: skillshot
+        label: 'Super Skill (Shot)'
+    skill:
+        number: L67
+        tags: skillshot
+        label: 'Super (Skill) Shot'
+    super:
+        number: L68
+        tags: skillshot
+        label: '(Super) Skill Shot'
+    #col7
+    neBottom:
+        number: L71
+        label: 'North East Bottom'
+    swBottom:
+        number: L72
+        label: 'South West Bottom'
+    nwBottom:
+        number: L73
+        label: 'North West Bottom'
+    swTop:
+        number: L74
+        label: 'South West Top'
+    nwTop:
+        number: L75
+        label: 'North West Top'
+    neTop:
+        number: L76
+        label: 'North East Top'
+    seTop:
+        number: L77
+        label: 'South East Top'
+    seBottom:
+        number: L78
+        label: 'South East Bottom'
+    #col8
+    shootAgain:
+        number: L81
+        label: 'Shoot Again'
+    2x:
+        number: L82
+        label: '2X'
+    3x:
+        number: L83
+        label: '3X'
+    4x:
+        number: L84
+        label: '4X'
+    5x:
+        number: L85
+        label: '5X'
+    6xEB:
+        number: L86
+        label: '6X Extra Ball'
+    6xSP:
+        number: L87
+        label: '6X Special'
+    rightSpinner:
+        number: L88
+        label: 'Right Spinner'
+
+PRBallSave:
+    pulseCoils: [leftSlingshot, rightSlingshot, lowerLeftJet, lowerRightJet, lowerTopJet, upperLeftJet, upperRightJet, upperBottomJet]
+    resetSwitches:
+        leftSlingshot: open
+        rightSlingshot: open
+        lowerLeftJet: open
+        lowerRightJet: open
+        lowerTopJet: open
+        upperLeftJet: open
+        upperRightJet: open
+        upperBottomJet: open
+        leftOutlane: open
+        leftInlane: open
+        rightOutlane: open
+        rightInlane: open
+    stopSwitches:
+        shooterLane: closed
+        flipperLwL: closed
+        flipperLwR: closed
+
+PRDriverGlobals:
+    lamp_matrix_strobe_time: 200
+    use_watchdog: True
+    watchdog_time: 1000
