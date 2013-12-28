@@ -6,7 +6,5 @@ To create new pinball software for Williams Whirlwind using the original rules, 
 ##Author
 [mypinballs](http://www.mypinballs.co.uk) is Jim Askey, a Java J2EE software programmer and long term pinball addict/restorer.
 
-##Updates
-
-v0.1.10 (27th Dec 2013)
-- First public upload
+##Notes
+ - The sounds, speech and music folders are not currently included as part of this repository

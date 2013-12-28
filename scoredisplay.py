@@ -66,9 +66,10 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 #update the data
                 self.update_alpha_display()
 
-        def mode_tick(self):
-            if self.text_set==False:
-                self.update_layer()
+
+#        def mode_tick(self):
+#            if self.text_set==False:
+#                self.update_layer()
             
             
         def test(self):
@@ -77,7 +78,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
         def restore(self):
                 self.reset()
                 self.text_set = False
-                #self.update_layer()
+                self.update_layer()
 
         def format_digit_score(self, score):
 	
@@ -98,7 +99,8 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                     self.bottom_text_data[posn:posn+len(text)] = text
                   
                     #update the data
-                    self.update_alpha_display()
+                    if not self.text_set:
+                        self.update_alpha_display()
 
 	def update_layer_1p(self, font=None):
                 super(AlphaScoreDisplay, self).update_layer_1p(font)
@@ -109,8 +111,10 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                         posn = self.player_score_posn[0]+1
                         #add the score as right justified in player 1s posn
                         self.top_text_data[posn-len(score):posn] = score
+
                         #update the data
-                        self.update_alpha_display()
+                        if not self.text_set:
+                            self.update_alpha_display()
                         
         def update_layer_4p(self):
                 super(AlphaScoreDisplay, self).update_layer_4p()
@@ -130,7 +134,8 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                             self.bottom_text_data[posn-len(formatted_score):posn] = formatted_score
 
                         #update the data
-                        self.update_alpha_display()
+                        if not self.text_set:
+                            self.update_alpha_display()
 
 
         def set_text(self,text,row,justify='center',opaque=True,blink_rate=0,seconds=0):
