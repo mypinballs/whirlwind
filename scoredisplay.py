@@ -1,19 +1,29 @@
+# -------------------------
+# Score Display Mode for Alphanumeric Display Games
+#
+# Controls displays during game play and provides various transition effects for displaying text during modes.
+# Repeating script list included for attract usage
+#
+# Copyright (C) 2013 myPinballs, Orange Cloud Software Ltd
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+# -------------------------
+
 import procgame
 import locale
 import random
 import logging
 from procgame import *
 
-
-#class AttractLayer(dmd.GroupedLayer):
-#	def __init__(self, width, height, mode):
-#		super(AttractLayer, self).__init__(width, height, mode)
-#		self.mode = mode
-#	def next_frame(self):
-#		"""docstring for next_frame"""
-#		# Setup for the frame.
-#		self.mode.update_script()
-#		return super(AttractLayer, self).next_frame()
 
 class AlphaScoreDisplay(game.ScoreDisplay):
 	
@@ -43,6 +53,8 @@ class AlphaScoreDisplay(game.ScoreDisplay):
         def reset(self):
                 #cancel any delays
                 self.cancel_delayed(self.text_blink_repeat)
+                for i in range(2):
+                    self.cancel_delayed('transition_loop'+str(i))
                 
                 #define the display data lists
                 self.top_text_data=[]
@@ -228,9 +240,9 @@ class AlphaScoreDisplay(game.ScoreDisplay):
             if justify=='left':
                 stop_posn = 0
             elif justify=='center':
-                stop_posn = 8-(size/2)
+                stop_posn = 7-(size/2)
             elif justify=='right':
-                stop_posn = 16-size
+                stop_posn = 15-size
 
             text_data=[]
             for i in range(0,32):
@@ -252,6 +264,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 self.transition_posn[row] = 17
                 if seconds>0:
                     self.delay(name='restore_display',delay=seconds,handler=self.restore)
+
 
         def set_transition_reveal(self,text,row,seconds=0):
             size = len(text)
