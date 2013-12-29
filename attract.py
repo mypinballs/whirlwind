@@ -188,7 +188,7 @@ class Attract(game.Mode):
 
                 #pricing
                 self.update_pricing()
-                script.append({'top':self.pricing_top,'bottom':self.pricing_bottom,'timer':5,'transition':0})
+                script.append({'top':self.pricing_top,'bottom':self.pricing_bottom,'timer':5,'transition':4})
 
                 #replays
                 replay_type =self.game.user_settings['Replay']['Replay Award'] +" AT"

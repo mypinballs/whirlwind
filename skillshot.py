@@ -47,6 +47,7 @@ class Skillshot(game.Mode):
             self.speed = 2
             self.value = 0
             self.display_repeats = 0
+            self.display_repeating = False
             self.reset_lamps()
 
 
@@ -114,8 +115,9 @@ class Skillshot(game.Mode):
         def display_text(self,seconds=3, blink_rate=0.1, opaque=True, repeat=False, hold=False):
 
             value =self.value-self.display_repeats*self.divider
-            
-            self.game.score_display.set_text('super skill shot'.upper(),0,'center',seconds=seconds, blink_rate=blink_rate)
+
+            if not self.display_repeating: #do not show text again if display repeating scoring
+                self.game.score_display.set_text('super skill shot'.upper(),0,'center',seconds=seconds, blink_rate=blink_rate)
             self.game.score_display.set_text(locale.format("%d", value, True),1,'center',seconds=seconds)
 
             self.effect_repeater()
@@ -129,6 +131,7 @@ class Skillshot(game.Mode):
 
             if self.display_repeats>0:
                 self.delay(name='display_repeat',delay=timer,handler=self.display_text)
+                self.display_repeating = True
                 self.display_repeats-=1
             else:
                 self.delay(name='cleanup',delay=2,handler=self.clear)

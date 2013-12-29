@@ -75,11 +75,23 @@ class Effects(game.Mode):
             if time>0:
                 self.delay(name=flasher_name+'_off', event_type=None, delay=time, handler=self.game.coils[flasher_name].disable)
 
-        def strobe_flasher_set(self,flasher_list,time=0.5):
+#        def strobe_flasher_set(self,flasher_list,time=0.5):
+#            timer = 0
+#            for fname in flasher_list:
+#                self.delay(name=fname+'strobe', event_type=None, delay=timer, handler=self.drive_flasher, param=[fname,'fast',time])
+#                timer+=time
+
+        def strobe_flasher_set(self,flasher_list,time=1,overlap=0.2,repeats=1,enable=True):
             timer = 0
-            for fname in flasher_list:
-                self.delay(name=fname+'strobe', event_type=None, delay=timer, handler=self.drive_flasher, param=[fname,'fast',time])
-                timer+=time
+            for i in range(repeats):
+                for fname in flasher_list:
+                    if enable:
+                        self.delay(name=fname+'strobe', event_type=None, delay=timer, handler=self.drive_flasher, param=[fname,'strobe',time+overlap])
+                        timer+=time
+                    else:
+                        self.cancel_delayed(fname+'strobe')
+                        self.game.coils[fname].disable()
+
 
         def drive_led(self,lamp_name,colour):
             if colour=='red':

@@ -26,17 +26,23 @@ class Ramp(game.Mode):
             self.game.sound.register_sound('enter_left_ramp', sound_path+"enter_left_ramp.ogg")
             self.game.sound.register_sound('made_left_ramp', sound_path+"made_left_ramp.ogg")
 
+            self.lightning_flashers = ['lightningLeftFlasher','lightningMiddleFlasher','lightningRightFlasher']
+
             self.enter_value = 10
             self.made_value_base = 50000
             self.made_value_boost = 10000
             self.made_value_max = 100000
             self.skyway_toll_boost = 3
-
-            self.reset()
-
-
+            self.super_combo_multiplier = 10
+            self.combo_multiplier = 2
+           
+        
         def reset(self):
-            pass
+            self.reset_combos()
+
+        def reset_combos(self):
+            self.combo = False
+            self.super_combo = False
 
         
 #        def update_lamps(self):
@@ -52,13 +58,25 @@ class Ramp(game.Mode):
             self.shots_made = 0
             self.multiball_ready = self.game.get_player_stats('multiball_ready')
             self.million_lit = self.game.get_player_stats('million_lit')
+
+            self.reset()
             
         def mode_stopped(self):
             pass
 
         def display_text(self, count, value, opaque=True, repeat=False, hold=False, frame_time=3):
-            self.game.score_display.set_text(str(count)+' skyway tolls'.upper(),0,'center',seconds=2)
-            self.game.score_display.set_text('+'+locale.format("%d", value, True),1,'center',seconds=2)
+            top_text=str(count)+' skyway tolls'
+            bottom_text = '+'+locale.format("%d", value, True)
+
+            if self.super_combo:
+                top_text = 'Super Combo'
+                bottom_text = 'Millions'
+            elif self.combo:
+                top_text = 'Skyway Combo'
+                bottom_text = str(count)+' tolls'
+
+            self.game.score_display.set_text(top_text.upper(),0,'center',seconds=2)
+            self.game.score_display.set_text(bottom_text.upper(),1,'center',seconds=2)
 
 
         def update_count(self):
@@ -72,13 +90,19 @@ class Ramp(game.Mode):
             self.game.score(value)
 
         def update_tolls(self):
-            tolls = self.skyway.inc_tolls(self.skyway_toll_boost)
+            if self.combo or self.super_combo:
+                tolls = self.skyway.inc_tolls(self.skyway_toll_boost*self.combo_multipier)
+            else:
+                tolls = self.skyway.inc_tolls(self.skyway_toll_boost)
 
             value = 0
-            if value<self.made_value_max:
-                value = self.made_value_base+(self.made_value_boost*self.shots_made)
+            if not self.super_combo:
+                if value<self.made_value_max:
+                    value = self.made_value_base+(self.made_value_boost*self.shots_made)
+                else:
+                    value = self.made_value_max
             else:
-                value = self.made_value_max
+                value = self.made_value_max*self.super_combo_multiplier
 
             self.display_text(tolls,value)
             self.score(value)
@@ -87,13 +111,25 @@ class Ramp(game.Mode):
             self.cellar.lite_cellar(20)
 
         def made(self):
+            self.check_combo()
             self.update_count()
             self.update_tolls()
             self.lite_cellar()
+            self.game.effects.strobe_flasher_set(flasher_list=self.lightning_flashers, time=0.2, repeats=3)
             self.game.sound.play('made_left_ramp')
 
         def spin_wheels(self):
             self.game.coils.spinWheelsMotor.pulse()
+
+        def check_combo(self):
+            #combo is left loop then ramp - gives double skyway tolls
+            #super combo is left loop, inner loop then ramp - gives 10 times max skyway value (1 million)
+    
+            if self.game.switches.leftLoopTop.time_since_change()<=3 and self.game.switches.rightLoopBottom.time_since_change()<=1:
+                if self.game.switches.innerLoop.time_since_change()<=1:
+                    self.super_combo = True
+                else:
+                    self.combo = True
 
         def sw_leftRampEnter_active(self, sw):
             self.game.score(10)
@@ -104,3 +140,5 @@ class Ramp(game.Mode):
 
         def sw_leftRampMadeBottom_active(self, sw):
             self.spin_wheels()
+            self.reset_combos()
+

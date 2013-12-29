@@ -51,8 +51,8 @@ class AlphaScoreDisplay(game.ScoreDisplay):
         def reset(self):
                 self.log.debug('reset called')
                 #cancel any delays
-                self.cancel_delayed('text_blink_repeat')
                 for i in range(2):
+                    self.cancel_delayed('text_blink_repeat'+str(i))
                     self.cancel_delayed('transition_loop'+str(i))
                 
                 #define the display data lists
@@ -184,6 +184,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 self.blink_flag = True
                 self.set_text_blink([blink_rate,row])
             else:
+                self.cancel_delayed('text_blink_repeat'+str(row))
                 self.update_alpha_display()
 
             #timer to restore the scores
@@ -227,7 +228,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 self.blink_flag=True
                 self.log.debug('blinking, restored')
 
-            self.delay(name='text_blink_repeat',delay=delay,handler=self.set_text_blink, param=data)
+            self.delay(name='text_blink_repeat'+str(row),delay=delay,handler=self.set_text_blink, param=data)
 
 
         def set_script(self,data): #set up a sequence of text calls to loop
@@ -249,7 +250,10 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                     elif item['transition']==3:
                         self.__top_delay = self.delay(name='display_script_ttext', delay=i,handler=lambda: self.set_transition_reveal(item['top'],0))
                         self.__bottom_delay = self.delay(name='display_script_btext', delay=i,handler=lambda: self.set_transition_reveal(item['bottom'],1))
-                    
+                    elif item['transition']==4:
+                        self.__top_delay = self.delay(name='display_script_ttext', delay=i,handler=lambda: self.set_text(item['top'],0,justify='center'))
+                        self.__bottom_delay = self.delay(name='display_script_btext', delay=i,handler=lambda: self.set_text(item['bottom'],1,justify='center',blink_rate=0.2))                        
+                        
                 wrapper(item,i)
                 i+=item['timer']
             repeat_delay =self.delay(name='display_script_repeat',delay=i,handler=self.set_script,param=data)
