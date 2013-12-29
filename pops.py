@@ -147,7 +147,7 @@ class Pops(game.Mode):
                         self.play_animation(self.lower_super_pops_required,set)
                     else:
                         self.lower_super_pops_collected+=1
-                        self.play_super_animation(self.lower_super_pops_required,set)
+                        self.play_super_animation(self.lower_super_pops_collected,set)
 
                 self.game.switched_coils.drive("rampLMFlasher",style='fast',time=0.5)
 
@@ -158,10 +158,10 @@ class Pops(game.Mode):
                 if self.super_pops_enabled:
                     if self.upper_super_pops_required>0:
                         self.upper_super_pops_required -=1
-                        self.play_animation(self.lower_super_pops_required,set)
+                        self.play_animation(self.upper_super_pops_required,set)
                     else:
                         self.upper_super_pops_collected+=1
-                        self.play_super_animation(self.lower_super_pops_required,set)
+                        self.play_super_animation(self.upper_super_pops_collected,set)
 
                 self.game.switched_coils.drive("rampTopFlasher",style='fast',time=0.5)
                     

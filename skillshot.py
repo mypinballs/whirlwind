@@ -111,7 +111,7 @@ class Skillshot(game.Mode):
             self.game.sound.play('skill_shot_hit')
             
 
-        def display_text(self,seconds=2, blink_rate=0.1, opaque=True, repeat=False, hold=False):
+        def display_text(self,seconds=3, blink_rate=0.1, opaque=True, repeat=False, hold=False):
 
             value =self.value-self.display_repeats*self.divider
             

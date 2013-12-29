@@ -33,26 +33,25 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 self.log = logging.getLogger('whirlwind.alpha_display')
                 
                 #set the position of the rhs of score for each player
-                self.player_score_posn=[6,15,6,15]
+                self.player_score_posn=[8,15,8,15]
 
-                #flag for display text
-                self.text_set = False
 
                 #set the starting point for a rhs transition
                 self.transition_posn = [17,17]
 
                 self.transition_reveal_posn = [0,0]
 
-                self.text_blink_repeat = None
+                #flags
                 self.blink_flag = False
-
+                self.text_set = False
 
                 #reset the display
                 self.reset()
 
         def reset(self):
+                self.log.debug('reset called')
                 #cancel any delays
-                self.cancel_delayed(self.text_blink_repeat)
+                self.cancel_delayed('text_blink_repeat')
                 for i in range(2):
                     self.cancel_delayed('transition_loop'+str(i))
                 
@@ -62,6 +61,16 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 for i in range(16):
                     self.top_text_data.append(' ')
                     self.bottom_text_data.append(' ')
+
+                self.top_text_data_store=[]
+                self.bottom_text_data_store=[]
+                for i in range(16):
+                    self.top_text_data_store.append(' ')
+                    self.bottom_text_data_store.append(' ')
+
+                #setup the display data store lists
+                #self.top_text_data_store = self.top_text_data
+                #self.bottom_text_data_store = self.bottom_text_data
                     
                 #update the data
                 self.update_alpha_display()
@@ -96,10 +105,10 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                         posn = 9
                     else:
                         posn = 0
-                    self.bottom_text_data[posn:posn+len(text)] = text
-                  
-                    #update the data
+                   
                     if not self.text_set:
+                        self.bottom_text_data[posn:posn+len(text)] = text
+                        #update the data
                         self.update_alpha_display()
 
 	def update_layer_1p(self, font=None):
@@ -109,11 +118,11 @@ class AlphaScoreDisplay(game.ScoreDisplay):
 		elif self.game.ball>0:
 			score = self.format_digit_score(self.game.current_player().score)
                         posn = self.player_score_posn[0]+1
-                        #add the score as right justified in player 1s posn
-                        self.top_text_data[posn-len(score):posn] = score
 
-                        #update the data
                         if not self.text_set:
+                            #add the score as right justified in player 1s posn
+                            self.top_text_data[posn-len(score):posn] = score
+                            #update the data
                             self.update_alpha_display()
                         
         def update_layer_4p(self):
@@ -127,14 +136,14 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                         else:
                             posn = self.player_score_posn[i]
 
-                        #add the scores as right justified for the num of players playing, players 1 and 2 on top, 3 and 4 on bottom
-                        if i<2:
-                            self.top_text_data[posn-len(formatted_score):posn] = formatted_score
-                        else:
-                            self.bottom_text_data[posn-len(formatted_score):posn] = formatted_score
-
-                        #update the data
                         if not self.text_set:
+                            #add the scores as right justified for the num of players playing, players 1 and 2 on top, 3 and 4 on bottom
+                            if i<2:
+                                self.top_text_data[posn-len(formatted_score):posn] = formatted_score
+                            else:
+                                self.bottom_text_data[posn-len(formatted_score):posn] = formatted_score
+
+                            #update the data
                             self.update_alpha_display()
 
 
@@ -155,24 +164,26 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                     for i in range(16):
                         self.top_text_data[i] = ' '
                 self.top_text_data[posn-size:posn]=text
+                self.top_text_data_store[posn-size:posn] = text
 
             elif row==1:
                 if opaque:
                     for i in range(16):
                         self.bottom_text_data[i] = ' '
                 self.bottom_text_data[posn-size:posn]=text
+                self.bottom_text_data_store[posn-size:posn]=text
 
             
             #check for blinking enabled
             if blink_rate>0:
                 #store the current text data
-                self.top_text_data_store = self.top_text_data
-                self.bottom_text_data_store = self.bottom_text_data
+                #self.top_text_data = self.top_text_data_store
+                #self.bottom_text_data_store = self.bottom_text_data
+
                 #call the blinker method
                 self.blink_flag = True
-                self.set_text_blink(blink_rate)
+                self.set_text_blink([blink_rate,row])
             else:
-                self.cancel_delayed(self.text_blink_repeat)
                 self.update_alpha_display()
 
             #timer to restore the scores
@@ -180,19 +191,29 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                 self.delay(name='restore_display',delay=seconds,handler=self.restore)
 
 
-        def set_text_blink(self,num):
+        def set_text_blink(self,data):
+            delay=data[0]
+            row=data[1]
+
+            self.log.debug('Top text data store contains:%s',self.top_text_data_store)
+                   
             def clear(self):
                 for i in range(16):
-                    self.top_text_data[i] = ' '
-                    self.bottom_text_data[i] = ' '
+                    if row==0:
+                        self.top_text_data[i] = ' '
+                    elif row==1:
+                        self.bottom_text_data[i] = ' '
 
                 #update the data
                 self.update_alpha_display()
 
             def restore(self):
-                for i in range(16):
-                    self.top_text_data = self.top_text_data_store
-                    self.bottom_text_data = self.bottom_text_data_store
+                if row==0:
+                    for i in range(len(self.top_text_data_store)):
+                        self.top_text_data[i] = self.top_text_data_store[i]
+                elif row==1:
+                    for i in range(len(self.bottom_text_data_store)):
+                        self.bottom_text_data[i] = self.bottom_text_data_store[i]
 
                 #update the data
                 self.update_alpha_display()
@@ -200,15 +221,17 @@ class AlphaScoreDisplay(game.ScoreDisplay):
             if self.blink_flag:
                 clear(self)
                 self.blink_flag=False
+                self.log.debug('blinking, cleared')
             else:
                 restore(self)
                 self.blink_flag=True
+                self.log.debug('blinking, restored')
 
-            self.text_blink_repeat = self.delay(delay=num,handler=self.set_text_blink, param=num)
+            self.delay(name='text_blink_repeat',delay=delay,handler=self.set_text_blink, param=data)
 
 
         def set_script(self,data): #set up a sequence of text calls to loop
-            self.log.info('display script called')
+            self.log.debug('display script called')
             i=0
             for item in data:
 
@@ -315,5 +338,5 @@ class AlphaScoreDisplay(game.ScoreDisplay):
             #write the data to the display
             self.game.alpha_display.display([''.join(self.top_text_data),''.join(self.bottom_text_data)])
             #debug
-            #self.log.debug('top text:%s',self.top_text_data)
-            #self.log.debug('bottom text:%s',self.bottom_text_data)
+            self.log.debug('top text:%s',self.top_text_data)
+            self.log.debug('bottom text:%s',self.bottom_text_data)

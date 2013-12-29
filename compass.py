@@ -37,8 +37,9 @@ class Compass(game.Mode):
             self.nelamps =['neTop','neBottom']
             self.swlamps=['swTop','swBottom']
             self.selamps=['seTop','seBottom']
-
             self.lamps=self.nwlamps+self.nelamps+self.swlamps+self.selamps
+
+            self.lightning_flashers = ['lightningLeftFlasher','lightningMiddleFlasher','lightningRightFlasher']
 
             self.directions=['nw','ne','sw','se']
             self.base_directions=['n','e','s','w']
@@ -260,6 +261,7 @@ class Compass(game.Mode):
                 self.log.debug('Compasss Flags Status:%s',self.flags)
 
                 self.set_lamps(num)
+                self.game.effects.strobe_flasher_set(self.lightning_flashers, 0.2)
                 self.game.sound.play('target_unlit')
                 self.score(self.target_unlit_value)
                 self.check_chase_progress()
