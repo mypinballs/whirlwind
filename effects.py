@@ -23,9 +23,9 @@ class Effects(game.Mode):
             elif style == 'medium':
       		self.game.lamps[lamp_name].schedule(schedule=0x0f0f0f0f, cycle_seconds=0, now=True)
             elif style == 'fast':
-		self.game.lamps[lamp_name].schedule(schedule=0x55555555, cycle_seconds=0, now=True)
-            elif style == 'superfast':
 		self.game.lamps[lamp_name].schedule(schedule=0x99999999, cycle_seconds=0, now=True)
+            elif style == 'superfast':
+		self.game.lamps[lamp_name].schedule(schedule=0xaaaaaaaa, cycle_seconds=0, now=True)
             elif style == 'on':
 		self.game.lamps[lamp_name].enable()
             elif style == 'off':
@@ -71,6 +71,16 @@ class Effects(game.Mode):
       		self.game.coils[flasher_name].schedule(schedule=0x30003000, cycle_seconds=cycle, now=True)
             elif style == 'fast':
 		self.game.coils[flasher_name].schedule(schedule=0x11111111, cycle_seconds=cycle, now=True)
+            elif style == 'super':
+		self.game.coils[flasher_name].schedule(schedule=0x55555555, cycle_seconds=cycle, now=True)
+            elif style == 'super2':
+		self.game.coils[flasher_name].schedule(schedule=0x55055055, cycle_seconds=cycle, now=True)
+            elif style == 'strobe':
+		self.game.coils[flasher_name].schedule(schedule=0xeeeeeeee, cycle_seconds=cycle, now=True)
+            elif style == 'chaos':
+		self.game.coils[flasher_name].schedule(schedule=0x019930AB, cycle_seconds=cycle, now=True)
+            elif style == 'fade':
+		self.game.coils[flasher_name].schedule(schedule=0xAAA99933, cycle_seconds=cycle, now=True)
 
             if time>0:
                 self.delay(name=flasher_name+'_off', event_type=None, delay=time, handler=self.game.coils[flasher_name].disable)
@@ -86,7 +96,7 @@ class Effects(game.Mode):
             for i in range(repeats):
                 for fname in flasher_list:
                     if enable:
-                        self.delay(name=fname+'strobe', event_type=None, delay=timer, handler=self.drive_flasher, param=[fname,'strobe',time+overlap])
+                        self.delay(name=fname+'strobe', event_type=None, delay=timer, handler=self.drive_flasher, param=[fname,'fast',time+overlap])
                         timer+=time
                     else:
                         self.cancel_delayed(fname+'strobe')

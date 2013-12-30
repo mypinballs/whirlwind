@@ -281,7 +281,7 @@ PRCoils:
 #        label: 'Spinner Flasher'
     rampLifter:
         number: C03
-        pulseTime: 30
+        pulseTime: 60
         tags: A
         label: 'Right Ramp Lifter'
 #    rampTopFlasher:
@@ -299,7 +299,7 @@ PRCoils:
 #        label: 'Right Ramp Upper Middle/Million Flasher'
     topEject:
         number: C05
-        pulseTime: 30
+        pulseTime: 50
         tags: A
         label: 'Left Lock Kickback'
 #    rampLMFlasher:
@@ -389,7 +389,7 @@ PRCoils:
         label: 'Upper Top Jet'
     rampDown:
         number: C22
-        pulseTime: 20
+        pulseTime: 30
         label: 'Ramp Down'
     flipperEnable:
         number: C23
@@ -477,27 +477,35 @@ PRLamps:
     sCompass:
         number: L31
         label: 'South Compass'
+        tag: 'compass'
     swCompass:
         number: L32
         label: 'South West Compass'
+        tag: 'compass'
     wCompass:
         number: L33
         label: 'West Compass'
+        tag: 'compass'
     nwCompass:
         number: L34
         label: 'North West Compass'
+        tag: 'compass'
     nCompass:
         number: L35
         label: 'North Compass'
+        tag: 'compass'
     neCompass:
         number: L36
         label: 'North East Compass'
+        tag: 'compass'
     eCompass:
         number: L37
         label: 'East Compass'
+        tag: 'compass'
     seCompass:
         number: L38
         label: 'South East Compass'
+        tag: 'compass'
     #col4
     toll1:
         number: L41
@@ -628,7 +636,7 @@ PRLamps:
         label: 'Right Spinner'
 
 PRBallSave:
-    pulseCoils: [leftSlingshot, rightSlingshot, lowerLeftJet, lowerRightJet, lowerTopJet, upperLeftJet, upperRightJet, upperBottomJet]
+    pulseCoils: [leftSlingshot, rightSlingshot, lowerLeftJet, lowerRightJet, lowerTopJet, upperLeftJet, upperRightJet, upperBottomJet, topEject, cellarKickout]
     resetSwitches:
         leftSlingshot: open
         rightSlingshot: open

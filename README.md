@@ -8,3 +8,6 @@ To create new pinball software for Williams Whirlwind using the original rules, 
 
 ##Notes
  - The sounds, speech and music folders are not currently included as part of this repository
+
+##Licence
+See the LICENCE file

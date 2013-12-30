@@ -148,7 +148,7 @@ class BaseGameMode(game.Mode):
             #medium priority basic modes
             self.multiball = Multiball(self.game,50)
             self.compass = Compass(self.game,51,self.multiball)
-            self.skillshot = Skillshot(self.game, 52)
+            self.skillshot = Skillshot(self.game, 52, self.drops)
 
             #higher priority basic modes
 

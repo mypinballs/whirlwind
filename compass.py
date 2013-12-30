@@ -59,6 +59,7 @@ class Compass(game.Mode):
             self.shots_made = 0
             self.set_complete = 0
             self.game.coils.divertor.disable()
+            self.virtual_lock = False
 
             for i in range(len(self.flags)):#reset flags
                 self.flags[i]=0
@@ -97,6 +98,10 @@ class Compass(game.Mode):
                 else:
                     self.game.effects.drive_lamp(self.directions[i]+'Compass','off')
 
+            #update the lock lit lamp
+            if self.lock_lit:
+                self.game.effects.drive_lamp('lock','fast')
+
 
         def set_lamps(self,num):
             self.game.effects.drive_lamp(self.lamps[num],'smarton')
@@ -110,6 +115,7 @@ class Compass(game.Mode):
                         self.game.effects.drive_lamp(self.lamps[(2*i)+j],'superfast')
 
             self.delay(delay=timer,handler=self.update_lamps)
+
             
         def mode_started(self):
 
@@ -176,11 +182,28 @@ class Compass(game.Mode):
             self.game.sound.play_music('lock_lit',-1)
             self.delay(name='lock_lit_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming_long'))
 
-            self.game.effects.drive_lamp('lock','smarton')
+            self.game.effects.drive_lamp('lock','fast')
+
+            self.spin_wheels()
+
+            #multiple player logic : raise ramp if balls already locked is greater than current players lock
+            if self.game.trough.num_balls_locked>self.balls_locked:
+                self.game.switched_coils.drive('rampLifter')
+            else:
+                self.game.coils['rampDown'].pulse()
+
+
+        def spin_wheels(self):
+            num=random.randint(50,200)
+            self.game.coils.spinWheelsMotor.pulse(num)
+            self.delay(name='spin_wheels_repeat',delay=0.8,handler=self.spin_wheels)
+
             
             
         def ball_locked(self):
-           
+            #stop the spinning wheels
+            self.cancel_delayed('spin_wheels_repeat')
+
             self.display_status_text(top='ball '+str(self.balls_locked)+' locked',bottom='',seconds=2)
 
             if self.balls_locked<2:
@@ -192,14 +215,22 @@ class Compass(game.Mode):
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
             else:
-                self.game.switched_coils.drive('rightRampLifter')
+                if self.compass_level==1: #allow start via saucer for first multiball
+                    self.game.switched_coils.drive('rightRampLifter')
+                else:
+                    self.game.effects.drive_lamp('lock','off')
+
                 self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming'))
-                self.game.effects.drive_lamp('release','smarton')
+                self.game.effects.drive_lamp('release','fast')
 
 
         def launch_next_ball(self):
-            self.game.trough.launch_balls(1,stealth=False) #stealth false, bip +1
+            if self.virtual_lock:
+                self.game.switched_coils.drive('topEject')
+            else:
+                self.game.trough.launch_balls(1,stealth=False) #stealth false, bip +1
             self.next_ball_ready = True
+            self.virtual_lock = False
             self.game.ball_save.start(time=5)
             
 
@@ -277,12 +308,12 @@ class Compass(game.Mode):
             self.game.set_player_stats('balls_locked', self.balls_locked)
 
             #update trough
-            self.game.trough.num_balls_locked = self.balls_locked
+            self.game.trough.num_balls_locked +=1
             self.game.trough.num_balls_in_play -=1
 
             if self.balls_locked==self.balls_needed:
                 #set flag
-                self.multiball.multiball_started = True
+                #self.multiball.multiball_started = True
                 self.multiball.multiball_start()
 
                 self.lock_lit=False
@@ -336,7 +367,7 @@ class Compass(game.Mode):
 
         def sw_rightRampMadeTop_active(self, sw):
             if self.lock_lit:
-                self.game.coils.divertor.patter(original_on_time=30, on_time=2, off_time=18)
+                self.game.coils.divertor.patter(original_on_time=30, on_time=2, off_time=20)
 
 
         #lock lane switches
@@ -352,7 +383,6 @@ class Compass(game.Mode):
             if self.balls_locked==2:
                 self.lock_manager()
 
-
         #start ball save for next ball after lock
         def sw_shooterLane_open_for_1s(self,sw):
             if self.next_ball_ready:
@@ -361,16 +391,17 @@ class Compass(game.Mode):
                 self.game.ball_save.start(num_balls_to_save=1, time=ball_save_time, now=True, allow_multiple_saves=False)
                 self.next_ball_ready = False
 
-        #start multiball via eject
+        #lock and start multiball via eject
         def sw_topRightEject_active_for_250ms(self, sw):
-            if self.balls_locked==2 & self.lock_lit:
+            if self.lock_lit:
+                self.virtual_lock = True
                 self.lock_manager()
-                self.delay(name='release_ball',delay=2,handler=lambda:self.game.switched_coils.drive('topEject'))
+#                self.delay(name='release_ball',delay=2,handler=lambda:self.game.switched_coils.drive('topEject'))
+#
+#            else:
+#                self.game.switched_coils.drive('topEject')
 
-            else:
-                self.game.switched_coils.drive('topEject')
-
-        #start multiball via ramp
+        #start multiball via ramp - TODO: check - possible removal of this
         def sw_leftRampMadeTop_active(self, sw):
-            if self.balls_locked==2 & self.lock_lit:
+            if self.balls_locked==2 and self.lock_lit:
                 self.lock_manager()

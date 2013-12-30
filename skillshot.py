@@ -22,10 +22,11 @@ music_path = game_path +"music/"
 
 class Skillshot(game.Mode):
 
-	def __init__(self, game, priority):
+	def __init__(self, game, priority, mode1=None):
             super(Skillshot, self).__init__(game, priority)
 
             self.log = logging.getLogger('whirlwind.skillshot')
+            self.drops = mode1
 
             self.game.sound.register_sound('skill_shot_hit', sound_path+"skill_shot.ogg")
 
@@ -158,18 +159,21 @@ class Skillshot(game.Mode):
         def sw_bottomDropTarget_active(self, sw):
             self.value+=self.top_value
             self.process()
+            self.drops.progress(0)
 
             #return procgame.game.SwitchStop
 
         def sw_middleDropTarget_active(self, sw):
             self.value+=self.mid_value
             self.process()
+            self.drops.progress(1)
 
             #return procgame.game.SwitchStop
 
         def sw_topDropTarget_active(self, sw):
             self.value+=self.bottom_value
             self.process()
+            self.drops.progress(2)
 
             #return procgame.game.SwitchStop
 

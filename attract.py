@@ -103,6 +103,7 @@ class Attract(game.Mode):
             #Release Stuck Balls code
             if self.game.switches.leftCellar.is_active(0.5):
                self.game.coils.cellarKickout.pulse()
+               
             if self.game.switches.outhole.is_active(0.5):
                self.game.switched_coils.drive('outhole')
 
@@ -111,6 +112,9 @@ class Attract(game.Mode):
 
             if self.game.switches.rightRampDown.is_inactive(0.5):
                 self.game.coils.rampDown.pulse()
+
+            if self.game.switches.topRightEject.is_active(0.5):
+                self.game.switched_coils.drive('topEject')
 
             if self.game.switches.lock1.is_active(0.5):
                 self.game.switched_coils.drive('leftLockKickback')

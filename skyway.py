@@ -1,4 +1,10 @@
-#Saucer Mode
+# -------------------------
+# Skyway Mode
+# Controls Right Ramp and Eject Saucer
+#
+# Copyright (C) 2013 myPinballs, Orange Cloud Software Ltd
+#
+# -------------------------
 
 import procgame
 import locale
@@ -104,9 +110,9 @@ class Skyway(game.Mode):
             self.set_lamps()
             
             return self.skyway_tolls
+
         
         def progress(self):
-            
             self.toll(1)
             if self.ramp_level>1:
                 self.toll(1)
@@ -118,6 +124,19 @@ class Skyway(game.Mode):
             self.combo()
 
 
+        def alt_progress(self):
+
+            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('lock_lit'):
+                self.toll(1)
+                self.play_sound()
+                self.score()
+                self.play_animation(self.skyway_tolls)
+                self.set_lamps()
+
+            #queue eject
+            self.delay(name='eject_ball',delay=2,handler=self.eject)
+
+
         def combo(self):
             self.ramp_level+=1
             self.game.effects.drive_lamp('2tolls','fast')
@@ -127,13 +146,12 @@ class Skyway(game.Mode):
             self.delay(name='skyway_reset',delay=5, handler=self.reset)
 
 
-
-
         def score(self):
             value = self.ramp_value_start*self.ramp_level*self.ramp_value_boost
             if value>self.ramp_value_limit:
                 value=self.ramp_value_limit
             self.game.score(value)
+            
 
         def play_sound(self):
             level = self.ramp_level
@@ -161,6 +179,15 @@ class Skyway(game.Mode):
             self.skyway_tolls+=num
             self.game.game_data['Audits']['Skyway Tolls'] += num
 
+            
+        def eject(self):
+            self.game.switched_coils.drive('topEject')
+
+
+        #switch handlers
         def sw_rightRampMadeTop_active(self, sw):
             self.progress()
-           
+
+        def sw_topRightEject_active_for_250ms(self, sw):
+            self.alt_progress()
+

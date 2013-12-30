@@ -9,10 +9,11 @@ __date__ ="$Jan 18, 2011 1:36:37 PM$"
 
 import procgame
 import locale
+import random
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/whirlwind/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -24,14 +25,15 @@ class Multiball(game.Mode):
             super(Multiball, self).__init__(game, priority)
 
             self.game.sound.register_sound('jackpot_attempt', sound_path+"jackpot_attempt.ogg")
-
-            self.game.sound.register_sound('multiball_start_speech', speech_path+"here_it_comes.ogg")
+            self.game.sound.register_sound('multiball_start_speech', speech_path+"ftp_wind.ogg")
+            self.game.sound.register_sound('multiball_eject_speech', speech_path+"here_it_comes.ogg")
             self.game.sound.register_sound('jackpot_speech', speech_path+"feel_the_power.ogg")
             self.game.sound.register_sound('super_jackpot_speech', speech_path+"feel_the_power.ogg")
 
             self.game.sound.register_music('multiball_play', music_path+"multiball_play.ogg")
 
-            self.flashers = ['bottomRightFlasher','spinnerFlasher','rampTopFlasher','rampUMFlasher','rampLMFlasher','rampBottomFlasher','dropTargetFlasher','compassFlasher']
+            self.flashers = ['rampBottomFlasher','rampLMFlasher','rampUMFlasher','rampTopFlasher','spinnerFlasher','dropTargetFlasher','compassFlasher']
+            self.lightning_flashers = ['lightningLeftFlasher','lightningMiddleFlasher','lightningRightFlasher']
 
             self.balls_needed = 3
             self.balls_in_play = 1
@@ -49,8 +51,9 @@ class Multiball(game.Mode):
             self.super_jackpot_enabled = False
             self.super_jackpot_value = 2000000
             self.next_ball_ready = False
+            self.ramp_lift_timer = 10
 
-            self.lock_lit = False
+            #self.lock_lit = False
             self.mode_running = False
             self.balls_locked = 0
             self.multiball_started = False
@@ -64,9 +67,19 @@ class Multiball(game.Mode):
             self.update_lamps()
 
 
+        def multiball_lamps(self, enable=True):
+            # Start the lamps doing a crazy rotating sequence:
+            schedules = [0xaaaa0000, 0xaaa0000a, 0xaa0000aa, 0xa0000aaa, 0x0000aaaa, 0x000aaaa0, 0x00aaaa00, 0x0aaaa000]
+            for index, lamp in enumerate(sorted(self.game.lamps.items_tagged('compass'), key=lambda lamp: lamp.number)):
+                if enable:
+                    sched = schedules[index%len(schedules)]
+                    lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
+                else:
+                    lamp.disable()
+
         def mode_started(self):
             #set player stats for mode
-            self.lock_lit = self.game.get_player_stats('lock_lit')
+            #self.lock_lit = self.game.get_player_stats('lock_lit')
             self.mode_running = self.game.get_player_stats('mode_running')
             self.balls_locked = self.game.get_player_stats('balls_locked')
             self.multiball_running = self.game.get_player_stats('multiball_running')
@@ -74,6 +87,8 @@ class Multiball(game.Mode):
 
         def mode_stopped(self):
             self.jackpot('cancelled')
+            self.game.set_player_stats('balls_locked',self.balls_locked)
+            #self.game.set_player_stats('lock_lit',self.lock_lit)
 
         
         def mode_tick(self):
@@ -92,6 +107,7 @@ class Multiball(game.Mode):
                     self.multiball_running = True;
                     self.game.set_player_stats('multiball_running',self.multiball_running)
 
+
                 if self.multiball_running:
                     self.multiball_tracking()
 
@@ -105,23 +121,77 @@ class Multiball(game.Mode):
             self.jackpot_worth_text= locale.format("%d", self.jackpot_value, True)+" X"+str(self.jackpot_x)
 
         def display(self, top, bottom, seconds, opaque=True, repeat=False, hold=False, frame_time=3):
-            self.game.score_display.set_text(top.upper(),0,'center',seconds=seconds)
-            self.game.score_display.set_text(bottom.upper(),1,'center',seconds=seconds)
+            self.game.score_display.set_transition_reveal(text=top.upper(),row=0,seconds=seconds)
+            self.game.score_display.set_transition_reveal(text=bottom.upper(),row=1,seconds=seconds)
+
+
+        def strobe_flashers(self,time=0.2):
+            timer = 0
+            repeats = 3
+
+            #lightning flashers
+            self.game.effects.strobe_flasher_set(self.lightning_flashers,time=time,overlap=0.2,repeats=repeats)
+
+            #playfield flashers
+            sequence=[]
+            for j in range(repeats):
+                sequence += self.flashers
+
+            for i in range(len(sequence)):
+
+                def flash(i,time,delay):
+                    self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=sequence[i],style='fast',time=time+0.6))
+
+                flash(i,time,timer)
+                timer+=time
 
 
         def multiball_start(self):
+            #update the flag
+            self.multiball_started = True
+            self.game.set_player_stats('multiball_started',self.multiball_started)
+
             #update display
             self.display(top='feel the power',bottom='of the wind',seconds=3)
-            #kick out balls
-            self.game.switched_coils.drive('leftLockKickback')
-            
+
+            #play speech
+            start_speech_length = self.game.sound.play_voice('multiball_start_speech')
+
             #change music
             self.game.sound.stop_music()
             self.game.sound.play_music('multiball_play',-1)
 
+            #make sure ramp is up
+            self.game.switched_coils.drive('rampLifter')
+            
+            #jackpot lit at start
+            self.jackpot('lit')
+
+            #spin wheels
+            self.spin_wheels()
+
             #turn on ball save
             self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
 
+            self.delay(name='multiball_eject_delay',delay=start_speech_length+1, handler=self.multiball_eject)
+
+
+
+        def multiball_eject(self):
+            #kick out balls
+            self.game.switched_coils.drive('leftLockKickback')
+            #play speech
+            self.game.sound.play_voice('multiball_eject_speech')
+
+            #run flasher effects
+            self.strobe_flashers()
+
+            #start lamp effects
+            self.multiball_lamps()
+
+            #update trough tracking
+            self.game.trough.num_balls_locked = 0
+            self.balls_locked = 0
             
 
         def multiball_tracking(self):
@@ -137,6 +207,9 @@ class Multiball(game.Mode):
                 self.game.set_player_stats('compass_level', self.compass_level+1)
                 #add reset mode call to compass here to set next chase sequence
 
+                #stop spinning wheels
+                self.cancel_delayed('spin_wheels_repeat')
+
                 #change music
                 self.game.sound.stop_music()
                 self.game.sound.play_music('general_play', loops=-1)
@@ -144,15 +217,26 @@ class Multiball(game.Mode):
                 #light jackpot if not collected during multiball otherwise cancel
                 if self.jackpot_collected==0:
                     self.jackpot('lit')
-                    self.delay(name='jackpot_timeout', event_type=None, delay=10, handler=self.jackpot, param='cancelled')
+                    self.delay(name='jackpot_timeout', event_type=None, delay=15, handler=self.jackpot, param='cancelled')
                 else:
                     self.jackpot('cancelled')
-        
 
-        def jackpot_collected_display(self,num):
+
+        def jackpot_helper_display(self):
+            time=3
+            self.display(top='shoot skyway',bottom='to lite jackpot',seconds=time)
+
+
+        def jackpot_collected_display(self):
             time=3
             self.display(top='j a c k p o t',bottom=locale.format("%d", self.jackpot_value*self.jackpot_collected*self.jackpot_x, True),seconds=time)
             self.delay(name='reset_jackpot',delay=time,handler=lambda:self.jackpot('unlit'))
+
+
+        def jackpot_raised_display(self,num):
+            time=2
+            self.jackpot_value+=num
+            self.display(top='jackpot raised',bottom=locale.format("%d", value, True),seconds=time)
 
 
         def jackpot(self,status=None):
@@ -170,20 +254,17 @@ class Multiball(game.Mode):
                     #self.game.sound.play('hit_jackpot')
 
                 elif status=='unlit':
-                    self.game.coils.flasherLiteJackpot.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
-                    self.game.coils.divertorHold.disable()
-                    self.game.coils.topLockupHold.disable()
-
-                    #update display
-                    if self.jackpot_collected<4:
-                        self.multiball_display(self.jackpot_collected)
-                    else:
-                        self.super_jackpot_display()
+                    #put ramp down so jackpot can be relit
+                    self.game.coils['rampDown'].pulse()
+                    #tell player what to do
+                    self.jackpot_helper_display()
+                   
 
                 elif status=='made':
                     self.game.switched_coils.drive('compassFlasher','off')
                     self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)#self.restore_lamps
                     self.strobe_flashers(0.4)
+                    self.game.sound.play_voice('jackpot_speech')
                     self.game.score(self.jackpot_value*self.jackpot_x)
                     self.jackpot_collected+=1
                     self.game.effects.drive_lamp(self.jackpot_lamps[self.jackpot_collected-1],'smarton')
@@ -201,18 +282,7 @@ class Multiball(game.Mode):
                     self.game.switched_coils.drive('compassFlasher','off')
 
 
-        def strobe_flashers(self,time):
-            timer = 0
-            for j in range(3):
-                for i in range(len(self.flashers)):
-
-                    def flash(i,time,delay):
-                        self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=self.flashers[i],style='fast',time=time+0.6))
-
-                    flash(i,time,timer)
-                    timer+=time
-
-
+     
         def super_jackpot_display(self):
             pass
 
@@ -223,19 +293,51 @@ class Multiball(game.Mode):
             self.jackpot_collected=0
 
 
-        def sw_topRightEject_active(self, sw):
+        def spin_wheels(self):
+            num=random.randint(100,200)
+            self.game.coils.spinWheelsMotor.pulse(num)
+            self.delay(name='spin_wheels_repeat',delay=0.5,handler=self.spin_wheels)
+
+
+        #switch handlers
+        #---------------------------
+
+        def sw_rightRampMadeTop_active(self, sw):
             if self.multiball_running:
                 if self.jackpot_status!='lit':
                     self.jackpot('lit')
-                
-                value = 100000
-                self.jackpot_value+=value
-                self.display(top='jackpot raised',bottom=locale.format("%d", value, True),seconds=2)
+
+                #raise jackpot
+                self.jackpot_raised_display(100000)
+
+                #lift ramp for timed period to allow easier jackpot shot
+                self.game.switched_coils.drive('rightRampLifter')
+                self.delay(name='ramp_down_timer',delay=self.ramp_lift_timer,handler=self.game.coils['rampDown'].pulse)
+
+                return procgame.game.SwitchStop
 
 
         def sw_leftRampMadeTop_active(self, sw):
             if self.multiball_running:
                 self.jackpot('made')
+
+                return procgame.game.SwitchStop
+
+
+        #lock handlers to update trough counters once multiball started
+        def sw_lock1_inactive_for_500ms(self, sw):
+            if self.multiball_started:
+                self.game.trough.num_balls_in_play+=1
+
+
+        def sw_lock2_inactive_for_500ms(self, sw):
+            if self.multiball_started:
+                self.game.trough.num_balls_in_play+=1
+
+
+        def sw_lock3_inactive_for_500ms(self, sw):
+            if self.multiball_started:
+                self.game.trough.num_balls_in_play+=1
                 
 
        

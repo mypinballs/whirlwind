@@ -31,6 +31,7 @@ class Player(procgame.game.Player):
                 self.player_stats['lock_lit']=False
                 self.player_stats['multiball_ready']=False
                 self.player_stats['multiball_started']=False
+                self.player_stats['multiball_running']=False
                 self.player_stats['balls_locked']=0
                 self.player_stats['million_lit']=False
                 self.player_stats['ball_start_time']=0

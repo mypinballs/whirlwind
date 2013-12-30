@@ -1,4 +1,13 @@
-#Saucer Mode
+# -------------------------
+# Cellar Mode
+#
+# Awards items from the backbox list
+# Controls Cellar Scoop and Skyway Ramp Entrance
+# Active item is changed by Spinner
+#
+# Copyright (C) 2013 myPinballs, Orange Cloud Software Ltd
+#
+# -------------------------
 
 import procgame
 import locale
@@ -36,6 +45,7 @@ class Cellar(game.Mode):
             self.score_value_start = 5000
             self.super_door_score = 500000
             self.cellar_lit = False
+            self.skyway_open = True
 
         def timeout(self):
             self.reset()
@@ -80,22 +90,51 @@ class Cellar(game.Mode):
         def score(self,value):
             self.game.score(value)
 
+
         def eject(self):
             self.score(self.score_value_start)
             self.game.sound.play('cellar_eject')
-            self.game.coils.cellarKickout.pulse()
-            self.game.switched_coils.drive('rampBottomFlasher','fast',time=1.5)
+            self.game.switched_coils.drive('rampBottomFlasher','fast',time=1.2)
+            self.delay(name='coil_delay', event_type=None, delay=1, handler=self.game.coils.cellarKickout.pulse)
 
+
+        def toggle_skyway_entrance(self):
+            if not self.game.get_player_stats('multiball_running'):
+                if self.skyway_open:
+                    self.game.switched_coils.drive('rampLifter')
+                    self.skyway_open = False
+                else:
+                    self.game.coils['rampDown'].pulse()
+                    self.skyway_open = True
+
+
+        #switch handlers
+        #-----------------------
+        
         def sw_leftCellar_active(self, sw):
             self.update_count()
-            if self.cellar_lit:
-                self.cellar_award()
+            wait=0
+
+            if not self.game.get_player_stats('multiball_running'):
+                if not self.game.get_player_stats('lock_lit'):
+                    self.toggle_skyway_entrance()
+            
+                if self.cellar_lit:
+                    self.cellar_award()
+                else:
+                    
+                    num = random.randint(0,10)
+                    if num>3: #only play speech 'sometimes'
+                        wait=self.game.sound.play_voice('cellar_unlit')
+                    self.delay(name='eject_delay',delay=wait, handler=self.eject)
             else:
-                wait=self.game.sound.play_voice('cellar_unlit')
-                self.delay(name='eject_delay',delay=wait, handler=self.eject)
+                 self.delay(name='eject_delay',delay=wait, handler=self.eject)
+
 
         def sw_rightInlane_active(self, sw):
-            self.lite_cellar(20)
+            if not self.game.get_player_stats('multiball_running'):
+                self.lite_cellar(20)
+
 
         def sw_spinner_active(self, sw):
             pass
