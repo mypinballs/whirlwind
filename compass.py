@@ -197,10 +197,17 @@ class Compass(game.Mode):
 
 
         def spin_wheels(self):
-            num=random.randint(50,200)
+            num=random.randint(50,150)
             self.game.coils.spinWheelsMotor.pulse(num)
             self.delay(name='spin_wheels_repeat',delay=0.8,handler=self.spin_wheels)
 
+
+        def million_flasher(self,enable=True):
+            if enable:
+                self.log.debug('Million Flasher should start flashing now')
+                self.game.switched_coils.drive(name='rampUMFlasher',style='fast',time=0)#schedule million flasher
+            else:
+                self.game.switched_coils.disable(name='rampUMFlasher')
             
             
         def ball_locked(self):
@@ -213,8 +220,8 @@ class Compass(game.Mode):
 
                 self.game.sound.stop_music()
                 self.game.sound.play_music('general_play',-1)
-                self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_over'))
-
+                #self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_over'))
+                self.game.sound.play_voice('storm_over')
                 self.lock_lit=False
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
@@ -225,16 +232,19 @@ class Compass(game.Mode):
                     self.game.coils['rampDown'].pulse()
                     self.game.effects.drive_lamp('lock','off')
 
-                self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming'))
+                #self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming'))
+                self.game.sound.play_voice('storm_coming')
+                #set release lamp
                 self.game.effects.drive_lamp('release','fast')
-                self.log.debug('Million FLasher should start flashing now')
-                self.game.switched_coils.drive(name='rampUMFlasher',style='fast',time=0)#schedule million flasher
+                #queue million flasher
+                self.delay(delay=1,handler=self.million_flasher)
+
+            #queue the next ball launch
+            self.delay(name='launch_next_ball',delay=0.5,handler=self.launch_next_ball)
 
 
         def launch_next_ball(self):
-            if self.virtual_lock:
-                self.game.switched_coils.drive('topEject') #TODO: this can be removed as skyway should handle the eject saucer with corect delay
-            else:
+            if not self.virtual_lock: #skyway should handle the eject saucer with corect delay if virtual lock
                 self.game.trough.launch_balls(1,stealth=False) #stealth false, bip +1
             self.next_ball_ready = True
             self.virtual_lock = False
@@ -329,8 +339,7 @@ class Compass(game.Mode):
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
                 self.game.effects.drive_lamp('release','off')
-                self.game.switched_coils.drive(name='rampUMFlasher',style='off')# million flasher
-                
+                self.million_flasher(enable=False)
 
                 self.reset_lamps()
 
@@ -341,8 +350,8 @@ class Compass(game.Mode):
                 if self.balls_locked<2:
                     self.reset()
 
-                #queue next ball launch.
-                self.delay(name='next_ball_launch',delay=2,handler=self.launch_next_ball)
+                #queue next ball launch. - removed added to ball_locked method
+                #self.delay(name='next_ball_launch',delay=2,handler=self.launch_next_ball)
 
 
 
@@ -417,7 +426,7 @@ class Compass(game.Mode):
 #            else:
 #                self.game.switched_coils.drive('topEject')
 
-        #start multiball via ramp - TODO: check - possible removal of this
+        #start multiball via left ramp
         def sw_leftRampMadeTop_active(self, sw):
             if self.balls_locked==2 and self.lock_lit:
                 self.lock_manager()

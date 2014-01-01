@@ -170,23 +170,15 @@ class Multiball(game.Mode):
             self.game.sound.stop_music()
             self.game.sound.play_music('multiball_play',-1)
 
-            #make sure ramp is up
-            self.game.switched_coils.drive('rampLifter')
             
-            #jackpot lit at start
-            self.jackpot('lit')
-
-            #spin wheels
-            self.spin_wheels()
-
-            #turn on ball save
-            self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
-
             self.delay(name='multiball_eject_delay',delay=start_speech_length+1, handler=self.multiball_eject)
 
 
         def multiball_eject(self):
             self.log.debug('multiball eject reached')
+
+            #make sure ramp is up
+            self.game.switched_coils.drive('rampLifter')
             
             #kick out balls
             self.game.switched_coils.drive('leftLockKickback')
@@ -202,11 +194,20 @@ class Multiball(game.Mode):
             
 
         def multiball_effects(self):
+            #jackpot lit at start
+            self.jackpot('lit')
+
+            #spin wheels
+            self.spin_wheels()
+
             #run flasher effects
             self.strobe_flashers()
 
             #start lamp effects
             self.multiball_lamps()
+
+            #turn on ball save
+            self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
             
 
         def multiball_tracking(self):
@@ -260,7 +261,7 @@ class Multiball(game.Mode):
          
                 if status=='lit':
                     #set flasher
-                    self.game.switched_coils.drive('compassFlasher','medium')
+                    self.game.switched_coils.drive(name='compassFlasher',style='medium',time=0)
                     #update display
                     self.display(top='jackpot lit',bottom='',seconds=2)
                     #update score
@@ -276,7 +277,7 @@ class Multiball(game.Mode):
                    
 
                 elif status=='made':
-                    self.game.switched_coils.drive('compassFlasher','off')
+                    self.game.switched_coils.disable('compassFlasher')
                     self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)#self.restore_lamps
                     self.strobe_flashers(0.4)
                     self.game.sound.play_voice('jackpot_speech')
@@ -309,7 +310,7 @@ class Multiball(game.Mode):
 
 
         def spin_wheels(self):
-            num=random.randint(100,200)
+            num=random.randint(50,200)
             self.game.coils.spinWheelsMotor.pulse(num)
             self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
 

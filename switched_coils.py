@@ -33,7 +33,7 @@ class SwitchedCoils(game.Mode):
                 if name==self.a_coils[i]:
                     #experimental a side - allow for switching of relay and restore (for flashers that are previously scheduled)
                     self.game.coils.acSelect.disable()
-                    wait=0.05
+                    wait=0.05 #50ms
                     self.delay(delay=wait,handler=self.game.coils[self.a_coils[i]].pulse)
                     wait=self.game.coils[self.a_coils[i]].default_pulse_time
                     self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
@@ -59,6 +59,13 @@ class SwitchedCoils(game.Mode):
              elif self.switch_tries<10:
                  self.delay(name='cside_retry',delay=0.1,handler=self.flasher,param=data)
                  self.switch_tries+=1
+
+        #disable the drive
+        def disable(self,name):
+            for i in range(len(self.a_coils)):
+                if name==self.a_coils[i] or name==self.c_coils[i]:
+                    self.game.coils[self.a_coils[i]].disable()
+
 
         #switch handlers
         def sw_csidePower_active(self, sw):

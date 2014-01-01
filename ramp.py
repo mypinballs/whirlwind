@@ -119,7 +119,7 @@ class Ramp(game.Mode):
             self.game.sound.play('made_left_ramp')
 
         def spin_wheels(self):
-            self.game.coils.spinWheelsMotor.pulse()
+            self.game.coils.spinWheelsMotor.pulse(200)
 
         def check_combo(self):
             #combo is left loop then ramp - gives double skyway tolls

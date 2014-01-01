@@ -1,6 +1,9 @@
 # -------------------------
-# Spinner Mode
+# Spinner Mode - possible mode name change to OUter Loops
 #
+# Controls Spinner Value
+# Cellar award change controlled in cellar mode
+# Effects for Outer Loops 
 #
 # Copyright (C) 2013 myPinballs, Orange Cloud Software Ltd
 #
@@ -86,18 +89,18 @@ class Spinner(game.Mode):
 #
 #            self.game.effects.strobe_flasher_set(self.flashers,time=0.07,overlap=0.02,repeats=3)
 
-        def strobe_flashers(self,time=0.2):
+        def strobe_flashers(self,flashers,time=0.1):
             timer = 0
             repeats = 1
 
             sequence=[]
             for j in range(repeats):
-                sequence += self.flashers
+                sequence += flashers
 
             for i in range(len(sequence)):
 
                 def flash(i,time,delay):
-                    self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=sequence[i],style='fast',time=time+0.2))
+                    self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=sequence[i],style='super',time=time+0.1))
 
                 flash(i,time,timer)
                 timer+=time
@@ -115,9 +118,14 @@ class Spinner(game.Mode):
 
         def sw_rightLoopTop_active(self,sw):
             if self.game.switches.rightLoopBottom.time_since_change()<=0.5:
-                self.strobe_flashers()
+                self.strobe_flashers(self.flashers)
+
+        def sw_leftLoopTop_active(self,sw):
+            if self.game.switches.leftLoopBottom.time_since_change()<=0.5:
+                self.flashers.reverse()
+                self.strobe_flashers(self.flashers)
 
         def sw_leftInlane_active(self,sw):
             self.game.switched_coils.drive(name='spinnerFlasher',style='fast',time=self.spinner_double_timer)
-            self.game.effects.drive_lamp('rightSpinner','fast',self.spinner_double_timer)
+            self.game.effects.drive_lamp('rightSpinner','timeout',self.spinner_double_timer)
 

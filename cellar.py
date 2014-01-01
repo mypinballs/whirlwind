@@ -140,7 +140,7 @@ class Cellar(game.Mode):
         
         def sw_leftCellar_active_for_250ms(self, sw):
             self.update_count()
-            wait=0
+            wait=0.1
 
             if not self.game.get_player_stats('multiball_running'):
                 if not self.game.get_player_stats('lock_lit'):

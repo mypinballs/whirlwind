@@ -281,7 +281,7 @@ PRCoils:
 #        label: 'Spinner Flasher'
     rampLifter:
         number: C03
-        pulseTime: 60
+        pulseTime: 70
         tags: A
         label: 'Right Ramp Lifter'
 #    rampTopFlasher:
