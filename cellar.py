@@ -34,18 +34,22 @@ class Cellar(game.Mode):
             self.game.sound.register_sound('cellar_unlit', speech_path+"no_storm_now.ogg")
             self.game.sound.register_sound('cellar_unlit', speech_path+"now_get_out.ogg")
             self.game.sound.register_sound('cellar_eject', sound_path+"cellar_eject.ogg")
+            self.game.sound.register_sound('door_knock', sound_path+"5knocks2.ogg")
 
             self.reset()
 
-            self.awards_text_top = ['SUPER DOOR SCORE']
-            self.awards_text_bottom = ['500K']
+            self.awards_text_top = ['Upper Super Jets','Big Points','Extra Ball Lit','3-Bank','Super Door Score','Lite Million','Lower Super Jets']
+            self.awards_text_bottom = ['100K per pop','250K','','100K','500K','','100K per pop']
+            self.lamps = ['scUpperJetsOn','sc250k','scExtraBall','sc3Bank100k','sc500k','scMillion','scLowerJetsOn']
 
         def reset(self):
             self.score_value_boost = 1000
             self.score_value_start = 5000
             self.super_door_score = 500000
+            self.big_points = 250000
             self.cellar_lit = False
             self.skyway_open = True
+            self.award_id = 0
 
         def timeout(self):
             self.reset()
@@ -57,21 +61,43 @@ class Cellar(game.Mode):
             else:
                 self.game.effects.drive_lamp('rightCellarSign','off')
 
+            for lamp in self.lamps:
+                self.game.effects.drive_lamp(lamp,'off')
+            self.game.effects.drive_lamp(self.lamps[self.award_id],'medium')
+
         def mode_started(self):
             self.cellar_visits = self.game.get_player_stats('cellar_visits')
+            self.change_award()
             
         def mode_stopped(self):
             self.game.set_player_stats('cellar_visits',self.cellar_visits)
 
         def cellar_award(self):
-            award = 0 #temp fix
-            if award==0:
+            if self.award_id==0:
+                pass
+            elif self.award_id==1:
+                self.score(self.big_points)
+            elif self.award_id==2:
+                pass
+                #self.game.extra_ball.lit()
+            elif self.award_id==3:
+                pass
+            elif self.award_id==4:
                 self.score(self.super_door_score)
+            elif self.award_id==5:
+                pass
+            elif self.award_id==6:
+                pass
 
-            self.game.score_display.set_text(self.awards_text_top[award],0,'center',seconds=2)
-            self.game.score_display.set_text(self.awards_text_bottom[award],1,'center',seconds=2)
+            self.game.score_display.set_text(self.awards_text_top[self.award_id],0,'center',seconds=2)
+            self.game.score_display.set_text(self.awards_text_bottom[self.award_id],1,'center',seconds=2)
 
-            self.delay(name='eject_delay',delay=4, handler=self.eject)
+            self.delay(name='eject_delay',delay=2, handler=self.eject)
+
+        def change_award(self):
+            num = random.randint(0,6)
+            self.award_id = num
+            self.update_lamps()
 
         def lite_cellar(self,num=0):
             self.cellar_lit = True
@@ -108,10 +134,11 @@ class Cellar(game.Mode):
                     self.skyway_open = True
 
 
+
         #switch handlers
         #-----------------------
         
-        def sw_leftCellar_active(self, sw):
+        def sw_leftCellar_active_for_250ms(self, sw):
             self.update_count()
             wait=0
 
@@ -120,11 +147,13 @@ class Cellar(game.Mode):
                     self.toggle_skyway_entrance()
             
                 if self.cellar_lit:
-                    self.cellar_award()
+                    wait =self.game.sound.play('door_knock')
+                    self.delay(name='award_delay',delay=wait, handler=self.cellar_award)
+                    
                 else:
                     
                     num = random.randint(0,10)
-                    if num>3: #only play speech 'sometimes'
+                    if num>3 and not self.game.get_player_stats('lock_lit'): #only play speech 'sometimes' and not when lock it lit
                         wait=self.game.sound.play_voice('cellar_unlit')
                     self.delay(name='eject_delay',delay=wait, handler=self.eject)
             else:
@@ -137,4 +166,4 @@ class Cellar(game.Mode):
 
 
         def sw_spinner_active(self, sw):
-            pass
+            self.change_award()

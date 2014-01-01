@@ -91,7 +91,7 @@ class Ramp(game.Mode):
 
         def update_tolls(self):
             if self.combo or self.super_combo:
-                tolls = self.skyway.inc_tolls(self.skyway_toll_boost*self.combo_multipier)
+                tolls = self.skyway.inc_tolls(self.skyway_toll_boost*self.combo_multiplier)
             else:
                 tolls = self.skyway.inc_tolls(self.skyway_toll_boost)
 
@@ -125,8 +125,8 @@ class Ramp(game.Mode):
             #combo is left loop then ramp - gives double skyway tolls
             #super combo is left loop, inner loop then ramp - gives 10 times max skyway value (1 million)
     
-            if self.game.switches.leftLoopTop.time_since_change()<=3 and self.game.switches.rightLoopBottom.time_since_change()<=1:
-                if self.game.switches.innerLoop.time_since_change()<=1:
+            if self.game.switches.leftLoopTop.time_since_change()<=4 and self.game.switches.rightLoopBottom.time_since_change()<=3:
+                if self.game.switches.innerLoop.time_since_change()<=2:
                     self.super_combo = True
                 else:
                     self.combo = True

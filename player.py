@@ -38,5 +38,7 @@ class Player(procgame.game.Player):
                 self.player_stats['drop_banks_completed']=0
                 self.player_stats['skillshot_level']=1
                 self.player_stats['skillshot_in_progress']=False
+                self.player_stats['mode_running']=False
+                self.player_stats['spinner_level']=0
 
 		

@@ -5,6 +5,7 @@ import logging
 import time
 from procgame import *
 from bonus import *
+from spinner import *
 from pops import *
 from tornado import *
 from skyway import *
@@ -136,6 +137,7 @@ class BaseGameMode(game.Mode):
         def add_basic_modes(self,ball_in_play):
 
             #lower priority basic modes
+            self.spinner = Spinner(self.game, 40)
             self.pops = Pops(self.game, 40)
             self.drops = Drops(self.game,41)
             self.tornado = Tornado(self.game,41)
@@ -153,14 +155,15 @@ class BaseGameMode(game.Mode):
             #higher priority basic modes
 
             
-
             #start modes
+            self.game.modes.add(self.spinner)
             self.game.modes.add(self.pops)
             self.game.modes.add(self.drops)
             self.game.modes.add(self.tornado)
             self.game.modes.add(self.skyway)
             self.game.modes.add(self.cellar)
             self.game.modes.add(self.ramp)
+            self.game.modes.add(self.multiball)
             self.game.modes.add(self.compass)
             self.game.modes.add(self.skillshot)
             

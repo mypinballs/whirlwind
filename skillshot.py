@@ -65,6 +65,7 @@ class Skillshot(game.Mode):
         
         def mode_stopped(self):
             self.game.set_player_stats('skillshot_level',self.level)
+            self.game.set_player_stats('skillshot_in_progress',self.skillshot_in_progress)
            
             self.cancel_delayed('lamp_delay')
             self.cancel_delayed('lamp_repeat')
@@ -78,6 +79,7 @@ class Skillshot(game.Mode):
 
 
         def clear(self):
+            self.skillshot_in_progress = False
             self.game.modes.remove(self)
 
         def reset_lamps(self):

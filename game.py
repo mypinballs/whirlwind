@@ -29,6 +29,10 @@ from time import strftime
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logging.getLogger('whirlwind.alpha_display').setLevel(logging.DEBUG)
+logging.getLogger('whirlwind.switched_coils').setLevel(logging.DEBUG)
+logging.getLogger('whirlwind.multiball').setLevel(logging.DEBUG)
+logging.getLogger('whirlwind.compass').setLevel(logging.DEBUG)
+
 
 #os.chdir("/Users/jim/Documents/Pinball/p-roc/p-roc system/src/pyprocgame/")
 
@@ -113,7 +117,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.4'
+                self.system_version='0.2.5'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time

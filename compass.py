@@ -53,14 +53,14 @@ class Compass(game.Mode):
             self.balls_needed =3
 
             self.next_ball_ready = False
+            self.virtual_lock = False
 
 
         def reset(self):
             self.shots_made = 0
             self.set_complete = 0
             self.game.coils.divertor.disable()
-            self.virtual_lock = False
-
+            
             for i in range(len(self.flags)):#reset flags
                 self.flags[i]=0
 
@@ -126,11 +126,14 @@ class Compass(game.Mode):
 
             self.lock_lit = self.game.get_player_stats('lock_lit')
             self.balls_locked =  self.game.get_player_stats('balls_locked')
-            self.multiball_started = False
+            #self.multiball_started = False
             self.multiball_ready = self.game.get_player_stats('multiball_ready')
 
-            #setup the compass
-            self.reset()
+            if self.lock_lit:
+                self.lock_ready()
+            else:
+                #setup the compass - flags are reset here so partial set completion is lost
+                self.reset()
 
             
         def mode_stopped(self):
@@ -201,12 +204,13 @@ class Compass(game.Mode):
             
             
         def ball_locked(self):
-            #stop the spinning wheels
-            self.cancel_delayed('spin_wheels_repeat')
-
+            
             self.display_status_text(top='ball '+str(self.balls_locked)+' locked',bottom='',seconds=2)
 
             if self.balls_locked<2:
+                #stop the spinning wheels
+                self.cancel_delayed('spin_wheels_repeat')
+
                 self.game.sound.stop_music()
                 self.game.sound.play_music('general_play',-1)
                 self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_over'))
@@ -215,18 +219,21 @@ class Compass(game.Mode):
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
             else:
-                if self.compass_level==1: #allow start via saucer for first multiball
+                if self.compass_level==2: #allow start via saucer for first multiball
                     self.game.switched_coils.drive('rightRampLifter')
                 else:
+                    self.game.coils['rampDown'].pulse()
                     self.game.effects.drive_lamp('lock','off')
 
                 self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming'))
                 self.game.effects.drive_lamp('release','fast')
+                self.log.debug('Million FLasher should start flashing now')
+                self.game.switched_coils.drive(name='rampUMFlasher',style='fast',time=0)#schedule million flasher
 
 
         def launch_next_ball(self):
             if self.virtual_lock:
-                self.game.switched_coils.drive('topEject')
+                self.game.switched_coils.drive('topEject') #TODO: this can be removed as skyway should handle the eject saucer with corect delay
             else:
                 self.game.trough.launch_balls(1,stealth=False) #stealth false, bip +1
             self.next_ball_ready = True
@@ -287,7 +294,7 @@ class Compass(game.Mode):
 
 
         def progress(self,num):
-            if self.flags[num]==1:
+            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started'):
                 self.flags[num]=2
                 self.log.debug('Compasss Flags Status:%s',self.flags)
 
@@ -306,10 +313,12 @@ class Compass(game.Mode):
         def lock_manager(self):
             self.balls_locked+=1
             self.game.set_player_stats('balls_locked', self.balls_locked)
+            self.game.coils.divertor.disable()
 
-            #update trough
-            self.game.trough.num_balls_locked +=1
-            self.game.trough.num_balls_in_play -=1
+
+            if not self.virtual_lock: #update trough tracking if physical game lock
+                self.game.trough.num_balls_locked +=1
+                self.game.trough.num_balls_in_play -=1
 
             if self.balls_locked==self.balls_needed:
                 #set flag
@@ -320,13 +329,20 @@ class Compass(game.Mode):
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
                 self.game.effects.drive_lamp('release','off')
-                self.game.coils.divertor.disable()
+                self.game.switched_coils.drive(name='rampUMFlasher',style='off')# million flasher
+                
+
+                self.reset_lamps()
 
             else:
                 self.ball_locked()
-                self.launch_next_ball()
+
                 self.compass_level+=1
-                self.reset()
+                if self.balls_locked<2:
+                    self.reset()
+
+                #queue next ball launch.
+                self.delay(name='next_ball_launch',delay=2,handler=self.launch_next_ball)
 
 
 
@@ -368,7 +384,7 @@ class Compass(game.Mode):
         def sw_rightRampMadeTop_active(self, sw):
             if self.lock_lit:
                 self.game.coils.divertor.patter(original_on_time=30, on_time=2, off_time=20)
-
+                self.delay(delay=5,handler=self.game.coils.divertor.disable) #disable divertor pwm after 5 sec - safety
 
         #lock lane switches
         def sw_lock1_active_for_500ms(self, sw):

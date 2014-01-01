@@ -10,6 +10,7 @@ __date__ ="$Jan 18, 2011 1:36:37 PM$"
 import procgame
 import locale
 import random
+import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -23,6 +24,7 @@ class Multiball(game.Mode):
 
 	def __init__(self, game, priority):
             super(Multiball, self).__init__(game, priority)
+            self.log = logging.getLogger('whirlwind.multiball')
 
             self.game.sound.register_sound('jackpot_attempt', sound_path+"jackpot_attempt.ogg")
             self.game.sound.register_sound('multiball_start_speech', speech_path+"ftp_wind.ogg")
@@ -32,7 +34,7 @@ class Multiball(game.Mode):
 
             self.game.sound.register_music('multiball_play', music_path+"multiball_play.ogg")
 
-            self.flashers = ['rampBottomFlasher','rampLMFlasher','rampUMFlasher','rampTopFlasher','spinnerFlasher','dropTargetFlasher','compassFlasher']
+            self.flashers = ['rampBottomFlasher','rampLMFlasher','rampUMFlasher','rampTopFlasher','spinnerFlasher','bottomRightFlasher']
             self.lightning_flashers = ['lightningLeftFlasher','lightningMiddleFlasher','lightningRightFlasher']
 
             self.balls_needed = 3
@@ -78,12 +80,14 @@ class Multiball(game.Mode):
                     lamp.disable()
 
         def mode_started(self):
+            self.log.debug('multiball mode started')
+
             #set player stats for mode
             #self.lock_lit = self.game.get_player_stats('lock_lit')
             self.mode_running = self.game.get_player_stats('mode_running')
             self.balls_locked = self.game.get_player_stats('balls_locked')
             self.multiball_running = self.game.get_player_stats('multiball_running')
-            self.multiball_started = self.game.get_player_stats('multiball_started')
+            #self.multiball_started = self.game.get_player_stats('multiball_started')
 
         def mode_stopped(self):
             self.jackpot('cancelled')
@@ -98,8 +102,10 @@ class Multiball(game.Mode):
                 #debug
                 #self.balls_in_play=3
                 #-------------------------------------------
-                #debug_ball_data = str(self.balls_in_play)+":"+str(self.game.trough.num_balls())+":"+str(self.game.trough.num_balls_locked)+":"+str(self.game.trough.num_balls_to_launch)+":"+str(self.multiball_running)
+                debug_ball_data = str(self.balls_in_play)+":"+str(self.game.trough.num_balls())+":"+str(self.game.trough.num_balls_locked)+":"+str(self.game.trough.num_balls_to_launch)+":"+str(self.multiball_running)
                 #self.game.set_status(debug_ball_data)
+                self.game.score_display.set_text(debug_ball_data.upper(),1,'left')
+                self.log.debug(debug_ball_data)
                 #-------------------------------------------
 
                 if self.balls_in_play==self.balls_needed and self.multiball_running==False:
@@ -127,10 +133,10 @@ class Multiball(game.Mode):
 
         def strobe_flashers(self,time=0.2):
             timer = 0
-            repeats = 3
+            repeats = 4
 
             #lightning flashers
-            self.game.effects.strobe_flasher_set(self.lightning_flashers,time=time,overlap=0.2,repeats=repeats)
+            #self.game.effects.strobe_flasher_set(self.lightning_flashers,time=time,overlap=0.2,repeats=repeats)
 
             #playfield flashers
             sequence=[]
@@ -147,16 +153,19 @@ class Multiball(game.Mode):
 
 
         def multiball_start(self):
+            self.log.debug('multiball start reached')
+
             #update the flag
             self.multiball_started = True
             self.game.set_player_stats('multiball_started',self.multiball_started)
+
 
             #update display
             self.display(top='feel the power',bottom='of the wind',seconds=3)
 
             #play speech
             start_speech_length = self.game.sound.play_voice('multiball_start_speech')
-
+            
             #change music
             self.game.sound.stop_music()
             self.game.sound.play_music('multiball_play',-1)
@@ -176,22 +185,28 @@ class Multiball(game.Mode):
             self.delay(name='multiball_eject_delay',delay=start_speech_length+1, handler=self.multiball_eject)
 
 
-
         def multiball_eject(self):
+            self.log.debug('multiball eject reached')
+            
             #kick out balls
             self.game.switched_coils.drive('leftLockKickback')
             #play speech
             self.game.sound.play_voice('multiball_eject_speech')
 
+            #update trough tracking
+            self.game.trough.num_balls_locked = 0
+            self.balls_locked = 0
+            
+            #queue multiball effects
+            self.delay(name='multiball_effects_delay',delay=0.5, handler=self.multiball_effects)
+            
+
+        def multiball_effects(self):
             #run flasher effects
             self.strobe_flashers()
 
             #start lamp effects
             self.multiball_lamps()
-
-            #update trough tracking
-            self.game.trough.num_balls_locked = 0
-            self.balls_locked = 0
             
 
         def multiball_tracking(self):
@@ -236,7 +251,7 @@ class Multiball(game.Mode):
         def jackpot_raised_display(self,num):
             time=2
             self.jackpot_value+=num
-            self.display(top='jackpot raised',bottom=locale.format("%d", value, True),seconds=time)
+            self.display(top='jackpot now',bottom=locale.format("%d", self.jackpot_value, True),seconds=time)
 
 
         def jackpot(self,status=None):
@@ -296,7 +311,7 @@ class Multiball(game.Mode):
         def spin_wheels(self):
             num=random.randint(100,200)
             self.game.coils.spinWheelsMotor.pulse(num)
-            self.delay(name='spin_wheels_repeat',delay=0.5,handler=self.spin_wheels)
+            self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
 
 
         #switch handlers

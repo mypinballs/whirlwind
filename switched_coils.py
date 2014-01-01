@@ -31,14 +31,23 @@ class SwitchedCoils(game.Mode):
         def drive(self,name,style='medium',cycle=0,time=2):
             for i in range(len(self.a_coils)):
                 if name==self.a_coils[i]:
+                    #experimental a side - allow for switching of relay and restore (for flashers that are previously scheduled)
                     self.game.coils.acSelect.disable()
-                    self.game.coils[self.a_coils[i]].pulse()
+                    wait=0.05
+                    self.delay(delay=wait,handler=self.game.coils[self.a_coils[i]].pulse)
+                    wait=self.game.coils[self.a_coils[i]].default_pulse_time
+                    self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
+
+                    self.log.debug('Switched Coil Pulsed:%s',name)
+
                 elif name==self.c_coils[i]:
                     self.game.coils.acSelect.enable()
                     if self.game.ac_relay.is_working():
                         self.switch_tries=0
                         data = [self.a_coils[i],style,cycle,time]
                         self.flasher(data)
+
+                    self.log.debug('Flasher Scheduled:%s',name)
 
         #flasher control - check that ac relay is switched before starting effect
         #try 10 times before giving up  - TODO - inform ac relay mode that relay is bust in this case
