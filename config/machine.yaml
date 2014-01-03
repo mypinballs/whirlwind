@@ -477,35 +477,35 @@ PRLamps:
     sCompass:
         number: L31
         label: 'South Compass'
-        tag: 'compass'
+        tags: compass
     swCompass:
         number: L32
         label: 'South West Compass'
-        tag: 'compass'
+        tags: compass
     wCompass:
         number: L33
         label: 'West Compass'
-        tag: 'compass'
+        tags: compass
     nwCompass:
         number: L34
         label: 'North West Compass'
-        tag: 'compass'
+        tags: compass
     nCompass:
         number: L35
         label: 'North Compass'
-        tag: 'compass'
+        tags: compass
     neCompass:
         number: L36
         label: 'North East Compass'
-        tag: 'compass'
+        tags: compass
     eCompass:
         number: L37
         label: 'East Compass'
-        tag: 'compass'
+        tags: compass
     seCompass:
         number: L38
         label: 'South East Compass'
-        tag: 'compass'
+        tags: compass
     #col4
     toll1:
         number: L41

@@ -73,8 +73,12 @@ class Skillshot(game.Mode):
 
             #stop shooter grove and play main play music
             self.game.sound.stop_music()
-            #start main play tune
-            self.game.sound.play_music('general_play', loops=-1)
+
+            #start main play tunes
+            if self.game.get_player_stats('lock_lit'):
+                self.game.sound.play_music('lock_lit',loops=-1)
+            else:
+                self.game.sound.play_music('general_play', loops=-1)
 
 
 

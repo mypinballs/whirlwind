@@ -35,7 +35,7 @@ class SwitchedCoils(game.Mode):
                     self.game.coils.acSelect.disable()
                     wait=0.05 #50ms
                     self.delay(delay=wait,handler=self.game.coils[self.a_coils[i]].pulse)
-                    wait=self.game.coils[self.a_coils[i]].default_pulse_time
+                    wait+=self.game.coils[self.a_coils[i]].default_pulse_time
                     self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
 
                     self.log.debug('Switched Coil Pulsed:%s',name)

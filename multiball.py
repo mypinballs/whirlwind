@@ -171,7 +171,7 @@ class Multiball(game.Mode):
             self.game.sound.play_music('multiball_play',-1)
 
             
-            self.delay(name='multiball_eject_delay',delay=start_speech_length+1, handler=self.multiball_eject)
+            self.delay(name='multiball_eject_delay',delay=start_speech_length+0.5, handler=self.multiball_eject)
 
 
         def multiball_eject(self):
@@ -260,8 +260,10 @@ class Multiball(game.Mode):
                 self.jackpot_status = status
          
                 if status=='lit':
-                    #set flasher
-                    self.game.switched_coils.drive(name='compassFlasher',style='medium',time=0)
+                    #set lamp
+                    self.game.effects.drive_lamp('millionPlus','fast')
+                    #set flasher for timed period
+                    self.game.switched_coils.drive(name='compassFlasher',style='fast',time=1)
                     #update display
                     self.display(top='jackpot lit',bottom='',seconds=2)
                     #update score
@@ -277,7 +279,9 @@ class Multiball(game.Mode):
                    
 
                 elif status=='made':
-                    self.game.switched_coils.disable('compassFlasher')
+                    self.game.effects.drive_lamp('millionPlus','off')
+                    #self.game.switched_coils.disable('compassFlasher')
+
                     self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)#self.restore_lamps
                     self.strobe_flashers(0.4)
                     self.game.sound.play_voice('jackpot_speech')
@@ -295,7 +299,8 @@ class Multiball(game.Mode):
 
                     
                 elif status=='cancelled':
-                    self.game.switched_coils.drive('compassFlasher','off')
+                    self.game.effects.drive_lamp('millionPlus','off')
+                    #self.game.switched_coils.disable('compassFlasher')
 
 
      

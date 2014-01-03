@@ -144,6 +144,8 @@ class BaseGameMode(game.Mode):
             self.skyway = Skyway(self.game,42,self.tornado)
             self.cellar = Cellar(self.game,43)
             self.ramp = Ramp(self.game,44,self.skyway,self.cellar)
+            #exp-  link method
+            self.cellar.lite_million = self.ramp.lite_million
 
 
 
@@ -286,6 +288,7 @@ class BaseGameMode(game.Mode):
 
         
         def sw_outhole_active(self,sw):
+            if not self.game.get_player_stats('multiball_running'):#and not self.game.ball_save.trough_enable_ball_save:
                 self.game.sound.stop_music();
                 self.game.sound.play_music('end',loops=0)
                 

@@ -28,7 +28,7 @@ class Spinner(game.Mode):
 
             self.log = logging.getLogger('whirlwind.spinner')
 
-            self.game.sound.register_sound('spinner', sound_path+"super_pop_1.ogg")
+            self.game.sound.register_sound('spinner', sound_path+"sling_2.ogg")
 
             self.flashers = ['bottomRightFlasher','rampTopFlasher','rampUMFlasher','rampLMFlasher','rampBottomFlasher']
             #var setup
@@ -122,8 +122,9 @@ class Spinner(game.Mode):
 
         def sw_leftLoopTop_active(self,sw):
             if self.game.switches.leftLoopBottom.time_since_change()<=0.5:
-                self.flashers.reverse()
-                self.strobe_flashers(self.flashers)
+                flashers = self.flashers
+                flashers.reverse()
+                self.strobe_flashers(flashers)
 
         def sw_leftInlane_active(self,sw):
             self.game.switched_coils.drive(name='spinnerFlasher',style='fast',time=self.spinner_double_timer)

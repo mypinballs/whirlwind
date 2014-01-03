@@ -42,6 +42,8 @@ class Cellar(game.Mode):
             self.awards_text_bottom = ['100K per pop','250K','','100K','500K','','100K per pop']
             self.lamps = ['scUpperJetsOn','sc250k','scExtraBall','sc3Bank100k','sc500k','scMillion','scLowerJetsOn']
 
+            self.lite_million = None #def for callback linkup
+
         def reset(self):
             self.score_value_boost = 1000
             self.score_value_start = 5000
@@ -85,7 +87,7 @@ class Cellar(game.Mode):
             elif self.award_id==4:
                 self.score(self.super_door_score)
             elif self.award_id==5:
-                pass
+                self.lite_million() # populated by 'callback' linkup in base.py
             elif self.award_id==6:
                 pass
 
@@ -98,6 +100,9 @@ class Cellar(game.Mode):
             num = random.randint(0,6)
             self.award_id = num
             self.update_lamps()
+
+
+
 
         def lite_cellar(self,num=0):
             self.cellar_lit = True
