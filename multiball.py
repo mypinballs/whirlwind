@@ -282,7 +282,8 @@ class Multiball(game.Mode):
                     self.game.effects.drive_lamp('millionPlus','off')
                     #self.game.switched_coils.disable('compassFlasher')
 
-                    self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)#self.restore_lamps
+                    #TODO add lampshows
+                    #self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)#self.restore_lamps
                     self.strobe_flashers(0.4)
                     self.game.sound.play_voice('jackpot_speech')
                     self.game.score(self.jackpot_value*self.jackpot_x)

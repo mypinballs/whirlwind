@@ -1,0 +1,5 @@
+# red flashers
+coil:flasherEternalLife         | .       .       .       .      
+coil:flasherSpecial             |    .       .       .       .
+coil:flasherSuperJackpot        |       .       .       .       .
+coil:flasherPlaneGuns           |          .       .       .       .

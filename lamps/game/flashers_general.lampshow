@@ -1,0 +1,5 @@
+# red flashers
+coil:flasherLeftRamp             | .      .      .      .
+coil:flasherRightRamp            |  .      .      .      .
+coil:flasherLeftSide             |   .      .      .      .
+coil:flasherRightSide            |    .      .      .      .

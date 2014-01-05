@@ -1,5 +1,20 @@
+# -------------------------
 # Switched Coils Control Mode - System 11
-# myPinballs Feb 2013
+# myPinballs Jan 2014
+#
+# Copyright (C) 2013 myPinballs, Orange Cloud Software Ltd
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+# -------------------------
 
 
 import procgame
@@ -35,8 +50,8 @@ class SwitchedCoils(game.Mode):
                     self.game.coils.acSelect.disable()
                     wait=0.05 #50ms
                     self.delay(delay=wait,handler=self.game.coils[self.a_coils[i]].pulse)
-                    wait+=self.game.coils[self.a_coils[i]].default_pulse_time
-                    self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
+                    #wait+=self.game.coils[self.a_coils[i]].default_pulse_time
+                    #self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
 
                     self.log.debug('Switched Coil Pulsed:%s',name)
 

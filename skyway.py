@@ -32,6 +32,8 @@ class Skyway(game.Mode):
             self.game.sound.register_sound('skyway_shot_made1', sound_path+"skyway_made2.ogg")
             self.game.sound.register_sound('skyway_shot_made2', sound_path+"skyway_made3.ogg")
             self.game.sound.register_sound('skyway_shot_made3', sound_path+"skyway_made4.ogg")
+            self.game.sound.register_sound('saucer_eject', sound_path+"saucer_eject.aiff")
+
 
             self.ramp_value_start = 50000
             self.ramp_value_boost = 10000
@@ -181,6 +183,7 @@ class Skyway(game.Mode):
 
             
         def eject(self):
+            self.game.sound.play('saucer_eject')
             self.game.switched_coils.drive('topEject')
 
 

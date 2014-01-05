@@ -28,7 +28,7 @@ class Spinner(game.Mode):
 
             self.log = logging.getLogger('whirlwind.spinner')
 
-            self.game.sound.register_sound('spinner', sound_path+"sling_2.ogg")
+            self.game.sound.register_sound('spinner', sound_path+"spinner.aiff")
 
             self.flashers = ['bottomRightFlasher','rampTopFlasher','rampUMFlasher','rampLMFlasher','rampBottomFlasher']
             #var setup
@@ -110,7 +110,7 @@ class Spinner(game.Mode):
             self.spins+=1
             self.calc_value()
             self.score()
-            self.game.sound.play('spinner')
+            self.game.sound.play_voice('spinner')
 
 
         def sw_spinner_active(self, sw):

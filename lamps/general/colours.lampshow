@@ -1,0 +1,67 @@
+#yellow
+lamp:bonus2X                       | . . . . . . . .    
+lamp:bonus4X                       | . . . . . . . .                               
+lamp:bonus6X                       | . . . . . . . .                                                      
+lamp:bonus8X                       | . . . . . . . .
+lamp:miniBottomLeft                | . . . . . . . .                    
+lamp:miniBottomRight               | . . . . . . . .                    
+lamp:miniMiddleBottomLeft          | . . . . . . . .                  
+lamp:miniMiddleBottomRight         | . . . . . . . .                  
+lamp:miniMiddleTopLeft             | . . . . . . . .                 
+lamp:miniMiddleTopRight            | . . . . . . . .                 
+lamp:miniTopLeft                   | . . . . . . . .                  
+lamp:miniTopRight                  | . . . . . . . .                  
+lamp:leftLoop                      | . . . . . . . .
+lamp:rightLoop                     | . . . . . . . .
+lamp:modeStart                     | . . . . . . . .                            
+lamp:leftRampArrow                 | . . . . . . . .
+lamp:rightRampArrow                | . . . . . . . .
+lamp:totemTopArrow                 | . . . . . . . .
+#green
+lamp:miniTopArrow                  |                 . . . . . . . .                                
+lamp:indyI                         |                 . . . . . . . .                              
+lamp:indyN                         |                 . . . . . . . .                              
+lamp:indyD                         |                 . . . . . . . .                               
+lamp:indyY                         |                 . . . . . . . .
+lamp:adventureA                    |                 . . . . . . . .                             
+lamp:adventureD                    |                 . . . . . . . .                           
+lamp:adventureV                    |                 . . . . . . . .
+lamp:adventureE2                   |                 . . . . . . . .                             
+lamp:adventureR                    |                 . . . . . . . .                              
+lamp:adventureU                    |                 . . . . . . . .  
+lamp:adventureT                    |                 . . . . . . . .                            
+lamp:adventureN                    |                 . . . . . . . .                           
+lamp:adventureE1                   |                 . . . . . . . .                         
+lamp:leftPlaneMiddle               |                 . . . . . . . .                             
+lamp:leftPlanebottom               |                 . . . . . . . .  
+lamp:rightPlaneBottom              |                 . . . . . . . .
+lamp:rightPlaneTop                 |                 . . . . . . . .                             
+lamp:rightPlaneMiddle              |                 . . . . . . . .
+lamp:leftPlaneTop                  |                 . . . . . . . .
+lamp:centerLock                    |                 . . . . . . . .
+#orange
+lamp:shorty                        |                                 . . . . . . . .                 
+lamp:marrion                       |                                 . . . . . . . .                               
+lamp:drJones                       |                                 . . . . . . . .                                 
+lamp:willie                        |                                 . . . . . . . .                                   
+lamp:sallah                        |                                 . . . . . . . .                                   
+lamp:shootAgain                    |                                 . . . . . . . .         
+lamp:extraBall                     |                                 . . . . . . . .       
+lamp:miniBottomArrow               |                                 . . . . . . . .                                                                                      
+#jackpot              
+lamp:grailJackpot                  |                                                . . . . . . . .
+lamp:arkJackpot                    |                                                . . . . . . . .                            
+lamp:stonesJackpot                 |                                                . . . . . . . .                                      
+#modes                 
+lamp:streetsOfCairo                |                                                               . . . . . . . .
+lamp:getTheIdol                    |                                                               . . . . . . . .                         
+lamp:ravenBar                      |                                                               . . . . . . . .                            
+lamp:monkeyBrains                  |                                                               . . . . . . . .                           
+lamp:ropeBridge                    |                                                               . . . . . . . .
+lamp:mineCart                      |                                                               . . . . . . . .                         
+lamp:tankChase                     |                                                               . . . . . . . .                        
+lamp:chooseWisely                  |                                                               . . . . . . . .                           
+lamp:stealTheStones                |                                                               . . . . . . . .                         
+lamp:wellOfSouls                   |                                                               . . . . . . . .                                                 
+lamp:theThreeChallenges            |                                                               . . . . . . . .                                            
+lamp:castleGrunwald                |                                                               . . . . . . . .                                                     

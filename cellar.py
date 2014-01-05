@@ -34,7 +34,10 @@ class Cellar(game.Mode):
             self.game.sound.register_sound('cellar_unlit', speech_path+"no_storm_now.ogg")
             self.game.sound.register_sound('cellar_unlit', speech_path+"now_get_out.ogg")
             self.game.sound.register_sound('cellar_eject', sound_path+"cellar_eject.ogg")
+            self.game.sound.register_sound('cellar_eject_kick', sound_path+"cellar_eject_kick.aiff")
             self.game.sound.register_sound('door_knock', sound_path+"5knocks2.ogg")
+            self.game.sound.register_sound('door_knock', sound_path+"5knocks1.ogg")
+            self.game.sound.register_sound('door_knock', sound_path+"3knocks.ogg")
 
             self.reset()
 
@@ -124,9 +127,14 @@ class Cellar(game.Mode):
 
         def eject(self):
             self.score(self.score_value_start)
-            self.game.sound.play('cellar_eject')
-            self.game.switched_coils.drive('rampBottomFlasher','fast',time=1.2)
-            self.delay(name='coil_delay', event_type=None, delay=1, handler=self.game.coils.cellarKickout.pulse)
+            timer = self.game.sound.play('cellar_eject')
+            self.game.switched_coils.drive('rampBottomFlasher','fast',time=timer-0.2)#1.2
+            self.delay(name='coil_delay', event_type=None, delay=timer, handler=self.eject_kick)
+
+        def eject_kick(self):
+            self.game.sound.play('cellar_eject_kick')
+            self.game.switched_coils.drive('rampBottomFlasher','super',time=0.2)
+            self.game.coils.cellarKickout.pulse()
 
 
         def toggle_skyway_entrance(self):
@@ -150,13 +158,12 @@ class Cellar(game.Mode):
             if not self.game.get_player_stats('multiball_running'):
                 if not self.game.get_player_stats('lock_lit'):
                     self.toggle_skyway_entrance()
-            
-                if self.cellar_lit:
+
+                if self.cellar_lit and self.game.switches.rightCellar.time_since_change()<=0.6:
                     wait =self.game.sound.play('door_knock')
                     self.delay(name='award_delay',delay=wait, handler=self.cellar_award)
                     
                 else:
-                    
                     num = random.randint(0,10)
                     if num>3 and not self.game.get_player_stats('lock_lit'): #only play speech 'sometimes' and not when lock it lit
                         wait=self.game.sound.play_voice('cellar_unlit')

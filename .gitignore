@@ -7,3 +7,4 @@
 /config/game_data.yaml
 *.pyc
 _notes/
+/switched_coils2.py
