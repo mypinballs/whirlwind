@@ -300,7 +300,15 @@ class AlphaScoreDisplay(game.ScoreDisplay):
 
         def set_transition_reveal(self,text,row,seconds=0):
             size = len(text)
-            reveal_text = text[(size/2)+1-self.transition_reveal_posn[row]:(size/2)+1+self.transition_reveal_posn[row]]
+            
+            #create curtain
+            curtain_text = '!"#$%&'
+            curtain=''
+            if self.transition_reveal_posn[row]<=(size/2):
+                for i in range(3):
+                    curtain += random.choice(curtain_text)
+
+            reveal_text = curtain+text[(size/2)+1-self.transition_reveal_posn[row]:(size/2)+1+self.transition_reveal_posn[row]]+curtain
             self.log.debug('%s %s',text,reveal_text)
 
             #work out end posn
