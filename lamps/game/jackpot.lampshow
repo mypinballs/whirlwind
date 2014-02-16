@@ -1,67 +1,64 @@
-lamp:adventureD                    | ..    ..    ..    ..    ..    .     
-lamp:adventureV                    | ..     ..   ..     ..   ..             
-lamp:shorty                        | ...      ..  ..      ..  ..      
-lamp:monkeyBrains                  | ..    .     ..   ..     ..   ..        
-lamp:shootAgain                    |     ..      .   ..      .   ..     
-lamp:ropeBridge                    |       ..    .     ..    .     . 
-lamp:drJones                       |    ..   ..     ..   ..     ..     
-lamp:bonus6X                       |     ..    ..    ..    ..    ..      
-lamp:leftPlaneMiddle               |      ..     .    .     ..    .        
-lamp:leftPlanebottom               |    ..      .   ..      .   ..        
-lamp:marrion                       |     .    ..     .    ..     .           
-lamp:bonus8X                       |    ..    .     ..    .     ..       
-lamp:rightPlaneBottom              |      .    .      .    .     ..        
-lamp:adventureA                    | ..   ..     ..   ..     ..   ..        
-lamp:rightPlaneTop                 | ..     .    ..    ..    ..    .     
-lamp:rightPlaneMiddle              |       .    ..     .    ..    ..   
-lamp:streetsOfCairo                |      ..    ..    ..    ..    ..    
-lamp:sallah                        |     ..    ..    ..    ..    ..    
-lamp:getTheIdol                    |     ..     ..   ..     ..   ..    
-lamp:arkJackpot                    |      .     .     .     .    ..    
-lamp:ravenBar                      |      ..   ..     ..   ..     ..   
-lamp:stonesJackpot                 |       ..    .     .     .     .    
-lamp:willie                        |    .      ..   .      ..  ..       
-lamp:bonus2X                       |   ..      .   ..      .   ..   
-lamp:grailJackpot                  | ..     ..    .     ..    .       
-lamp:mineCart                      | ..    ..    ..    ..    ..     
-lamp:tankChase                     | ...    ..    ..    ..    ..      
-lamp:chooseWisely                  | ...    ..    ..    ..    ..       
-lamp:rightRampArrow                |   .    ..     .    ..    ..     
-lamp:bonus4X                       |    ..     ..   ..     ..   ..   
-lamp:stealTheStones                | ..    ..    ..    ..    ..     
-lamp:wellOfSouls                   |      ..    ..    ..    ..    
-lamp:indyI                         | ..  ..      ..  ..      .   
-lamp:indyN                         |     ..     ..   ..     ..   
-lamp:indyD                         |      ..    ..    .     ..    
-lamp:indyY                         |      ..    .     ..    .     
-lamp:theThreeChallenges            | ...    ..    ..    ..    ..   
-lamp:adventureE2                   |       ..   ..     ..   ..     
-lamp:adventureR                    |       ..   ..     ..   ..     
-lamp:adventureU                    | ..    ..    ..    ..    ..       
-lamp:castleGrunwald                | ..     ..    .     ..    .       
-lamp:rightLoop                     |   .    ..     .    ..     .      
-lamp:adventureT                    |   .     ..    .     ..   ..     
-lamp:adventureN                    |   .     ..    .     ..    .      
-lamp:adventureE1                   |   .     ..    .     ..    .     
-lamp:leftRampArrow                 |   .     ..   ..     ..   ..     
-lamp:modeStart                     |   .      ..   .      ..  ..      
-lamp:handOfFate                    | ...     ..   ..     ..   ..      
-lamp:extraBall                     | ...     ..   ..     .    ..     
-lamp:leftLoop                      | ...      .   ..     ..   ..     
-lamp:centerLock                    |   ..     ..   ..     .    ..     
-lamp:totemTopArrow                 |     ..    .     ..   ..      
-lamp:miniBottomLeft                | .....        . .         .      
-lamp:miniBottomRight               |    ..       .  ..       . 
-lamp:miniMiddleBottomLeft          | .....        ....             
-lamp:miniMiddleBottomRight         | .. ..        . ..            
-lamp:miniMiddleTopLeft             |   . ..       .. .             
-lamp:miniMiddleTopRight            | ... ..       .. ..      
-lamp:miniTopLeft                   |   ....        ....         
-lamp:miniTopRight                  | ... ..       .. ..        
-lamp:miniTopArrow                  | ... ..       .. ..       
-lamp:miniBottomArrow               | .. ..       .. ..       
-lamp:leftPlaneTop                  | ..    ..    ..    ..
-coil:flasherLeftRamp               | .      .      .      .
-coil:flasherRightRamp              |  .      .      .      .
-coil:flasherLeftSide               |   .      .      .      .
-coil:flasherRightSide              |    .      .      .      .
+lamp:middleStandup                 | ..    ..    ..    ..    ..    .
+lamp:scUpperJetsOn                 | ..     ..   ..     ..   ..
+lamp:sc250k                        | ...      ..  ..      ..  ..
+lamp:sc3Bank100k                   | ..    .     ..   ..     ..   ..
+lamp:sc3Bank100k                   |     ..      .   ..      .   ..
+lamp:sc500k                        |       ..    .     ..    .     .
+lamp:scMillion                     |    ..   ..     ..   ..     ..
+lamp:scLowerJetsOn                 |     ..    ..    ..    ..    ..
+lamp:specialLeftOutlane            |      ..     .    .     ..    .
+lamp:specialRightOutlane           |    ..      .   ..      .   ..
+lamp:topDrop50k                    |     .    ..     .    ..     .
+lamp:topDrop75k                    |    ..    .     ..    .     ..
+lamp:topDrop100k                   |      .    .      .    .     ..
+lamp:topDrop150k                   | ..   ..     ..   ..     ..   ..
+lamp:topDropQuickMB                | ..     .    ..    ..    ..    .
+lamp:topDropEB                     |       .    ..     .    ..    ..
+lamp:sCompass                      |      ..    ..    ..    ..    ..
+lamp:swCompass                     |     ..    ..    ..    ..    ..
+lamp:wCompass                      |     ..     ..   ..     ..   ..
+lamp:nwCompass                     |      .     .     .     .    ..
+lamp:nCompass                      |      ..   ..     ..   ..     ..
+lamp:neCompass                     |       ..    .     .     .     .
+lamp:eCompass                      |    .      ..   .      ..  ..
+lamp:seCompass                     |   ..      .   ..      .   ..
+lamp:toll1                         | ..     ..    .     ..    .
+lamp:toll2                         | ..    ..    ..    ..    ..
+lamp:toll3                         | ...    ..    ..    ..    ..
+lamp:toll4                         | ...    ..    ..    ..    ..
+lamp:toll5                         |   .    ..     .    ..    ..
+lamp:toll30                        |    ..     ..   ..     ..   ..
+lamp:toll20                        | ..    ..    ..    ..    ..
+lamp:toll10                        |      ..    ..    ..    ..
+lamp:lowerLeftJet                  | ..  ..      ..  ..      .
+lamp:lowerTopJet                   |     ..     ..   ..     ..
+lamp:lowerRightJet                 |      ..    ..    .     ..
+lamp:upperLeftJet                  |      ..    .     ..    .
+lamp:upperRightJet                 | ...    ..    ..    ..    ..
+lamp:upperBottomJet                |       ..   ..     ..   ..
+lamp:leftCellarSign                |       ..   ..     ..   ..
+lamp:rightCellarSign               | ..    ..    ..    ..    ..
+lamp:lock                          | ..     ..    .     ..    .
+lamp:2tolls                        |   .    ..     .    ..     .
+lamp:millionPlus                   |   .     ..    .     ..   ..
+lamp:million                       |   .     ..    .     ..    .
+lamp:release                       |   .     ..    .     ..    .
+lamp:shot                          |   .     ..   ..     ..   ..
+lamp:skill                         |   .      ..   .      ..  ..
+lamp:super                         | ...     ..   ..     ..   ..
+lamp:neBottom                      | ...     ..   ..     .    ..
+lamp:swBottom                      | ...      .   ..     ..   ..
+lamp:nwBottom                      |   ..     ..   ..     .    ..
+lamp:swTop                         |     ..    .     ..   ..
+lamp:nwTop                         | .....        . .         .
+lamp:neTop                         |    ..       .  ..       .
+lamp:seTop                         | .....        ....
+lamp:seBottom                      | .. ..        . ..
+lamp:shootAgain                    |   . ..       .. .
+lamp:2x                            | ... ..       .. ..
+lamp:3x                            |   ....        ....
+lamp:4x                            | ... ..       .. ..
+lamp:5x                            | ... ..       .. ..
+lamp:6xEB                          | .. ..       .. ..
+lamp:6xSP                          | ..    ..    ..    ..
+lamp:rightSpinner                  | .      .      .      .

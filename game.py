@@ -117,7 +117,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.9'
+                self.system_version='0.2.10'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -200,7 +200,7 @@ class Game(game.BasicGame):
 #                self.lampctrl.register_show('success', game_path +"lamps/game/success.lampshow")
 #                self.lampctrl.register_show('ball_lock', game_path +"lamps/game/ball_lock.lampshow")
 #                self.lampctrl.register_show('hit', game_path +"lamps/game/success.lampshow")
-#                self.lampctrl.register_show('jackpot', game_path +"lamps/game/success.lampshow")
+                self.lampctrl.register_show('jackpot', game_path +"lamps/game/jackpot.lampshow")
 
                 #setup high scores
 		self.highscore_categories = []

@@ -42,11 +42,10 @@ class Multiball(game.Mode):
 
 
             self.lock_ball_score = 50000
-            self.jackpot_base = 1000000
+            self.jackpot_base = 2000000
             self.jackpot_boost = 1000000
             self.jackpot_value = self.jackpot_base
-            self.jackpot_x = 1
-            self.jackpot_collected = 0
+            
             self.jackpot_lamps = ['millionPlus']
             self.jackpot_status = 'notlit'
             self.jackpot_worth_text =''
@@ -68,16 +67,28 @@ class Multiball(game.Mode):
         def reset(self):
             self.update_lamps()
 
+            #add a setting to disable/enable resetting these
+            self.jackpot_x = 1
+            self.jackpot_collected = 0
+
 
         def multiball_lamps(self, enable=True):
             # Start the lamps doing a crazy rotating sequence:
-            schedules = [0xaaaa0000, 0xaaa0000a, 0xaa0000aa, 0xa0000aaa, 0x0000aaaa, 0x000aaaa0, 0x00aaaa00, 0x0aaaa000]
+            schedules = [0xffff000f, 0xfff000ff, 0xff000fff, 0xf000ffff, 0x000fffff, 0x00fffff0, 0x0fffff00, 0xfffff000]
             for index, lamp in enumerate(sorted(self.game.lamps.items_tagged('compass'), key=lambda lamp: lamp.number)):
                 if enable:
                     sched = schedules[index%len(schedules)]
                     lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
                 else:
                     lamp.disable()
+
+
+        def update_lamps(self):
+            if self.multiball_running:
+                self.multiball_lamps()
+            else:
+                self.multiball_lamps(False)
+
 
         def mode_started(self):
             self.log.debug('multiball mode started')
@@ -87,11 +98,13 @@ class Multiball(game.Mode):
             self.mode_running = self.game.get_player_stats('mode_running')
             self.balls_locked = self.game.get_player_stats('balls_locked')
             self.multiball_running = self.game.get_player_stats('multiball_running')
+            self.jackpot_collected = self.game.get_player_stats('jackpot_collected')
             #self.multiball_started = self.game.get_player_stats('multiball_started')
 
         def mode_stopped(self):
             self.jackpot('cancelled')
             self.game.set_player_stats('balls_locked',self.balls_locked)
+            self.game.set_player_stats('jackpot_collected',self.jackpot_collected)
             #self.game.set_player_stats('lock_lit',self.lock_lit)
 
         
@@ -260,6 +273,8 @@ class Multiball(game.Mode):
                 self.jackpot_status = status
          
                 if status=='lit':
+                    #put ramp up so jackpot shot is easier to shoot for
+                    self.game.switched_coils.drive('rightRampLifter')
                     #set lamp
                     self.game.effects.drive_lamp('millionPlus','fast')
                     #set flasher for timed period
@@ -282,13 +297,12 @@ class Multiball(game.Mode):
                     self.game.effects.drive_lamp('millionPlus','off')
                     #self.game.switched_coils.disable('compassFlasher')
 
-                    #TODO add lampshows
-                    #self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)#self.restore_lamps
+                    self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)
                     self.strobe_flashers(0.4)
                     self.game.sound.play_voice('jackpot_speech')
                     self.game.score(self.jackpot_value*self.jackpot_x)
                     self.jackpot_collected+=1
-                    self.game.effects.drive_lamp(self.jackpot_lamps[self.jackpot_collected-1],'smarton')
+                    #self.game.effects.drive_lamp(self.jackpot_lamps[self.jackpot_collected-1],'smarton')
 
                     if self.jackpot_collected>10:
                         self.super_jackpot_collected()
