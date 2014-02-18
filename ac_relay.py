@@ -33,7 +33,7 @@ class ACRelay(game.Mode):
 
         def test(self):
             self.game.coils.acSelect.pulse(200)
-            if self.repeats<5:
+            if self.repeats<2:
                 self.delay(name='ac_relay_test_repeat',delay=0.5,handler=self.test)
                 self.repeats+=1
             else:

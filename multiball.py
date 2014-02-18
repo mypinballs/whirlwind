@@ -59,6 +59,7 @@ class Multiball(game.Mode):
             self.balls_locked = 0
             self.multiball_started = False
             self.multiball_running = False
+            self.end_callback = None
 
             
             self.reset()
@@ -115,10 +116,10 @@ class Multiball(game.Mode):
                 #debug
                 #self.balls_in_play=3
                 #-------------------------------------------
-                debug_ball_data = str(self.balls_in_play)+":"+str(self.game.trough.num_balls())+":"+str(self.game.trough.num_balls_locked)+":"+str(self.game.trough.num_balls_to_launch)+":"+str(self.multiball_running)
+                #debug_ball_data = str(self.balls_in_play)+":"+str(self.game.trough.num_balls())+":"+str(self.game.trough.num_balls_locked)+":"+str(self.game.trough.num_balls_to_launch)+":"+str(self.multiball_running)
                 #self.game.set_status(debug_ball_data)
-                self.game.score_display.set_text(debug_ball_data.upper(),1,'left')
-                self.log.debug(debug_ball_data)
+                #self.game.score_display.set_text(debug_ball_data.upper(),1,'left')
+                #self.log.debug(debug_ball_data)
                 #-------------------------------------------
 
                 if self.balls_in_play==self.balls_needed and self.multiball_running==False:
@@ -250,6 +251,11 @@ class Multiball(game.Mode):
                 else:
                     self.jackpot('cancelled')
 
+                #callback from compass
+                if self.end_callback:
+                    self.log.debug('Multiball End Callback Called')
+                    self.end_callback()
+
 
         def jackpot_helper_display(self):
             time=3
@@ -273,8 +279,10 @@ class Multiball(game.Mode):
                 self.jackpot_status = status
          
                 if status=='lit':
-                    #put ramp up so jackpot shot is easier to shoot for
+                    #lift ramp for timed period to allow easier jackpot shot
                     self.game.switched_coils.drive('rightRampLifter')
+                    self.delay(name='ramp_down_timer',delay=self.ramp_lift_timer,handler=self.game.coils['rampDown'].pulse)
+                    
                     #set lamp
                     self.game.effects.drive_lamp('millionPlus','fast')
                     #set flasher for timed period
@@ -346,15 +354,11 @@ class Multiball(game.Mode):
                 #raise jackpot
                 self.jackpot_raised_display(100000)
 
-                #lift ramp for timed period to allow easier jackpot shot
-                self.game.switched_coils.drive('rightRampLifter')
-                self.delay(name='ramp_down_timer',delay=self.ramp_lift_timer,handler=self.game.coils['rampDown'].pulse)
-
                 return procgame.game.SwitchStop
 
 
         def sw_leftRampMadeTop_active(self, sw):
-            if self.multiball_running:
+            if self.multiball_running and self.jackpot_status=='lit':
                 self.jackpot('made')
 
                 return procgame.game.SwitchStop

@@ -46,12 +46,18 @@ class SwitchedCoils(game.Mode):
         def drive(self,name,style='medium',cycle=0,time=2):
             for i in range(len(self.a_coils)):
                 if name==self.a_coils[i]:
+
+                    #clear all active devices - the easy way
+                    for coil in self.a_coils:
+                        self.game.coils[coil].disable()
+
                     #experimental a side - allow for switching of relay and restore (for flashers that are previously scheduled)
                     self.game.coils.acSelect.disable()
                     wait=0.05 #50ms
                     self.delay(delay=wait,handler=self.game.coils[self.a_coils[i]].pulse)
-                    #wait+=self.game.coils[self.a_coils[i]].default_pulse_time
-                    #self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
+                    wait+=0.05
+                    wait+=self.game.coils[self.a_coils[i]].default_pulse_time
+                    self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
 
                     self.log.debug('Switched Coil Pulsed:%s',name)
 

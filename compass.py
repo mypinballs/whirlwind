@@ -60,6 +60,7 @@ class Compass(game.Mode):
             self.shots_made = 0
             self.set_complete = 0
             self.game.coils.divertor.disable()
+            self.cancel_delayed('spin_wheels_repeat')
             
             for i in range(len(self.flags)):#reset flags
                 self.flags[i]=0
@@ -361,6 +362,7 @@ class Compass(game.Mode):
                 #set flag
                 #self.multiball.multiball_started = True
                 self.multiball.multiball_start()
+                self.multiball.end_callback=self.reset()
 
                 self.lock_lit=False
                 self.game.set_player_stats('lock_lit',self.lock_lit)

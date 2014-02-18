@@ -74,7 +74,7 @@ class Attract(game.Mode):
                 self.schedule_all_lamps()
 
                 #check for stuck balls
-                self.release_stuck_balls()
+                #self.release_stuck_balls()
                 self.delay(name='stuck_balls', event_type=None, delay=2, handler=self.release_stuck_balls)
 
                 #check trough status
