@@ -13,6 +13,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -33,6 +34,9 @@ class Cellar(game.Mode):
             self.game.sound.register_sound('cellar_unlit', speech_path+"go_away.ogg")
             self.game.sound.register_sound('cellar_unlit', speech_path+"no_storm_now.ogg")
             self.game.sound.register_sound('cellar_unlit', speech_path+"now_get_out.ogg")
+            self.game.sound.register_sound('hurryup_start_speech', speech_path+"head_for_the_cellar.ogg")
+            self.game.sound.register_sound('hurryup_collected_speech', speech_path+"youall_come_back_now.ogg")
+            self.game.sound.register_sound('cellar_award_speech', speech_path+"well_lucky_here.ogg")
             self.game.sound.register_sound('cellar_eject', sound_path+"cellar_eject.ogg")
             self.game.sound.register_sound('cellar_eject_kick', sound_path+"cellar_eject_kick.aiff")
             self.game.sound.register_sound('door_knock', sound_path+"5knocks2.ogg")
@@ -41,11 +45,16 @@ class Cellar(game.Mode):
 
             self.reset()
 
-            self.awards_text_top = ['Upper Super Jets','Big Points','Extra Ball Lit','3-Bank','Super Door Score','Lite Million','Lower Super Jets']
-            self.awards_text_bottom = ['100K per pop','250K','','100K','500K','','100K per pop']
-            self.lamps = ['scUpperJetsOn','sc250k','scExtraBall','sc3Bank100k','sc500k','scMillion','scLowerJetsOn']
+            self.awards_text_top = ['Upper Super Jets','Big Points','Extra Ball Lit','3-Bank','Light','Lite','Lower Super Jets']
+            self.awards_text_bottom = ['100K per pop','500K','','100K','Quick Multiball','Million','100K per pop']
+            self.lamps = ['scUpperJetsOn','sc500k','scExtraBall','sc3Bank100k','scQuickMultiball','scMillion','scLowerJetsOn']
 
-            self.lite_million = None #def for callback linkup
+            #defs for callback linkup
+            self.lite_million = None
+            self.quick_multiball = None
+            self.drops = None
+            self.lower_pops = None
+            self.upper_pops = None
 
         def reset(self):
             self.score_value_boost = 1000
@@ -55,6 +64,8 @@ class Cellar(game.Mode):
             self.cellar_lit = False
             self.skyway_open = True
             self.award_id = 0
+
+            self.hurryup_reset2()
 
         def timeout(self):
             self.reset()
@@ -77,34 +88,48 @@ class Cellar(game.Mode):
         def mode_stopped(self):
             self.game.set_player_stats('cellar_visits',self.cellar_visits)
 
-        def cellar_award(self):
+
+        def cellar_award_part1(self):
+            wait =self.game.sound.play_voice('cellar_award_speech')
+
+            self.delay(name='award_delay',delay=wait+0.2, handler=self.cellar_award_part2)
+
+
+        def cellar_award_part2(self):
             if self.award_id==0:
-                pass
+                self.upper_pops()
             elif self.award_id==1:
                 self.score(self.big_points)
             elif self.award_id==2:
-                pass
-                #self.game.extra_ball.lit()
+                self.game.extra_ball.lit()
+                audits.record_value(self.game,'cellarExtraBall')
             elif self.award_id==3:
-                pass
+                self.drops()
             elif self.award_id==4:
-                self.score(self.super_door_score)
+                self.quick_multiball()
+                audits.record_value(self.game,'cellarQuickMultiball')
             elif self.award_id==5:
                 self.lite_million() # populated by 'callback' linkup in base.py
             elif self.award_id==6:
-                pass
+                 self.lower_pops()
 
             self.game.score_display.set_text(self.awards_text_top[self.award_id],0,'center',seconds=2)
             self.game.score_display.set_text(self.awards_text_bottom[self.award_id],1,'center',seconds=2)
 
             self.delay(name='eject_delay',delay=2, handler=self.eject)
 
+            self.cellar_lit = False
+            self.update_lamps()
+
+            #update audits
+            audits.record_value(self.game,'cellarAward')
+
+
         def change_award(self):
             num = random.randint(0,6)
             self.award_id = num
+            self.log.debug('Cellar Award Now: %s',self.lamps[self.award_id])
             self.update_lamps()
-
-
 
 
         def lite_cellar(self,num=0):
@@ -112,14 +137,75 @@ class Cellar(game.Mode):
             self.game.effects.drive_lamp('rightCellarSign','smarton')
             if num>0:
                 self.game.effects.drive_lamp('rightCellarSign','timeout',num)
+                self.cancel_delayed('timeout_delay')
                 self.delay(name='timeout_delay',delay=num, handler=self.reset)
+
+
+        def display_hurryup_text(self):
+            self.game.score_display.set_text('Cellar Hurryup',0,justify='center',blink_rate=0.2)
+
+
+        def display_hurryup_countdown_text(self):
+            self.game.score_display.set_text(locale.format("%d", self.hurryup_value, True),1,justify='center')
+
+            if self.hurryup_value>self.hurryup_base:
+                self.hurryup_value-=1530
+            else:
+                self.hurryup_value=self.hurryup_base
+
+            self.delay(name='update_hurryup_display', event_type=None, delay=0.1, handler=self.display_hurryup_countdown_text)
+
+
+        def hurryup(self):
+            self.hurryup_lit = True
+            self.game.sound.play_voice('hurryup_start_speech')
+            self.game.effects.drive_lamp('leftCellarSign','fast')
+
+            self.display_hurryup_text()
+            self.display_hurryup_countdown_text()
+
+            self.delay(name='cancel_hurryup', event_type=None, delay=self.hurryup_timer, handler=self.hurryup_timeout)
+
+
+        def hurryup_timeout(self):
+            self.cancel_delayed('update_hurryup_display')
+            self.hurryup_reset1()
+            self.delay(name='cancel_hurryup', event_type=None, delay=self.hurryup_grace_time, handler=self.hurryup_reset2)
+
+
+        def hurryup_collected(self):
+            time=2
+            self.cancel_delayed('update_hurryup_display')
+            self.game.score_display.set_text('Cellar HurryUp',0,'center',seconds=time)
+            self.game.score_display.set_text(locale.format("%d", self.hurryup_value, True),1,justify='center',blink_rate=0.2,seconds=2)
+
+            self.game.sound.play_voice('hurryup_collected_speech')
+            
+            self.game.score(self.hurryup_value)
+
+            self.delay(name='cleanup_hurryup', event_type=None, delay=time, handler=self.hurryup_reset1)
+            self.delay(name='cleanup_hurryup', event_type=None, delay=time, handler=self.hurryup_reset2)
+            self.delay(name='eject_delay',delay=time, handler=self.eject)
+
+
+        def hurryup_reset1(self):
+            self.game.effects.drive_lamp('leftCellarSign','off')
+            self.game.score_display.restore()
+
+        def hurryup_reset2(self):
+            self.hurryup_lit = False
+            self.hurryup_timer = 15
+            self.hurryup_value= 1000000
+            self.hurryup_base= 25000
+            self.hurryup_grace_time=2
+           
 
         def update_count(self):
             
             self.cellar_visits+=1
 
             #update audit tracking
-            self.game.game_data['Audits']['Cellar Visits'] += 1
+            audits.record_value(self.game,'cellarVisit')
     
         def score(self,value):
             self.game.score(value)
@@ -155,14 +241,17 @@ class Cellar(game.Mode):
             self.update_count()
             wait=0.1
 
+            self.log.debug('Cellar Lit Status:%s',self.cellar_lit)
+
             if not self.game.get_player_stats('multiball_running'):
-                if not self.game.get_player_stats('lock_lit'):
+                if not self.game.get_player_stats('lock_lit') and not self.game.get_player_stats('qm_lock_lit'):
                     self.toggle_skyway_entrance()
 
-                if self.cellar_lit and self.game.switches.rightCellar.time_since_change()<=0.6:
+                if self.hurryup_lit: #check for hurry up made
+                    self.hurryup_collected()
+                elif self.cellar_lit and self.game.switches.rightCellar.time_since_change()<=1.2:
                     wait =self.game.sound.play('door_knock')
-                    self.delay(name='award_delay',delay=wait, handler=self.cellar_award)
-                    
+                    self.delay(name='award_delay',delay=wait+0.2, handler=self.cellar_award_part1)
                 else:
                     num = random.randint(0,10)
                     if num>3 and not self.game.get_player_stats('lock_lit'): #only play speech 'sometimes' and not when lock it lit
@@ -171,9 +260,11 @@ class Cellar(game.Mode):
             else:
                  self.delay(name='eject_delay',delay=wait, handler=self.eject)
 
+            
+
 
         def sw_rightInlane_active(self, sw):
-            if not self.game.get_player_stats('multiball_running'):
+            if not self.game.get_player_stats('multiball_running') and not self.hurryup_lit:
                 self.lite_cellar(20)
 
 

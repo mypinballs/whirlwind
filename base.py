@@ -11,6 +11,7 @@ from tornado import *
 from skyway import *
 from cellar import *
 from ramp import *
+from quick_multiball import *
 from compass import *
 from multiball import *
 from skillshot import *
@@ -144,17 +145,25 @@ class BaseGameMode(game.Mode):
             self.skyway = Skyway(self.game,42,self.tornado)
             self.cellar = Cellar(self.game,43)
             self.ramp = Ramp(self.game,44,self.skyway,self.cellar)
-            #exp-  link method
-            self.cellar.lite_million = self.ramp.lite_million
-
 
 
             #medium priority basic modes
-            self.multiball = Multiball(self.game,50)
-            self.compass = Compass(self.game,51,self.multiball)
-            self.skillshot = Skillshot(self.game, 52, self.drops)
+            self.quick_multiball = QuickMultiball(self.game,50)
+            self.multiball = Multiball(self.game,51)
+            self.compass = Compass(self.game,52,self.multiball)
+            
 
             #higher priority basic modes
+            self.skillshot = Skillshot(self.game, 60, self.drops)
+
+
+            #link mode methods
+            self.cellar.lite_million = self.ramp.lite_million
+            self.cellar.quick_multiball = self.quick_multiball.lock_ready
+            self.cellar.drops = self.drops.max
+            self.cellar.lower_pops = self.pops.max_lower_pops
+            self.cellar.upper_pops = self.pops.max_upper_pops
+            self.tornado.quick_multiball = self.quick_multiball.lock_ready
 
             
             #start modes
@@ -165,6 +174,7 @@ class BaseGameMode(game.Mode):
             self.game.modes.add(self.skyway)
             self.game.modes.add(self.cellar)
             self.game.modes.add(self.ramp)
+            self.game.modes.add(self.quick_multiball)
             self.game.modes.add(self.multiball)
             self.game.modes.add(self.compass)
             self.game.modes.add(self.skillshot)
@@ -178,6 +188,9 @@ class BaseGameMode(game.Mode):
             #self.game.sound.play('ball_save')
 
             self.ball_saved = True
+
+            #update audits
+            audits.record_value(self.game,'ballSaved')
 
 
 	def ball_launch_callback(self):
@@ -217,39 +230,21 @@ class BaseGameMode(game.Mode):
 		self.game.ball_search.disable()
 
                 #remove modes
+                self.game.modes.remove(self.spinner)
                 self.game.modes.remove(self.pops)
                 self.game.modes.remove(self.skyway)
                 self.game.modes.remove(self.cellar)
                 self.game.modes.remove(self.drops)
                 self.game.modes.remove(self.tornado)
                 self.game.modes.remove(self.ramp)
+                self.game.modes.remove(self.quick_multiball)
+                self.game.modes.remove(self.multiball)
                 self.game.modes.remove(self.compass)
 
                 #update audits
-                self.update_game_audits()
+                #self.update_game_audits()
+                audits.record_value(self.game,'ballPlayed')
 
-
-        def update_game_audits(self):
-                #update the game audits
-                current_ball_time =  int(time.time())-self.game.get_player_stats('ball_start_time')
-                current_on_time  = int(time.time())-self.game.start_time
-
-                self.game.game_data['Audits']['Balls Played'] += 1
-                self.game.game_data['Time Stamps']['Overall Game Time']+= current_ball_time
-                self.game.game_data['Time Stamps']['Overall Time On'] += current_on_time
-                self.game.game_data['Audits']['Average Ball Time'] = self.game.game_data['Time Stamps']['Overall Game Time']/self.game.game_data['Audits']['Balls Played']
-                if self.game.game_data['Audits']['Games Played']>=1:
-                    self.game.game_data['Audits']['Average Game Time'] = self.game.game_data['Time Stamps']['Overall Game Time']/self.game.game_data['Audits']['Games Played']
-
-                player = self.game.current_player()
-                self.game.game_data['Hidden']['Total Score']+=player.score
-                if self.game.game_data['Audits']['Games Played']>=1:
-                    self.game.game_data['Audits']['Average Score'] =self.game.game_data['Hidden']['Total Score']/self.game.game_data['Audits']['Games Played']
-
-                #save game audit data
-                self.game.save_game_data()
-
-                
 
 	def ball_drained_callback(self):
 		if self.game.trough.num_balls_in_play == 0:
@@ -383,19 +378,19 @@ class BaseGameMode(game.Mode):
 
         def sw_leftInlane_active(self,sw):
             self.inlane('left')
-            self.game.game_data['Audits']['Left Inlanes'] += 1
+            audits.record_value(self.game,'leftInlane')
 
         def sw_rightInlane_active(self,sw):
             self.inlane('right')
-            self.game.game_data['Audits']['Right Inlanes'] += 1
+            audits.record_value(self.game,'rightInlane')
 
         def sw_rightOutlane_active(self,sw):
             self.outlane()
-            self.game.game_data['Audits']['Right Outlane Drains'] += 1
+            audits.record_value(self.game,'rightOutlane')
             
         def sw_leftOutlane_active(self,sw):
             self.outlane()
-            self.game.game_data['Audits']['Left Outlane Drains'] += 1
+            audits.record_value(self.game,'leftOutlane')
 
         def rebound(self):
             self.game.score(110)

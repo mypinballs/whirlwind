@@ -4,6 +4,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -39,10 +40,10 @@ class Tornado(game.Mode):
             self.game.switched_coils.drive('singleDropTargetReset')
 
         def timeout(self):
-            self.game.effects.drive_lamp(self.lamps[self.level],'timeout',self.timeout_time)
-            level = self.level-1
+            self.game.effects.drive_lamp(self.lamps[self.level-1],'timeout',self.timeout_time)
+            self.level-=1
             if self.level>0:
-                self.delay(name='start_timeout',delay=self.timeout_time, handler=self.set_level,param=level)
+                self.delay(name='start_timeout',delay=self.timeout_time, handler=self.timeout)
 
 
         def set_level(self,num):
@@ -57,7 +58,9 @@ class Tornado(game.Mode):
             for i in range(self.level):
                 self.game.effects.drive_lamp(self.lamps[i],'smarton')
 
+            self.cancel_delayed('start_timeout')
             self.delay(name='start_timeout',delay=1, handler=self.timeout)
+
             
         def mode_started(self):
             self.tornado_hits = self.game.get_player_stats('tornados_collected')
@@ -67,12 +70,11 @@ class Tornado(game.Mode):
             self.game.set_player_stats('tornados_collected',self.tornado_hits)
             self.game.set_player_stats('tornado_level',self.tornado_level)
 
-        def update_count(self):
-            
+        def update_count(self):         
             self.tornado_hits+=1
 
-            #update audit tracking
-            self.game.game_data['Audits']['Tornados'] += 1
+            #update audits
+            audits.record_value(self.game,'tornadoTargetHit')
     
         def score(self,value):
             self.game.score(value)
@@ -82,6 +84,8 @@ class Tornado(game.Mode):
             self.score(self.score_value[self.level])
             self.game.sound.play('tornado_level'+str(self.level))
             self.delay(name='topdropreset',delay=1,handler=lambda:self.game.switched_coils.drive('singleDropTargetReset'))
+
+            
 
         def sw_topSingleDropTarget_active_for_250ms(self, sw):
             if self.game.ball>0:

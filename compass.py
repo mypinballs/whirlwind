@@ -4,6 +4,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -243,11 +244,13 @@ class Compass(game.Mode):
                 self.game.sound.play_music('general_play',-1)
                 #self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_over'))
                 self.game.sound.play_voice('storm_over')
+
                 self.lock_lit=False
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
             else:
                 self.multiball_ready = True
+                self.log.info('Multiball Ready: Compass Level:%s',self.compass_level)
                 if self.compass_level==2: #allow start via saucer for first multiball
                     #add delay here to ramp lifter because of skyway flashers not ending soon enough after lock
                     self.delay(name='lift ramp',delay=1,handler=self.ramp_lifter,param='up')
@@ -268,6 +271,8 @@ class Compass(game.Mode):
 
             #queue the next ball launch
             self.delay(name='launch_next_ball',delay=0.5,handler=self.launch_next_ball)
+
+            audits.record_value(self.game,'ballLocked')
 
 
 
@@ -332,7 +337,7 @@ class Compass(game.Mode):
 
 
         def progress(self,num):
-            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started'):
+            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started'):
                 self.flags[num]=2
                 self.log.debug('Compasss Flags Status:%s',self.flags)
 
@@ -364,8 +369,11 @@ class Compass(game.Mode):
                 self.multiball.multiball_start()
                 self.multiball.end_callback=self.reset()
 
+                #reset lock vars and lamps
                 self.lock_lit=False
                 self.game.set_player_stats('lock_lit',self.lock_lit)
+                self.balls_locked=0
+                self.game.set_player_stats('balls_locked', self.balls_locked)
                 self.game.effects.drive_lamp('lock','off')
                 self.game.effects.drive_lamp('release','off')
                 self.game.effects.drive_lamp('million','off')
@@ -447,7 +455,7 @@ class Compass(game.Mode):
 
         #lock and start multiball via eject
         def sw_topRightEject_active_for_250ms(self, sw):
-            if self.lock_lit:
+            if self.lock_lit and not self.game.get_player_stats('qm_lock_lit'):
                 self.virtual_lock = True
                 self.lock_manager()
 #                self.delay(name='release_ball',delay=2,handler=lambda:self.game.switched_coils.drive('topEject'))

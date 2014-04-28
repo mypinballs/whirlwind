@@ -4,6 +4,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -94,15 +95,14 @@ class Ramp(game.Mode):
             else:
                 self.cancel_delayed('million_speech_repeat')
 
+
         def update_count(self):
-            
             self.shots_made+=1
 
-            #update audit tracking
-            self.game.game_data['Audits']['Left Ramps'] += 1
-    
+
         def score(self,value):
             self.game.score(value)
+            
 
         def update_tolls(self):
             if self.combo or self.super_combo:
@@ -130,10 +130,19 @@ class Ramp(game.Mode):
         def made(self):
             self.check_combo()
             self.update_count()
-            self.update_tolls()
-            self.lite_cellar()
+            self.update_tolls
             self.game.effects.strobe_flasher_set(flasher_list=self.lightning_flashers, time=0.2, repeats=3)
+
             self.game.sound.play('made_left_ramp')
+
+            if not self.game.get_player_stats('multiball_started') or not self.game.get_player_stats('quick_multiball_started'):
+                if self.shots_made%5==0: #new feature :) every 5 ramps light the cellar hurryup shot!
+                    self.cellar.hurryup()
+                else:
+                    self.cellar.lite_cellar(20)
+
+            #update audits
+            audits.record_value(self.game,'thunderRampMade')
 
 
         def spin_wheels(self):
@@ -183,6 +192,9 @@ class Ramp(game.Mode):
 
             #reset
             self.lite_million(False)
+
+            #update audits
+            audits.record_value(self.game,'millionCollected')
 
         #switch handlers
         #-------------------------

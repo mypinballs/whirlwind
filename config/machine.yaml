@@ -430,18 +430,18 @@ PRLamps:
     scUpperJetsOn:
         number: L12
         label: 'Upper Jets On (Super Cellar)'
-    sc250k:
+    sc500k:
         number: L13
-        label: '250K (Super Cellar)'
+        label: '500K (Super Cellar)'
     scExtraBall:
         number: L14
         label: 'Lite Extra Ball (Super Cellar)'
     sc3Bank100k:
         number: L15
         label: '3-Bank 100K (Super Cellar)'
-    sc500k:
+    scQuickMultiball:
         number: L16
-        label: '500K (Super Cellar)'
+        label: 'Quick Multiball (Super Cellar)'
     scMillion:
         number: L17
         label: 'Lite Million (Super Cellar)'

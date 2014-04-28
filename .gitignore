@@ -8,3 +8,8 @@
 *.pyc
 _notes/
 /switched_coils2.py
+/scoredisplay-exp.py
+/diagnostics.py
+/scoredisplay-bkup.py
+/audits.py
+/var/*

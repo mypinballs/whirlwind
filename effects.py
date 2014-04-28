@@ -29,19 +29,30 @@ class Effects(game.Mode):
             elif style == 'on':
 		self.game.lamps[lamp_name].enable()
             elif style == 'off':
+                self.cancel_delayed(lamp_name+'_medium')
+                self.cancel_delayed(lamp_name+'_fast')
+                self.cancel_delayed(lamp_name+'_superfast')
+                self.cancel_delayed(lamp_name+'on')
+                self.cancel_delayed(lamp_name+'_off')
 		self.game.lamps[lamp_name].disable()
             elif style == 'smarton':
 		self.game.lamps[lamp_name].schedule(schedule=0xaaaaaaaa, cycle_seconds=0, now=True)
+                self.cancel_delayed(lamp_name+'on')
                 self.delay(name=lamp_name+'_on', event_type=None, delay=0.6, handler=self.game.lamps[lamp_name].enable)
             elif style == 'timedon':
 		self.game.lamps[lamp_name].enable()
+                self.cancel_delayed(lamp_name+'_off')
                 self.delay(name=lamp_name+'_off', event_type=None, delay=time, handler=self.game.lamps[lamp_name].disable)
             elif style == 'timeout':
+
                 if time>10:
+                    self.cancel_delayed(lamp_name+'_medium')
                     self.delay(name=lamp_name+'_medium', event_type=None, delay=time-10, handler=self.drive_medium, param=lamp_name)
                 if time>5:
+                    self.cancel_delayed(lamp_name+'_fast')
                     self.delay(name=lamp_name+'_fast', event_type=None, delay=time-5, handler=self.drive_fast, param=lamp_name)
                 if time>1:
+                    self.cancel_delayed(lamp_name+'_superfast')
                     self.delay(name=lamp_name+'_superfast', event_type=None, delay=time-1, handler=self.drive_super_fast, param=lamp_name)
                 self.delay(name=lamp_name+'_off', event_type=None, delay=time, handler=self.game.lamps[lamp_name].disable)
 

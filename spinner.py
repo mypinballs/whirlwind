@@ -13,6 +13,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')

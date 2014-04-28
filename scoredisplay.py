@@ -1,7 +1,22 @@
-# -------------------------
+# -------------------------------------------------------------------------------------
+# _______         _____  _     _ _______
+# |_____| |      |_____] |_____| |_____|
+# |     | |_____ |       |     | |     |
+#                                       
+# _______ _______  _____   ______ _______
+# |______ |       |     | |_____/ |______
+# ______| |_____  |_____| |    \_ |______
+#                                        
+# ______  _____ _______  _____         _______ __   __
+# |     \   |   |______ |_____] |      |_____|   \_/  
+# |_____/ __|__ ______| |       |_____ |     |    |   
+#
+# -------------------------------------------------------------------------------------
 # Score Display Mode for Alphanumeric Display Games
 #
-# Controls displays during game play and provides various transition effects for displaying text during modes.
+# Controls displays during game play and provides various transition effects for 
+# displaying text during modes.
+# 
 # Repeating script list included for attract usage
 #
 # Copyright (C) 2013 myPinballs, Orange Cloud Software Ltd
@@ -16,7 +31,19 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-# -------------------------
+# -------------------------------------------------------------------------------------
+#  _______  ______ _______ __   _ _______ _____ _______ _____  _____  __   _ _______
+#     |    |_____/ |_____| | \  | |______   |      |      |   |     | | \  | |______
+#     |    |    \_ |     | |  \_| ______| __|__    |    __|__ |_____| |  \_| ______|
+# 
+# -------------------------------------------------------------------------------------
+# Transition 0: Fixed top and bottom, centered
+# Transition 1: Slide in top and bottom, from right to left, left justified
+# Transition 2: Fixed top, slide in bottom from right to left, centered
+# Transition 3: Reveal out from center top and bottom, centered
+# Transition 4: Fixed top, flashing bottom, centered
+# -------------------------------------------------------------------------------------
+
 
 import procgame
 import locale
@@ -30,7 +57,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
 	def __init__(self, game, priority, left_players_justify="right"):
 		super(AlphaScoreDisplay, self).__init__(game, priority)
 
-                self.log = logging.getLogger('whirlwind.alpha_display')
+                self.log = logging.getLogger('scoredisplay.alpha_display')
                 
                 #set the position of the rhs of score for each player
                 self.player_score_posn=[8,15,8,15]
@@ -111,8 +138,8 @@ class AlphaScoreDisplay(game.ScoreDisplay):
                         #update the data
                         self.update_alpha_display()
 
-	def update_layer_1p(self, font=None):
-                super(AlphaScoreDisplay, self).update_layer_1p(font)
+	def update_layer_1p(self):
+                super(AlphaScoreDisplay, self).update_layer_1p()
                 if self.game.current_player() == None:
 			score = 0 # Small hack to make *something* show up on startup.
 		elif self.game.ball>0:
@@ -272,7 +299,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
             if justify=='left':
                 stop_posn = 0
             elif justify=='center':
-                stop_posn = 7-(size/2)
+                stop_posn = 8-(size/2)
             elif justify=='right':
                 stop_posn = 15-size
 
@@ -289,7 +316,7 @@ class AlphaScoreDisplay(game.ScoreDisplay):
             self.update_alpha_display()
             self.transition_posn[row] -=1
 
-            if self.transition_posn[row]>stop_posn:
+            if self.transition_posn[row]>=stop_posn:
                 self.delay(name='transition_loop'+str(row),delay=0.03,handler=lambda:self.set_transition_in(text,row,justify,seconds))
             else:
                 self.cancel_delayed('transition_loop'+str(row))

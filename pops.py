@@ -5,6 +5,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 from utility import boolean_format
 
@@ -149,10 +150,12 @@ class Pops(game.Mode):
                         self.lower_super_pops_collected+=1
                         self.play_super_animation(self.lower_super_pops_collected,set)
 
+                        #update audits
+                        audits.record_value(self.game,'lowerSuperPopCollected')
+
                 self.game.switched_coils.drive("rampLMFlasher",style='fast',time=0.5)
 
-                #update audit tracking
-                self.game.game_data['Audits']['Lower Jet Hits'] += 1
+                
 
             elif set==1:
                 if self.super_pops_enabled:
@@ -163,10 +166,11 @@ class Pops(game.Mode):
                         self.upper_super_pops_collected+=1
                         self.play_super_animation(self.upper_super_pops_collected,set)
 
+                        #update audits
+                        audits.record_value(self.game,'upperSuperPopCollected')
+
                 self.game.switched_coils.drive("rampTopFlasher",style='fast',time=0.5)
                     
-                #update audit tracking
-                self.game.game_data['Audits']['Upper Jet Hits'] += 1
     
         def pops_score(self,num):
             value  = (self.flags[num]*self.flags[num])+1

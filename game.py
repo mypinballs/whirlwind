@@ -8,7 +8,10 @@ import locale
 import math
 import copy
 import yaml
+import os
 import logging
+import audits
+import diagnostics
 
 from ac_relay import *
 from switched_coils import *
@@ -27,14 +30,10 @@ from threading import Thread
 from time import strftime
 
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-logging.getLogger('whirlwind.alpha_display').setLevel(logging.DEBUG)
-logging.getLogger('whirlwind.switched_coils').setLevel(logging.DEBUG)
-logging.getLogger('whirlwind.multiball').setLevel(logging.DEBUG)
-logging.getLogger('whirlwind.compass').setLevel(logging.DEBUG)
 
 
 #os.chdir("/Users/jim/Documents/Pinball/p-roc/p-roc system/src/pyprocgame/")
+serial = config.value_for_key_path('game_serial')
 
 game_locale = config.value_for_key_path('std_locale')
 locale.setlocale(locale.LC_ALL, game_locale) # en_GB Used to put commas in the score.
@@ -52,6 +51,8 @@ settings_path = game_path +"config/settings.yaml"
 game_data_path = game_path +"config/game_data.yaml"
 game_data_template_path = game_path +"config/game_data_template.yaml"
 settings_template_path = game_path +"config/settings_template.yaml"
+displayed_audits_path = game_path +"config/audits_display.yaml"
+
 
 voice_path = game_path +"speech/"
 sound_path = game_path +"sound/"
@@ -93,6 +94,16 @@ class Game(game.BasicGame):
                 #setup score display
                 self.score_display = AlphaScoreDisplay(self, 0)
 
+                #create displayed audits dict
+                self.displayed_audits = yaml.load(open(displayed_audits_path, 'r'))
+                #load and update audits database
+		audits.load(self)
+
+                #setup diagnostics
+                self.health_status = ''
+                self.switch_error_log =[]
+                self.device_error_log=[]
+
 
 	def save_settings(self):
 		#self.write_settings(settings_path)
@@ -117,14 +128,17 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.11'
+                self.system_version='0.2.12'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
-                self.game_data['Time Stamps']['Last Boot-Up'] =str(strftime("%d %b %Y %H:%M"))
-                if self.game_data['Time Stamps']['First Boot-Up']=='Not Set':
-                     self.game_data['Time Stamps']['First Boot-Up'] = self.game_data['Time Stamps']['Last Boot-Up']
-                self.save_game_data()
+#                self.game_data['Time Stamps']['Last Boot-Up'] =str(strftime("%d %b %Y %H:%M"))
+#                if self.game_data['Time Stamps']['First Boot-Up']=='Not Set':
+#                     self.game_data['Time Stamps']['First Boot-Up'] = self.game_data['Time Stamps']['Last Boot-Up']
+#                self.save_game_data()
+
+                audits.record_value(self,'bootUp')
+
 
                 self.start_time = time.time()
 
@@ -299,12 +313,11 @@ class Game(game.BasicGame):
                 self.score_display.reset()
 
                 #update game start audits
-		self.game_data['Audits']['Games Started'] += 1
-                self.game_data['Time Stamps']['Last Game Start'] =str(strftime("%d %b %Y %H:%M"))
+                self.start_time = time.time()
+                audits.record_value(self,'gameStarted')
                 if self.user_settings['Standard']['Free Play'].startswith('N'):
-                    self.game_data['Audits']['Credits'] -= 1
-                self.save_game_data()
-
+                    credits =  audits.display(self,'general','creditsCounter')
+                    audits.update_counter(self,'credits',credits-1)
                 
                 
 	def ball_starting(self):
@@ -331,10 +344,29 @@ class Game(game.BasicGame):
 
                 self.modes.add(self.match)
 
-                #update games played stats
-                self.game_data['Audits']['Games Played'] += 1
-                #save game audit data
-                self.save_game_data()
+                #record audits
+                #-------------
+                self.game_time = time.time()-self.start_time
+                p = self.current_player()
+                audits.record_value(self,'gameTime',self.game_time)
+                audits.record_value(self,'gamePlayed')
+                audits.record_value(self,'gameScore',p.score)
+                #-------------
+
+                #update diagnostics
+                #--------------------
+                self.update_diagnostics()
+                #--------------------
+
+
+        def update_diagnostics(self):
+            if self.game_time:
+                diagnostics.update_switches(self,self.game_time)
+                self.switch_error_log = diagnostics.broken_switches(self)
+            else:
+                self.switch_error_log = diagnostics.broken_switches(self)
+
+            self.log.debug('Switch Errors:%s',self.switch_error_log)
 
         def score(self, points):
 		super(Game, self).score(points)
@@ -362,17 +394,58 @@ class Game(game.BasicGame):
 
 def main():
 
-	config = yaml.load(open(machine_config_path, 'r'))
+        VAR_PATH='./var'
+        if not os.path.exists(VAR_PATH):
+            os.mkdir(VAR_PATH)
+
+        LOG_PATH='./var/logs'
+        if not os.path.exists(LOG_PATH):
+            os.mkdir(LOG_PATH)
+
+        root_logger = logging.getLogger()
+	root_logger.setLevel(logging.DEBUG)
+
+        #setup console logging
+        from colorlogging import ColorizingStreamHandler
+        handler = ColorizingStreamHandler()
+        handler.setLevel(logging.DEBUG)
+	handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+
+        #setup logging to file
+        datetime = str(time.strftime("%Y-%m-%d %H-%M-%S"))
+        file_handler = logging.FileHandler(game_path +'var/logs/'+serial+' Game Log '+datetime+'.log')
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+
+        root_logger.addHandler(handler)
+        root_logger.addHandler(file_handler)
+
+        #set invidivual log levels here
+        logging.getLogger('whirlwind.alpha_display').setLevel(logging.DEBUG)
+        logging.getLogger('whirlwind.switched_coils').setLevel(logging.DEBUG)
+        logging.getLogger('whirlwind.multiball').setLevel(logging.DEBUG)
+        logging.getLogger('whirlwind.compass').setLevel(logging.DEBUG)
+        logging.getLogger('game.vdriver').setLevel(logging.INFO)
+        logging.getLogger('game.driver').setLevel(logging.INFO)
+
+
+        config = yaml.load(open(machine_config_path, 'r'))
         print("Using config at: %s "%(machine_config_path))
 	machine_type = config['PRGame']['machineType']
-	config = 0
+
+        config = 0
 	game = None
+        
 	try:
 	 	game = Game(machine_type)
 		game.yamlpath = machine_config_path
 		game.setup()
 		game.run_loop()
-                
+
+        except Exception, err:
+                log = logging.getLogger()
+                log.exception('We are stopping here!:')
+
 	finally:
 		del game
 

@@ -1,0 +1,115 @@
+# This file contains the catalogue of audits that can be stored int he audits database
+generalAudits:
+  gamePlayed:
+    label: 'Game Played'
+  gameStarted:
+    label: 'Game Started'
+  gameTime:
+    label: 'Game Time'
+  attractTime:
+    label: 'Attract Time'
+  ballPlayed:
+    label: 'Ball Played'
+  tiltActivated:
+    label: 'Tilt Actived'
+  freePlayGameStarted:
+    label: 'Free Play Game Started'
+  creditGameStarted:
+    label: 'Credit Game Started'
+  ballSaved:
+    label: 'Ball Saved'
+  replayAwarded:
+    label: 'Replay Awarded'
+  specialAwarded:
+    label: 'Special Awarded'
+  matchAwarded:
+    label: 'Match Awarded'
+  extraBallLit:
+    label: 'Extra Ball Lit'
+  extraBallAwarded:
+    label: 'Extra Ball Awarded'
+  grandChampionCreditAwarded:
+    label: 'Grand Champion Credit Awarded'
+  1PlayerGameStarted:
+    label: '1 Player Game Started'
+  2PlayerGameStarted:
+    label: '2 Player Game Started'
+  3PlayerGameStarted:
+    label: '3 Player Game Started'
+  4PlayerGameStarted:
+    label: '4 Player Game Started'
+  timeSet:
+    label: 'Time Set'
+  bootUp:
+    label: 'Boot-Up'
+  grandChampionScoreEntry:
+    label: 'Grand Champion Score Entry'
+  highScoreEntry:
+    label: 'High Score Entry'
+  gameScore:
+    label: 'Game Score'
+  auditsReset:
+    label: 'Audits Reset'
+  leftFlipper:
+    label: 'Left Flipper'
+  rightFlipper:
+    label: 'Right Flipper'
+featureAudits:
+  leftOutlane:
+    label: 'Left Outlane'
+  rightOutlane:
+    label: 'Right Outlane'
+  leftInlane:
+    label: 'left Inlane'
+  rightInlane:
+    label: 'rightInlane'
+  cellarVisit:
+    label: 'Cellar Visit'
+  cellarAward:
+    label: 'Cellar Award'
+  cellarExtraBall:
+    label: 'Cellar Extra Ball'
+  cellarQuickMultiball:
+    label: 'Cellar Quick Multiball'
+  dropTarget3BankCompleted:
+    label: 'Drop Target 3-Bank Completed'
+  multiballStarted:
+    label: 'Multiball Started'
+  quickMultiballStarted:
+    label: 'Quick Multiball Started'
+  ballLocked:
+     label: 'Ball Locked'
+  ballLockedSaucer:
+    label: 'Ball Locked in Saucer'
+  jackpotLit:
+    label: 'Jackpot Lit'
+  jackpotCollected:
+    label: 'Jackpot Collected'
+  skywayRampMade:
+    label: 'Skyway Ramp Made'
+  skywayComboMade:
+    label: 'Skyway Combo Made'
+  skywaySaucerMade:
+    label: 'Skyway Saucer Made'
+  thunderRampMade:
+    label: 'Left Ramp Made'
+  millionCollected:
+    label: 'Million Collected'
+  lowerSuperPopCollected:
+    label: 'Super Pop Collected'
+  upperSuperPopCollected:
+    label: 'Super Pop Collected'
+  skillshotMade:
+    label: 'Skillshot Made'
+  tornadoTargetHit:
+    label: 'Tornado Target Hit'
+  tornadoTargetExtraBall:
+    label: 'Tornado Target Extra Ball'
+  tornadoTargetQuickMulitball:
+    label: 'Tornado Target Quick Multiball'
+#this section is for items that o a value against them i.e read and write not just read
+counters:
+  credits:
+    label: 'Credits'
+  highScoreReset:
+    label: 'High Score Reset In'

@@ -4,6 +4,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -63,12 +64,13 @@ class Drops(game.Mode):
             
             self.hits+=1
 
-            #update audit tracking
-            self.game.game_data['Audits']['3-Bank Drop Targets Hits'] += 1
-
 
         def score(self,value):
             self.game.score(value)
+
+
+        def max(self):
+            self.value=self.max_value
 
          
         def check_sweeping(self):
@@ -105,6 +107,8 @@ class Drops(game.Mode):
                         self.banks_completed+=1
                         self.game.switched_coils.drive('dropTargetFlasher',style='fast',time=timer)
                         self.delay(name='reset',delay=timer+0.5,handler=self.reset)
+
+                        audits.record_value(self.game,'dropTarget3BankCompleted')
                     
 
                     else:
@@ -116,7 +120,6 @@ class Drops(game.Mode):
                 else:
                     self.value=self.max_value
                 self.score(self.value)
-
 
 
         #switch handlers

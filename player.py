@@ -35,6 +35,10 @@ class Player(procgame.game.Player):
                 self.player_stats['jackpot_collected']=0
                 self.player_stats['balls_locked']=0
                 self.player_stats['million_lit']=False
+                self.player_stats['qm_lock_lit']=False
+                self.player_stats['quick_multiball_ready']=False
+                self.player_stats['quick_multiball_started']=False
+                self.player_stats['quick_multiball_running']=False
                 self.player_stats['ball_start_time']=0
                 self.player_stats['drop_banks_completed']=0
                 self.player_stats['skillshot_level']=1

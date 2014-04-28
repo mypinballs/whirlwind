@@ -3,6 +3,7 @@
 import procgame
 import locale
 import logging
+import audits
 import time
 from procgame import *
 from random import *
@@ -267,9 +268,9 @@ class Attract(game.Mode):
             if self.game.user_settings['Standard']['Free Play'].startswith('Y'):
                 self.pricing_top='FREE PLAY'
             else:
-                self.pricing_top=str(self.game.game_data['Audits']['Credits']+" CREDITS")
+                self.pricing_top=str(audits.display(self.game,'general','creditsCounter')+" CREDITS")
 
-            if self.game.game_data['Audits']['Credits'] >0 or self.game.user_settings['Standard']['Free Play'].startswith('Y'):
+            if audits.display(self.game,'general','creditsCounter') >0 or self.game.user_settings['Standard']['Free Play'].startswith('Y'):
                 self.pricing_bottom = 'PRESS START'
             else:
                 self.pricing_bottom = 'INSERT COINS'
@@ -318,7 +319,7 @@ class Attract(game.Mode):
 	# Perhaps if the trough isn't full after a few ball search attempts, it logs a ball
 	# as lost?
 	def sw_start_active(self, sw):
-            if self.game.user_settings['Standard']['Free Play'].startswith('Y') or self.game.game_data['Audits']['Credits']>0:
+            if self.game.user_settings['Standard']['Free Play'].startswith('Y') or audits.display(self.game,'general','creditsCounter') >0>0:
 		if self.game.trough.is_full:
 			# Remove attract mode from mode queue
 			self.game.modes.remove(self)
@@ -346,7 +347,7 @@ class Attract(game.Mode):
 
 
         def sw_coin_active(self, sw):
-            self.game.game_data['Audits']['Credits'] += 1
-            self.game.save_game_data()
+            self.credits =  audits.display(self.game,'general','creditsCounter')
+            audits.update_counter(self.game,'credits',self.credits+1)
             self.show_pricing()
             self.game.sound.play("coin")

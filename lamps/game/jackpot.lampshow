@@ -1,9 +1,9 @@
 lamp:middleStandup                 | ..    ..    ..    ..    ..    .
 lamp:scUpperJetsOn                 | ..     ..   ..     ..   ..
-lamp:sc250k                        | ...      ..  ..      ..  ..
+lamp:sc500k                        | ...      ..  ..      ..  ..
 lamp:sc3Bank100k                   | ..    .     ..   ..     ..   ..
 lamp:sc3Bank100k                   |     ..      .   ..      .   ..
-lamp:sc500k                        |       ..    .     ..    .     .
+lamp:scQuickMultiball                        |       ..    .     ..    .     .
 lamp:scMillion                     |    ..   ..     ..   ..     ..
 lamp:scLowerJetsOn                 |     ..    ..    ..    ..    ..
 lamp:specialLeftOutlane            |      ..     .    .     ..    .

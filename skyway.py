@@ -10,6 +10,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -135,6 +136,9 @@ class Skyway(game.Mode):
                 self.play_animation(self.skyway_tolls)
                 self.set_lamps()
 
+                #update audits
+                audits.record_value(self.game,'skywaySaucerMade')
+
             #queue eject
             self.delay(name='eject_ball',delay=2,handler=self.eject)
 
@@ -146,6 +150,9 @@ class Skyway(game.Mode):
 
             self.cancel_delayed('skyway_reset')
             self.delay(name='skyway_reset',delay=5, handler=self.reset)
+
+            #update audits
+            audits.record_value(self.game,'skywayComboMade')
 
 
         def score(self):
@@ -179,7 +186,9 @@ class Skyway(game.Mode):
 
         def toll(self,num):
             self.skyway_tolls+=num
-            self.game.game_data['Audits']['Skyway Tolls'] += num
+
+            #update audits
+            audits.record_value(self.game,'skywayRampMade')
 
             
         def eject(self):
@@ -192,5 +201,6 @@ class Skyway(game.Mode):
             self.progress()
 
         def sw_topRightEject_active_for_250ms(self, sw):
-            self.alt_progress()
+            if not self.game.get_player_stats('qm_lock_lit'):
+                self.alt_progress()
 

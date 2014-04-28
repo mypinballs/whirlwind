@@ -11,6 +11,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -47,6 +48,7 @@ class Multiball(game.Mode):
             self.jackpot_value = self.jackpot_base
             
             self.jackpot_lamps = ['millionPlus']
+            self.light_jackpot_lamps = ['toll20','toll3','lock','2tolls']
             self.jackpot_status = 'notlit'
             self.jackpot_worth_text =''
             self.super_jackpot_enabled = False
@@ -82,6 +84,17 @@ class Multiball(game.Mode):
                     lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
                 else:
                     lamp.disable()
+
+
+        def light_jackpot_strobe_lamps(self, enable=True):
+            schedule = [0x0000000f, 0x000000f0, 0x00000f00, 0x00ccc000]
+            for i in range(len(self.light_jackpot_lamps)):
+                lamp = self.light_jackpot_lamps[i]
+		if enable:
+                    #sched = schedules[index%len(schedules)]
+                    self.game.lamps[lamp].schedule(schedule=schedule[i], cycle_seconds=0, now=False)
+		else:
+                    self.game.lamps[lamp].disable()
 
 
         def update_lamps(self):
@@ -145,7 +158,7 @@ class Multiball(game.Mode):
             self.game.score_display.set_transition_reveal(text=bottom.upper(),row=1,seconds=seconds)
 
 
-        def strobe_flashers(self,time=0.2):
+        def strobe_flashers(self,time=0.1):
             timer = 0
             repeats = 4
 
@@ -160,7 +173,7 @@ class Multiball(game.Mode):
             for i in range(len(sequence)):
 
                 def flash(i,time,delay):
-                    self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=sequence[i],style='fast',time=time+0.6))
+                    self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=sequence[i],style='fast',time=time+0.1))
 
                 flash(i,time,timer)
                 timer+=time
@@ -186,6 +199,8 @@ class Multiball(game.Mode):
 
             
             self.delay(name='multiball_eject_delay',delay=start_speech_length+0.5, handler=self.multiball_eject)
+
+            audits.record_value(self.game,'multiballStarted')
 
 
         def multiball_eject(self):
@@ -240,6 +255,10 @@ class Multiball(game.Mode):
                 #stop spinning wheels
                 self.cancel_delayed('spin_wheels_repeat')
 
+                #stop lamp strobes
+                self.multiball_lamps(False)
+                self.light_jackpot_strobe_lamps(False)
+
                 #change music
                 self.game.sound.stop_music()
                 self.game.sound.play_music('general_play', loops=-1)
@@ -283,8 +302,10 @@ class Multiball(game.Mode):
                     self.game.switched_coils.drive('rightRampLifter')
                     self.delay(name='ramp_down_timer',delay=self.ramp_lift_timer,handler=self.game.coils['rampDown'].pulse)
                     
-                    #set lamp
+                    #set lamps
                     self.game.effects.drive_lamp('millionPlus','fast')
+                    self.light_jackpot_strobe_lamps(False)
+                    
                     #set flasher for timed period
                     self.game.switched_coils.drive(name='compassFlasher',style='fast',time=1)
                     #update display
@@ -294,11 +315,15 @@ class Multiball(game.Mode):
                     #play speech
                     #self.game.sound.play('hit_jackpot')
 
+                    audits.record_value(self.game,'jackpotLit')
+
                 elif status=='unlit':
                     #put ramp down so jackpot can be relit
                     self.game.coils['rampDown'].pulse()
                     #tell player what to do
                     self.jackpot_helper_display()
+                    #set lamps
+                    self.light_jackpot_strobe_lamps()
                    
 
                 elif status=='made':
@@ -319,6 +344,8 @@ class Multiball(game.Mode):
                         self.jackpot_collected_display()
                         #speech
                         self.game.sound.play('jackpot_speech')
+
+                    audits.record_value(self.game,'jackpotCollected')
 
                     
                 elif status=='cancelled':

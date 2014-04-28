@@ -11,6 +11,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -151,6 +152,9 @@ class Skillshot(game.Mode):
             self.display_repeats = (self.value/self.divider)-1
             self.display_text()
             self.award_score()
+
+            #update audits
+            audits.record_value(self.game,'skillshotMade')
 
 
         def other_switch(self):

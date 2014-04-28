@@ -1,0 +1,231 @@
+# This file contains the list of audits that are 'displayable'
+#each audit contains the keys that are required to calculate the result
+general:
+  label: 'General'
+  averageBallTime:
+    type: average
+    cid1: gameTime
+    cid2: ballPlayed
+    label: 'Average Ball Time'
+  averageGameTime:
+    type: average
+    cid1: gameTime
+    cid2: gamePlayed
+    label: 'Average Game time'
+  averageScore:
+    type: average
+    cid1: gameScore
+    cid2: gamePlayed
+    label: 'Average Score'
+  totalGamesPlayed:
+    type: sum
+    cid1: gamePlayed
+    label: 'Total Games Played'
+  totalGamesStarted:
+    type: sum
+    cid1: gameStarted
+    label: 'Total Games Started'
+  totalGameTime:
+    type: sum
+    cid1: gameTime
+    label: 'Total Game Time'
+  totalAttractTime:
+    type: sum
+    cid1: attractTime
+    label: 'Total Attract Time'
+  totalOnTime:
+    type: multiSum
+    cid1: attractTime
+    cid2: gameTime
+    label: 'Total On Time'
+  totalBallsPlayed:
+    type: sum
+    cid1: ballPlayed
+    label: 'Total Balls Played'
+  totalTilts:
+    type: sum
+    cid1: tiltActivated
+    label: 'Total Tilts'
+  totalFreePlays:
+    type: sum
+    cid1: freePlayGameStarted
+    label: 'Total Free Plays'
+  totalBallSaves:
+    type: sum
+    cid1: ballSaved
+    label: 'Total Ball Saves'
+  totalReplayAwards:
+    type: sum
+    cid1: replayAwarded
+    label: 'Total Replay Awards'
+  replayPercent:
+    type: percent
+    cid1: replayAwarded
+    cid2: gamePlayed
+    label: 'Replay Percentage'
+  totalSpecialAwards:
+    type: sum
+    cid1: specialAwarded
+    label: 'Total Special Awards'
+  specialPercent:
+    type: percent
+    cid1: specialAwarded
+    cid2: gamePlayed
+    label: 'Special Percentage'
+  totalMatchAwards:
+    type: sum
+    cid1: matchAwarded
+    label: 'Total Match Awards'
+  matchPercent:
+    type: percent
+    cid1: matchAwarded
+    cid2: gamePlayed
+    label: 'Match Percentage'
+  totalExtraBalls:
+    type: sum
+    cid1: extraBallAwarded
+    label: 'Total Extra Balls'
+  extraBallPercent:
+    type: percent
+    cid1: extraBallAwarded
+    cid2: gamePlayed
+    label: 'Extra Ball Percentage'
+  totalGrandChampCredits:
+    type: sum
+    cid1: grandChampionCreditAwarded
+    label: 'Total Grand Champion Credits Awarded'
+  totalGrandChamps:
+    type: sum
+    cid1: grandChampionScoreEntry
+    label: 'Total Grand Champions Awarded'
+  grandChampPercent:
+    type: percent
+    cid1: grandChampionScoreEntry
+    cid2: gamePlayed
+    label: 'Grand Champion Percentage'
+  highScoreResetCounter:
+    type: counter
+    cid1: highScoreReset
+    label: 'High Score Reset Counter'
+  creditsCounter:
+    type: counter
+    cid1: credits
+    label: 'Credits Counter'
+  total1PlayerGames:
+    type: sum
+    cid1: 1PlayerGameStarted
+    label: 'Total 1 Player Games'
+  total2PlayerGames:
+    type: sum
+    cid1: 2PlayerGameStarted
+    label: 'Total 2 Player Games'
+  total3PlayerGames:
+    type: sum
+    cid1: 3PlayerGameStarted
+    label: 'Total 3 Player Games'
+  total4PlayerGames:
+    type: sum
+    cid1: 4PlayerGameStarted
+    label: 'Total 4 Player Games'
+dateStamps:
+  label: 'Date Stamps'
+  firstBootup:
+    type: orderFirst
+    cid1: bootUp
+    order: date
+    label: 'First Boot-Up Date'
+  lastBootup:
+    type: orderLast
+    cid1: bootUp
+    order: date
+    label: 'Last Boot-Up Date'
+  lastGameStart:
+    type: orderLast
+    cid1: gameStarted
+    order: date
+    label: 'Last Game Start Date'
+  lastGrandChampEntry:
+    type: orderLast
+    cid1: grandChampionScoreEntry
+    order: date
+    label: 'Last Grand Champion Entry Date'
+  lastHighScoreEntry:
+    type: orderLast
+    cid1: highScoreEntry
+    order: date
+    label: 'Last High Score Entry Date'
+  lastHighScoreReset:
+    type: orderLast
+    cid1: highScoreReset
+    order: date
+    label: 'Last High Score Reset Date'
+  lastReplay:
+    type: orderLast
+    cid1: replayAwarded
+    order: date
+    label: 'Last Replay Date'
+  lastFactoryReset:
+    type: orderFirst
+    cid1: bootUp
+    order: date
+    label: 'Last Factory Reset Date'
+  lastAuditReset:
+    type: orderLast
+    cid1: auditsReset
+    order: date
+    label: 'Last Audit Reset Date'
+  lastClockSet:
+    type: orderLast
+    cid1: timeSet
+    order: date
+    label: 'Last Clock Set Date'
+featureAudits:
+  label: 'Game Features'
+  totalCellarVisits:
+    type: sum
+    cid1: cellarVisit
+    label: 'Total Cellar Visits'
+  totalCellarAwards:
+    type: sum
+    cid1: cellarAward
+    label: 'Total Cellar Award'
+  totalCellarExtraBalls:
+    type: sum
+    cid1: cellarExtraBall
+    label: 'Total Cellar Extra Ball'
+  totalCellarQuickMultiballs:
+    type: sum
+    cid1: cellarQuickMultiball
+    label: 'Total Cellar Quick Multiballs Started'
+  totalDropTarget3BanksCompleted:
+    type: sum
+    cid1: dropTarget3Bank
+    label: 'Total Drop Target 3-Banks Completed'
+  totalMultiballsStarted:
+    type: sum
+    cid1: multiballStarted
+    label: 'Total Multiballs Started'
+  totalJackpotsCollected:
+    type: sum
+    cid1: jackpotCollected
+    label: 'Total Jackpots Collected'
+  totalSkywayRampsMade:
+    type: sum
+    cid1: skywayRampMade
+    label: 'Total Skyway Ramps Made'
+  totalSuperPopsCollected:
+    type: sum
+    cid1: superPopCollected
+    label: 'Total Super Pops Collected'
+  totalSkillshotsMade:
+    type: sum
+    cid1: skillshotMade
+    label: 'Total Skillshots Made'
+  totalTornadoTargetExtraBallsCollected:
+    type: sum
+    cid1: tornadoTargetExtraBall
+    label: 'Total Tornado Target Extra Balls Collected'
+  totalTornadoTargetQuickMultiballsStarted:
+    type: sum
+    cid1: tornadoTargetQuickMulitball
+    label: 'Total Tornado Target Quick Multiballs Started'

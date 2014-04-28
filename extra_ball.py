@@ -6,6 +6,7 @@ __date__ ="$Jan 18, 2011 1:36:37 PM$"
 
 import procgame
 import locale
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -23,21 +24,27 @@ class Extra_Ball(game.Mode):
             self.game.sound.register_sound('extra_ball_lit', sound_path+"extra_ball_lit_ff.ogg")
             self.game.sound.register_sound('extra_ball_speech', speech_path+"extra_ball_speech.ogg")
 
+
+        def display(self, top, bottom, seconds, opaque=True, repeat=False, hold=False, frame_time=3):
+            self.game.score_display.set_transition_reveal(text=top.upper(),row=0,seconds=seconds)
+            self.game.score_display.set_transition_reveal(text=bottom.upper(),row=1,seconds=seconds)
+
+
         def collect(self):
             print("Extra Ball Collected")
-            anim = dmd.Animation().load(game_path+"dmd/extra_ball.dmd")
-            self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False)
+            self.display(top='Extra Ball',bottom='',seconds=3)
             self.game.sound.play('extra_ball_collected')
             #self.game.sound.play_voice('extra_ball_speech')
-            self.game.effects.drive_lamp('extraBall','off')
-            self.game.effects.drive_lamp('miniBottomArrow','off')
+            self.game.effects.drive_lamp('scExtraBall','off')
             self.game.effects.drive_lamp('shootAgain','smarton')
             self.game.extra_ball_count()
 
+            audits.record_value(self.game,'extraBallAwarded')
+
 
         def lit(self):
-            text_layer = dmd.TextLayer(128/2, 7, self.game.fonts['num_09Bx7'], "center", opaque=False)
-            text_layer.set_text("EXTRA BALL LIT",1.5,5)#on for 1.5 seconds 5 blinks
-            self.layer = text_layer
+            self.display(top='Extra Ball',bottom='Lit',seconds=3)
             self.game.sound.play('extra_ball_lit')
-            self.game.effects.drive_lamp('extraBall','smarton')
+            self.game.effects.drive_lamp('scExtraBall','smarton')
+
+            audits.record_value(self.game,'extraBallLit')

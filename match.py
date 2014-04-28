@@ -8,6 +8,7 @@ import procgame
 import locale
 import random
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -92,8 +93,8 @@ class Match(game.Mode):
             for i in range(len(self.game.players)):
                 if self.player_digits[i]==value:
                     self.player_layers[i].set_text(digit,blink_frames=10)
-                    self.game.game_data['Audits']['Credits'] += 1
-                    self.game.save_game_data()
+                    self.credits =  audits.display(self.game,'general','creditsCounter')
+                    audits.update_counter(self.game,'credits',self.credits+1)
             
 
             #set clear time
