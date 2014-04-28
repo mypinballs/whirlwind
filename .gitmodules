@@ -1,0 +1,3 @@
+[submodule "scoredisplay"]
+	path = scoredisplay
+	url = https://github.com/mypinballs/scoredisplay.git

@@ -15,7 +15,8 @@ import diagnostics
 
 from ac_relay import *
 from switched_coils import *
-from scoredisplay import *
+from scoredisplay.alphanumeric import *
+from scoredisplay.scoredisplay import *
 from effects import *
 from extra_ball import *
 from service import *
@@ -92,6 +93,7 @@ class Game(game.BasicGame):
                     self.log.info("Game Config:"+str(lamp.name)+" "+str(lamp.number))
 
                 #setup score display
+                self.alpha_display = AlphanumericDisplay(self.aux_port)
                 self.score_display = AlphaScoreDisplay(self, 0)
 
                 #create displayed audits dict
