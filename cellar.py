@@ -134,6 +134,7 @@ class Cellar(game.Mode):
 
         def lite_cellar(self,num=0):
             self.cellar_lit = True
+            self.game.effects.clear_lamp_timers('rightCellarSign')
             self.game.effects.drive_lamp('rightCellarSign','smarton')
             if num>0:
                 self.game.effects.drive_lamp('rightCellarSign','timeout',num)

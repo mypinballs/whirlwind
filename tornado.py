@@ -56,6 +56,7 @@ class Tornado(game.Mode):
 
         def set_lamps(self):
             for i in range(self.level):
+                self.game.effects.clear_lamp_timers(self.lamps[i])
                 self.game.effects.drive_lamp(self.lamps[i],'smarton')
 
             self.cancel_delayed('start_timeout')
