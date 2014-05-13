@@ -123,8 +123,8 @@ class Pops(game.Mode):
             elif set==1:
                 name='high'
 
-            self.game.score_display.set_text(str(count)+' hits for'.upper(),0,'center',seconds=2)
-            self.game.score_display.set_text('super '+name+' jets'.upper(),1,'center',seconds=2)
+            self.game.score_display.set_text((str(count)+' hits for').upper(),0,'center',seconds=2)
+            self.game.score_display.set_text(('super '+name+' jets').upper(),1,'center',seconds=2)
 
 
         def play_super_animation(self,count,set,opaque=False, repeat=False, hold=False, frame_time=3):
@@ -135,7 +135,7 @@ class Pops(game.Mode):
                 name='high'
                 self.game.switched_coils.drive("rampLMFlasher",style='slow',cycle=1)
 
-            self.game.score_display.set_text('super '+name+' jets'.upper(),0,'center')
+            self.game.score_display.set_text(('super '+name+' jets').upper(),0,'center')
             score = count * self.super_score
             self.game.score_display.set_text(locale.format("%d",score,True),1,'center',blink_rate=0.5)
 

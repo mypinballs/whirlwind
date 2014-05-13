@@ -135,11 +135,12 @@ class Ramp(game.Mode):
 
             self.game.sound.play('made_left_ramp')
 
-            if not self.game.get_player_stats('multiball_started') or not self.game.get_player_stats('quick_multiball_started'):
+            if not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started'):
                 if self.shots_made%5==0: #new feature :) every 5 ramps light the cellar hurryup shot!
                     self.cellar.hurryup()
                 else:
                     self.cellar.lite_cellar(20)
+
 
             #update audits
             audits.record_value(self.game,'thunderRampMade')

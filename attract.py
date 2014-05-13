@@ -12,7 +12,7 @@ from time import strftime
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/spacemission/"
+game_path = base_path+"games/whirlwind/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -37,9 +37,16 @@ class Attract(game.Mode):
                 self.display_order = [0,1,2,3,4,5,6,7,8,9]
 		self.display_index = 0
 		self.game.sound.register_sound('burp', sound_path+'burp.ogg')
-                self.game.sound.register_sound('power_up', sound_path+"power_up.ogg")
+                self.game.sound.register_sound('power_up', speech_path+"whirlwind.ogg")
                 self.game.sound.register_sound('coin', sound_path+"coin_1.ogg")
 
+                self.game.sound.register_sound('flipperAttract', sound_path+'burp.ogg')
+                self.game.sound.register_sound('flipperAttract', speech_path+"feel_the_power.ogg")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ooh_million.ogg")
+                self.game.sound.register_sound('flipperAttract', speech_path+"whirlwind.ogg")
+                self.game.sound.register_sound('flipperAttract', speech_path+"youall_come_back_now.ogg")
+
+                self.sound_timestamp = time.time()
                 self.highscore_script = []
 
 	def mode_topmost(self):
@@ -119,6 +126,7 @@ class Attract(game.Mode):
 
             if self.game.switches.lock1.is_active(0.5):
                 self.game.switched_coils.drive('leftLockKickback')
+                self.game.trough.num_balls_locked = 0
 
             self.game.coils.spinWheelsMotor.pulse()
 
@@ -185,15 +193,15 @@ class Attract(game.Mode):
 
                 #logo
                 #self.mypinballs_logo.transition = dmd.ExpandTransition(direction='horizontal')
-                script.append({'top':'mypinballs','bottom':'','timer':5,'transition':0})
+                script.append({'top':'mypinballs'.upper(),'bottom':'','timer':5,'transition':0})
 
                 #system stuff
                 #self.game_logo_layer.transition = dmd.PushTransition(direction='north')
-                script.append({'top':self.game.system_name.upper(),'bottom':'v'+self.game.system_version.upper(),'timer':5,'transition':3})
+                script.append({'top':self.game.system_name.upper(),'bottom':'V'+self.game.system_version.upper(),'timer':5,'transition':3})
 
                 #pricing
                 self.update_pricing()
-                script.append({'top':self.pricing_top,'bottom':self.pricing_bottom,'timer':5,'transition':4})
+                script.append({'top':self.pricing_top.upper(),'bottom':self.pricing_bottom.upper(),'timer':5,'transition':4})
 
                 #replays
                 replay_type =self.game.user_settings['Replay']['Replay Award'] +" AT"
@@ -201,7 +209,7 @@ class Attract(game.Mode):
                 
                 for i in range(replay_levels):
                     name = 'Replay Level '+str(i+1)
-                    script.append({'top':replay_type,'bottom':locale.format("%d", self.game.user_settings['Replay'][name], True),'timer':4,'transition':2})
+                    script.append({'top':replay_type.upper(),'bottom':locale.format("%d", self.game.user_settings['Replay'][name], True),'timer':4,'transition':2})
 
                 #high scores
                 for category in self.game.highscore_categories:
@@ -218,7 +226,7 @@ class Attract(game.Mode):
                             text1 = 'high score '+ranking+')'
                             text2 = name+' '+score_str
 
-                        script.append({'top':text1,'bottom':text2,'timer':5,'transition':1})
+                        script.append({'top':text1.upper(),'bottom':text2.upper(),'timer':5,'transition':1})
 
                 #date and time
                 #self.date_time_layer.transition = dmd.PushTransition(direction='west')
@@ -226,7 +234,7 @@ class Attract(game.Mode):
                     day = str(strftime("%A"))
                     date= str(strftime("%d %b %Y"))
                    
-                    script.append({'top':day,'bottom':date,'timer':5,'transition':3})
+                    script.append({'top':day.upper(),'bottom':date.upper(),'timer':5,'transition':3})
 
                 #game over text
                 index=3
@@ -290,6 +298,11 @@ class Attract(game.Mode):
 #            self.layer  = dmd.GroupedLayer(128, 32, [bgnd_layer,self.pricing_layer])
 
 
+        def sound_effects(self):
+             if time.time()-self.sound_timestamp>5:
+                self.game.sound.play_voice('flipperAttract')
+                self.sound_timestamp=time.time()
+
 	# Enter service mode when the enter button is pushed.
 	def sw_enter_active(self, sw):
 		for lamp in self.game.lamps:
@@ -351,3 +364,10 @@ class Attract(game.Mode):
             audits.update_counter(self.game,'credits',self.credits+1)
             self.show_pricing()
             self.game.sound.play("coin")
+
+
+        def sw_flipperLwL_active(self, sw):
+                self.sound_effects()
+
+        def sw_flipperLwR_active(self, sw):
+                self.sound_effects()

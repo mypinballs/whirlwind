@@ -113,8 +113,8 @@ class Cellar(game.Mode):
             elif self.award_id==6:
                  self.lower_pops()
 
-            self.game.score_display.set_text(self.awards_text_top[self.award_id],0,'center',seconds=2)
-            self.game.score_display.set_text(self.awards_text_bottom[self.award_id],1,'center',seconds=2)
+            self.game.score_display.set_text(self.awards_text_top[self.award_id].upper(),0,'center',seconds=2)
+            self.game.score_display.set_text(self.awards_text_bottom[self.award_id].upper(),1,'center',seconds=2)
 
             self.delay(name='eject_delay',delay=2, handler=self.eject)
 
@@ -143,7 +143,7 @@ class Cellar(game.Mode):
 
 
         def display_hurryup_text(self):
-            self.game.score_display.set_text('Cellar Hurryup',0,justify='center',blink_rate=0.2)
+            self.game.score_display.set_text('Cellar Hurryup'.upper(),0,justify='center',blink_rate=0.2)
 
 
         def display_hurryup_countdown_text(self):
@@ -244,7 +244,7 @@ class Cellar(game.Mode):
 
             self.log.debug('Cellar Lit Status:%s',self.cellar_lit)
 
-            if not self.game.get_player_stats('multiball_running'):
+            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('qm_lock_lit'):
                 if not self.game.get_player_stats('lock_lit') and not self.game.get_player_stats('qm_lock_lit'):
                     self.toggle_skyway_entrance()
 

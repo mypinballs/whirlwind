@@ -130,7 +130,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.13'
+                self.system_version='0.2.15'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -416,7 +416,7 @@ def main():
         #setup logging to file
         datetime = str(time.strftime("%Y-%m-%d %H-%M-%S"))
         file_handler = logging.FileHandler(game_path +'var/logs/'+serial+' Game Log '+datetime+'.log')
-        file_handler.setLevel(logging.DEBUG)
+        file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
         root_logger.addHandler(handler)
@@ -429,6 +429,7 @@ def main():
         logging.getLogger('whirlwind.compass').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.INFO)
         logging.getLogger('game.driver').setLevel(logging.INFO)
+        logging.getLogger('game.sound').setLevel(logging.DEBUG)
 
 
         config = yaml.load(open(machine_config_path, 'r'))

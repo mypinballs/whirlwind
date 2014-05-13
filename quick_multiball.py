@@ -69,6 +69,7 @@ class QuickMultiball(game.Mode):
             
         def mode_started(self):
             self.shots_made = 0
+            self.lock_lit=False
             self.multiball_ready = self.game.get_player_stats('quick_multiball_ready')
             self.multiball_started = self.game.get_player_stats('quick_multiball_started')
             self.multiball_running = self.game.get_player_stats('quick_multiball_running')
@@ -137,9 +138,14 @@ class QuickMultiball(game.Mode):
         def ball_locked(self):
 
             self.display(top='Quick Multiball',bottom='Ready',seconds=3)
-            
+
+            #set multiball ready flag
             self.multiball_ready = True
             self.log.info('Quick Multiball Ready')
+
+            #update lock lit flag
+            self.lock_lit=False
+            self.game.set_player_stats('qm_lock_lit',self.lock_lit)
 
             self.game.sound.play_voice('whirlwind_speech')
             
@@ -406,11 +412,11 @@ class QuickMultiball(game.Mode):
 
 
         def sw_topRightEject_active_for_200ms(self, sw):
-            if self.game.get_player_stats('qm_lock_lit'):
+            if self.lock_lit and not self.multiball_running:
                 self.ball_locked()
 
                 
         def sw_shooterLane_open_for_1s(self,sw):
-            if self.multiball_ready:
+            if self.multiball_ready and not self.multiball_running:
                 self.multiball_start()
 

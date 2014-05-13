@@ -186,6 +186,7 @@ class Skyway(game.Mode):
 
         def toll(self,num):
             self.skyway_tolls+=num
+            self.game.set_player_stats('skyway_tolls',self.skyway_tolls)
 
             #update audits
             audits.record_value(self.game,'skywayRampMade')

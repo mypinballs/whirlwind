@@ -337,7 +337,7 @@ class Compass(game.Mode):
 
 
         def progress(self,num):
-            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started'):
+            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started')  and not self.game.get_player_stats('qm_lock_lit'):
                 self.flags[num]=2
                 self.log.debug('Compasss Flags Status:%s',self.flags)
 

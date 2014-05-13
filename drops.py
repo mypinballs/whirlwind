@@ -71,6 +71,7 @@ class Drops(game.Mode):
 
         def max(self):
             self.value=self.max_value
+            self.game.switched_coils.drive('dropTargetFlasher',style='fast',time=2)
 
          
         def check_sweeping(self):
@@ -115,10 +116,11 @@ class Drops(game.Mode):
                         self.update_count()
                         self.game.sound.play('drop_target_hit')
 
-                if self.value<=self.max_value:
+                if self.value<self.max_value:
                     self.value = self.base_value+(self.hits*self.inc_value)
                 else:
                     self.value=self.max_value
+
                 self.score(self.value)
 
 
