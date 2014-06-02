@@ -90,7 +90,7 @@ PRSwitches:
     #col2
     outhole:
         number: S22
-        tags: outhole
+        tags: outhole,early_save
         label: 'Outhole'
     trough1:
         number: S23
@@ -106,27 +106,32 @@ PRSwitches:
         label: 'Ball Trough 3 (Right)'
     rightInlane:
         number: S27
+        tags: moonlight
         label: 'Right Inlane'
     rightOutlane:
         number: S28
-        tags: outlane,early_save
+        tags: outlane,early_save,moonlight
         label: 'Right Outlane'
     #col3
     leftOutlane:
         number: S31
-        tags: outlane,early_save
+        tags: outlane,early_save,moonlight
         label: 'Left Outlane'
     leftInlane:
         number: S32
+        tags: moonlight
         label: 'Left Inlane'
     rightCellar:
         number: S33
+        tags: moonlight
         label: 'Right Cellar'
     leftCellar:
         number: S34
+        tags: moonlight
         label: 'Left Cellar'
     leftStandup:
         number: S35
+        tags: moonlight
         label: 'Left Standup'
     lock1:
         number: S36
@@ -140,25 +145,31 @@ PRSwitches:
     #col4
     rightStandup:
         number: S41
+        tags: moonlight
         label: 'Right Standup'
     topSingleDropTarget:
         number: S42
         #type: 'NC'
+        tags: moonlight
         label: 'Top Single Drop Target'
     bottomDropTarget:
         number: S43
         #type: 'NC'
+        tags: moonlight
         label: 'Lower Drop Target (3 Bank)'
     middleDropTarget:
         number: S44
         #type: 'NC'
+        tags: moonlight
         label: 'Middle Drop Target (3 Bank)'
     topDropTarget:
         number: S45
         #type: 'NC'
+        tags: moonlight
         label: 'Top Drop Target (3 Bank)'
     middleStandup:
         number: S46
+        tags: moonlight
         label: 'Middle Standup'
     #col5
     leftRampEnter:
@@ -169,68 +180,88 @@ PRSwitches:
         label: 'Left Ramp Made Top'
     leftRampMadeBottom:
         number: S53
+        tags: moonlight
         label: 'Left Ramp Made Bottom'
     leftLoopTop:
         number: S54
+        tags: moonlight
         label: 'Left Loop Top'
     leftLoopBottom:
         number: S55
+        tags: moonlight
         label: 'Left Loop Bottom'
     rightLoopTop:
         number: S56
+        tags: moonlight
         label: 'Right Loop Top'
     rightLoopBottom:
         number: S57
+        tags: moonlight
         label: 'Right Loop Bottom'
     innerLoop:
         number: S58
+        tags: moonlight
         label: 'Right Loop Bottom'
     #col6
     spinner:
         number: S61
+        tags: moonlight
         label: 'Spinner'
     rightRampDown:
         number: S62
         label: 'Right Ramp Down'
     topRightEject:
         number: S63
+        tags: moonlight
         label: 'Top Right Eject'
     rightRampMadeTop:
         number: S64
+        tags: moonlight
         label: 'Right Ramp Made Top'
     rightRampMadeBottom:
         number: S65
+        tags: moonlight
         label: 'Right Ramp Made Bottom'
     leftStandupRightRamp:
         number: S67
+        tags: moonlight
         label: 'Left Standup Right Ramp'
     rightStandupRightRamp:
         number: S68
+        tags: moonlight
         label: 'Right Standup Right Ramp'
     #col 7
     upperLeftJet:
         number: S71
+        tags: moonlight
         label: 'Upper Left Jet'
     upperRightJet:
         number: S72
+        tags: moonlight
         label: 'Upper Right Jet'
     upperBottomJet:
         number: S73
+        tags: moonlight
         label: 'Upper Bottom Jet'
     lowerLeftJet:
         number: S74
+        tags: moonlight
         label: 'Lower Left Jet'
     lowerRightJet:
         number: S75
+        tags: moonlight
         label: 'Lower Right Jet'
     lowerTopJet:
         number: S76
+        tags: moonlight
         label: 'Lower Top Jet'
     leftSlingshot:
         number: S77
+        tags: moonlight
         label: 'Left Slingshot'
     rightSlingshot:
         number: S78
+        tags: moonlight
         label: 'Right Slingshot'
     #col 8
     flipperLwR:
@@ -245,9 +276,11 @@ PRSwitches:
         label: 'Shooter Lane'
     leftRebound:
         number: S84
+        tags: moonlight
         label: 'Left Single Rebound'
     rightRebound:
         number: S85
+        tags: moonlight
         label: 'Right Single Rebound'
         
 PRCoils:
@@ -421,6 +454,10 @@ PRCoils:
         #speial config for top 4 drives on enable line 1 - S35-S38
         pulseTime: 120
         label: 'Spin Wheels Motor'
+    autoLaunch:
+        number: S36
+        pulseTime: 50
+        label: 'Auto Launcher'
         
 PRLamps:
     #col1
@@ -650,7 +687,12 @@ PRBallSave:
         leftInlane: open
         rightOutlane: open
         rightInlane: open
+        rightCellar: open
+        rightRampMadeTop: open
+        spinner: open
     stopSwitches:
+        leftCellar: closed
+        outhole: closed
         shooterLane: closed
         flipperLwL: closed
         flipperLwR: closed

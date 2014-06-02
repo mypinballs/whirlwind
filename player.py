@@ -13,6 +13,7 @@ class Player(procgame.game.Player):
                 self.player_stats['status']=''
                 self.player_stats['bonus_x']=1
                 self.player_stats['skyway_tolls']=1
+                self.player_stats['skyway_eb_tolls']=10
                 self.player_stats['cellar_visits']=0
                 self.player_stats['pop_flags']=[0,0,0,0,0,0]
                 self.player_stats['lower_super_pops_collected']=0
@@ -39,11 +40,17 @@ class Player(procgame.game.Player):
                 self.player_stats['quick_multiball_ready']=False
                 self.player_stats['quick_multiball_started']=False
                 self.player_stats['quick_multiball_running']=False
+                self.player_stats['war_lock_lit']=False
+                self.player_stats['war_multiball_ready']=False
+                self.player_stats['war_multiball_started']=False
+                self.player_stats['war_multiball_running']=False
                 self.player_stats['ball_start_time']=0
                 self.player_stats['drop_banks_completed']=0
                 self.player_stats['skillshot_level']=1
                 self.player_stats['skillshot_in_progress']=False
                 self.player_stats['mode_running']=False
                 self.player_stats['spinner_level']=0
+                self.player_stats['moonlight_total']=0
+                self.player_stats['moonlight_status']=False
 
 		

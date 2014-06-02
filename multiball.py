@@ -405,6 +405,12 @@ class Multiball(game.Mode):
         def sw_lock3_inactive_for_500ms(self, sw):
             if self.multiball_started:
                 self.game.trough.num_balls_in_play+=1
+
+
+        #auto launch balls if kicked out from trough and in shooter lane and multiball not running, i.e fill in ball launches TODO:check this
+        def sw_shooterLane_active_for_500ms(self,sw):
+            if self.multiball_started and not self.multiball_running and self.game.auto_launch_enabled:
+                self.game.coils.autoLaunch.pulse()
                 
 
        

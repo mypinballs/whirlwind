@@ -12,8 +12,10 @@ ClassicHighScoreData:
 SuperJetsChampion:
 - {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 200}
 SkywayChampion:
-- {date: 'Sun Oct  3 17:38:46 2010', inits: PLA, score: 200}
+- {date: 'Sun Oct  3 17:38:46 2010', inits: PLA, score: 50}
 MultiBallChampion:
 - {date: 'Sun Oct  3 17:38:46 2010', inits: TOM, score: 200}
+MoonlightChampion:
+- {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 500000}
 Hidden:
   Total Score: 0

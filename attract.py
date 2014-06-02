@@ -128,6 +128,9 @@ class Attract(game.Mode):
                 self.game.switched_coils.drive('leftLockKickback')
                 self.game.trough.num_balls_locked = 0
 
+            if self.game.switches.shooterLane.is_active(0.5) and self.game.auto_launch_enabled:
+                self.game.coils.autoLaunch.pulse()
+
             self.game.coils.spinWheelsMotor.pulse()
 
 
@@ -218,13 +221,18 @@ class Attract(game.Mode):
 			ranking = str(index)
                         name = str(score.inits)
 
-                        data={'score':score_str, 'ranking':ranking}
-                        if index==0:
-                            text1 = 'champion ('+name+')'
-                            text2 = score_str
+                        if category.game_data_key =='ClassicHighScoreData':
+                            data={'score':score_str, 'ranking':ranking}
+                            if index==0:
+                                text1 = 'champion ('+name+')'
+                                text2 = score_str
+                            else:
+                                text1 = 'high score '+ranking+')'
+                                text2 = name+' '+score_str
+
                         else:
-                            text1 = 'high score '+ranking+')'
-                            text2 = name+' '+score_str
+                            text1 = category.titles[0]
+                            text2 = str(score.score)+" "+category.score_suffix_plural
 
                         script.append({'top':text1.upper(),'bottom':text2.upper(),'timer':5,'transition':1})
 

@@ -229,3 +229,7 @@ featureAudits:
     type: sum
     cid1: tornadoTargetQuickMulitball
     label: 'Total Tornado Target Quick Multiballs Started'
+  totalMoonlightMultiballsStarted:
+    type: sum
+    cid1: moonlightMulitball
+    label: 'Total Moonlight Multiballs Started'

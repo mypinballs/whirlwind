@@ -171,6 +171,13 @@ Feature:
     options: [10,110]
     increments: 10
     default: 50
+  'Auto Launcher Installed':
+    options: ['Yes', 'No']
+    default: 'Yes'
+  'Moonlight Mins to Midnight':
+    options: [5,30]
+    increments: 5
+    default: 15
 Network:
   'IP Address':
     options: [0,255]

@@ -58,13 +58,15 @@ class Skyway(game.Mode):
 
         def mode_started(self):
             self.skyway_tolls= self.game.get_player_stats('skyway_tolls')
+            self.extra_ball_tolls = self.game.get_player_stats('skyway_eb_tolls')
             
         def mode_stopped(self):
             self.game.set_player_stats('skyway_tolls',self.skyway_tolls)
+            self.game.set_player_stats('skyway_eb_tolls',self.extra_ball_tolls)
 
 
         def update_lamps(self):
-            print("Updating Skyway Lamps")
+            self.log.debug("Updating Skyway Lamps")
 
             full = self.skyway_tolls/5
             rem = self.skyway_tolls%5
@@ -83,7 +85,7 @@ class Skyway(game.Mode):
                 self.game.effects.drive_lamp('toll20','on')
 
         def set_lamps(self):
-            print("Setting Skyway Lamps")
+            self.log.debug("Setting Skyway Lamps")
 
             full = self.skyway_tolls/5
             rem = self.skyway_tolls%5
@@ -126,9 +128,14 @@ class Skyway(game.Mode):
             self.set_lamps()
             self.combo()
 
+            if self.skyway_tolls>=self.extra_ball_tolls:
+                self.game.extra_ball.lit()
+                self.extra_ball_tolls+=10
+
 
         def alt_progress(self):
 
+            self.log.info('alt skyway progress')
             if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('lock_lit'):
                 self.toll(1)
                 self.play_sound()
@@ -202,6 +209,6 @@ class Skyway(game.Mode):
             self.progress()
 
         def sw_topRightEject_active_for_250ms(self, sw):
-            if not self.game.get_player_stats('qm_lock_lit'):
+            if not self.game.get_player_stats('quick_multiball_ready') and not self.game.get_player_stats('war_multiball_ready'):
                 self.alt_progress()
 

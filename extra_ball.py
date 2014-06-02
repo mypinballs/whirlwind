@@ -29,7 +29,19 @@ class Extra_Ball(game.Mode):
             self.game.score_display.set_transition_reveal(text=top.upper(),row=0,seconds=seconds)
             self.game.score_display.set_transition_reveal(text=bottom.upper(),row=1,seconds=seconds)
 
+        def schedule_all_lamps(self, enable=True, timer=2):
+		# Start the lamps doing a crazy rotating sequence:
+		schedules = [0xf0f0f0f0, 0x0f0f0f0f]
+		for index, lamp in enumerate(sorted(self.game.lamps, key=lambda lamp: lamp.number)):
+			if enable:
+				sched = schedules[index%len(schedules)]
+				lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
+                                self.delay(delay=timer,handler=lambda:self.schedule_all_lamps(enable=False))
+			else:
+				lamp.disable()
+                                self.game.update_lamps()
 
+            
         def collect(self):
             print("Extra Ball Collected")
             self.display(top='Extra Ball',bottom='',seconds=3)
@@ -43,8 +55,16 @@ class Extra_Ball(game.Mode):
 
 
         def lit(self):
-            self.display(top='Extra Ball',bottom='Lit',seconds=3)
+            timer=3
+            self.display(top='Extra Ball',bottom='Lit',seconds=timer)
             self.game.sound.play('extra_ball_lit')
-            self.game.effects.drive_lamp('scExtraBall','smarton')
+            self.schedule_all_lamps(timer-1)
+            self.delay(delay=timer,handler=self.lit_finish)
 
+
+        def lit_finish(self):
+            self.game.effects.drive_lamp('scExtraBall','smarton')
             audits.record_value(self.game,'extraBallLit')
+
+
+

@@ -77,8 +77,10 @@ featureAudits:
     label: 'Multiball Started'
   quickMultiballStarted:
     label: 'Quick Multiball Started'
+  warMultiballStarted:
+    label: 'War Multiball Started (Secret)'
   ballLocked:
-     label: 'Ball Locked'
+    label: 'Ball Locked'
   ballLockedSaucer:
     label: 'Ball Locked in Saucer'
   jackpotLit:
@@ -95,6 +97,8 @@ featureAudits:
     label: 'Left Ramp Made'
   millionCollected:
     label: 'Million Collected'
+  warMillionCollected:
+    label: War Million Collected'
   lowerSuperPopCollected:
     label: 'Super Pop Collected'
   upperSuperPopCollected:
@@ -107,6 +111,8 @@ featureAudits:
     label: 'Tornado Target Extra Ball'
   tornadoTargetQuickMulitball:
     label: 'Tornado Target Quick Multiball'
+  moonlightMultiballStarted:
+    label: 'Moonlight Multiball Started'
 #this section is for items that o a value against them i.e read and write not just read
 counters:
   credits:

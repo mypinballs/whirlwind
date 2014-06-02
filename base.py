@@ -4,6 +4,7 @@ import random
 import logging
 import time
 from procgame import *
+from utility import boolean_format
 from bonus import *
 from spinner import *
 from pops import *
@@ -12,6 +13,7 @@ from skyway import *
 from cellar import *
 from ramp import *
 from quick_multiball import *
+from war_multiball import *
 from compass import *
 from multiball import *
 from skillshot import *
@@ -56,11 +58,14 @@ class BaseGameMode(game.Mode):
                 self.game.sound.register_sound('ball_save', sound_path+"ball_save.ogg")
                 self.game.sound.register_sound('ball_save_speech', speech_path+"well_lucky_here.ogg")
                 self.game.sound.register_sound('big_thunder', sound_path+"thunder_crack.ogg")
+
                 self.ball_saved = False
 
 
 
 	def mode_started(self):
+
+                
 
                 #debug
                 self.log.info("Basic Game Mode Started, Ball "+str(self.game.ball))
@@ -149,6 +154,7 @@ class BaseGameMode(game.Mode):
 
             #medium priority basic modes
             self.quick_multiball = QuickMultiball(self.game,50)
+            self.war_multiball = WarMultiball(self.game,50)
             self.multiball = Multiball(self.game,51)
             self.compass = Compass(self.game,52,self.multiball)
             
@@ -156,17 +162,16 @@ class BaseGameMode(game.Mode):
             #higher priority basic modes
             self.skillshot = Skillshot(self.game, 60, self.drops)
 
-
             #link mode methods
             self.cellar.lite_million = self.ramp.lite_million
             self.cellar.quick_multiball = self.quick_multiball.lock_ready
+            self.cellar.war_multiball = self.war_multiball.lock_ready
             self.cellar.drops = self.drops.max
             self.cellar.lower_pops = self.pops.max_lower_pops
             self.cellar.upper_pops = self.pops.max_upper_pops
             self.tornado.quick_multiball = self.quick_multiball.lock_ready
 
-            
-            #start modes
+            #start modes        
             self.game.modes.add(self.spinner)
             self.game.modes.add(self.pops)
             self.game.modes.add(self.drops)
@@ -175,10 +180,10 @@ class BaseGameMode(game.Mode):
             self.game.modes.add(self.cellar)
             self.game.modes.add(self.ramp)
             self.game.modes.add(self.quick_multiball)
+            self.game.modes.add(self.war_multiball)
             self.game.modes.add(self.multiball)
             self.game.modes.add(self.compass)
-            self.game.modes.add(self.skillshot)
-            
+            self.game.modes.add(self.skillshot)     
 
 
         def ball_save_callback(self):
@@ -259,6 +264,7 @@ class BaseGameMode(game.Mode):
                 # Create the bonus mode so bonus can be calculated.
 		self.bonus = Bonus(self.game, 98)
 		self.game.modes.add(self.bonus)
+                self.compass.spin_wheels(False) #stop any spinning wheels
 
 		# Only compute bonus if it wasn't tilted away. 23/02/2011
 		if not self.game.tilt.status:
@@ -283,7 +289,7 @@ class BaseGameMode(game.Mode):
 
         
         def sw_outhole_active(self,sw):
-            if not self.game.get_player_stats('multiball_running'):#and not self.game.ball_save.trough_enable_ball_save:
+            if not self.game.get_player_stats('multiball_running') and not self.game.ball_save.is_active():
                 self.game.sound.stop_music();
                 self.game.sound.play_music('end',loops=0)
                 
@@ -331,6 +337,12 @@ class BaseGameMode(game.Mode):
         def sw_shooterLane_open_for_250ms(self,sw):
                 self.game.sound.play('ball_launch')
 
+
+        def sw_shooterLane_active_for_500ms(self,sw):
+            if self.ball_saved and self.game.auto_launch_enabled:
+                self.game.coils.autoLaunch.pulse()
+                self.ball_saved = False
+                
 #        def sw_shooterLane_active_for_500ms(self,sw):
 #                if self.ball_saved:
 #                    self.game.coils.xxx.pulse()

@@ -52,6 +52,7 @@ class Cellar(game.Mode):
             #defs for callback linkup
             self.lite_million = None
             self.quick_multiball = None
+            self.war_multiball = None
             self.drops = None
             self.lower_pops = None
             self.upper_pops = None
@@ -64,6 +65,7 @@ class Cellar(game.Mode):
             self.cellar_lit = False
             self.skyway_open = True
             self.award_id = 0
+            self.secret_mode = False
 
             self.hurryup_reset2()
 
@@ -106,8 +108,12 @@ class Cellar(game.Mode):
             elif self.award_id==3:
                 self.drops()
             elif self.award_id==4:
-                self.quick_multiball()
-                audits.record_value(self.game,'cellarQuickMultiball')
+                if self.secret_mode:
+                    self.war_multiball()
+                    self.secret_mode_unlocked = False
+                else:
+                    self.quick_multiball()
+                    audits.record_value(self.game,'cellarQuickMultiball')
             elif self.award_id==5:
                 self.lite_million() # populated by 'callback' linkup in base.py
             elif self.award_id==6:
@@ -242,9 +248,16 @@ class Cellar(game.Mode):
             self.update_count()
             wait=0.1
 
-            self.log.debug('Cellar Lit Status:%s',self.cellar_lit)
+            #set the secret mode flag?
+            if self.game.switches.flipperLwR.is_active(0.5):
+                self.secret_mode = True
+            else:
+                 self.secret_mode = False
 
-            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('qm_lock_lit'):
+            self.log.debug('Cellar Lit Status:%s',self.cellar_lit)
+            self.log.debug('Secret Mode Enabled: %s',self.secret_mode)
+
+            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_multiball_running') and not self.game.get_player_stats('war_lock_lit'):
                 if not self.game.get_player_stats('lock_lit') and not self.game.get_player_stats('qm_lock_lit'):
                     self.toggle_skyway_entrance()
 
@@ -259,7 +272,11 @@ class Cellar(game.Mode):
                         wait=self.game.sound.play_voice('cellar_unlit')
                     self.delay(name='eject_delay',delay=wait, handler=self.eject)
             else:
-                 self.delay(name='eject_delay',delay=wait, handler=self.eject)
+                if self.game.get_player_stats('multiball_running') or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('war_multiball_running'): #add extra wait before kickout when multiballs running
+                    wait=wait+6
+                    self.game.effects.drive_lamp('leftCellarSign','timeout',wait)
+
+                self.delay(name='eject_delay',delay=wait, handler=self.eject)
 
             
 
@@ -271,3 +288,4 @@ class Cellar(game.Mode):
 
         def sw_spinner_active(self, sw):
             self.change_award()
+            

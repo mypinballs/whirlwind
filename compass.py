@@ -61,7 +61,7 @@ class Compass(game.Mode):
             self.shots_made = 0
             self.set_complete = 0
             self.game.coils.divertor.disable()
-            self.cancel_delayed('spin_wheels_repeat')
+            self.spin_wheels(False)
             
             for i in range(len(self.flags)):#reset flags
                 self.flags[i]=0
@@ -151,7 +151,7 @@ class Compass(game.Mode):
             self.game.set_player_stats('multiball_ready',self.multiball_ready)
 
             #stop the spinning wheels
-            self.cancel_delayed('spin_wheels_repeat')
+            self.spin_wheels(False)
 
             
         def set_chase(self):
@@ -206,10 +206,14 @@ class Compass(game.Mode):
                 self.game.coils['rampDown'].pulse()
 
 
-        def spin_wheels(self):
-            num=random.randint(50,150)
-            self.game.coils.spinWheelsMotor.pulse(num)
-            self.delay(name='spin_wheels_repeat',delay=0.8,handler=self.spin_wheels)
+        def spin_wheels(self, enable=True):
+            if enable:
+                num=random.randint(50,150)
+                self.game.coils.spinWheelsMotor.pulse(num)
+                self.delay(name='spin_wheels_repeat',delay=0.8,handler=self.spin_wheels)
+            else:
+                self.game.coils.spinWheelsMotor.disable()
+                self.cancel_delayed('spin_wheels_repeat')
 
 
 #        def million_flasher(self,enable=True):
@@ -238,7 +242,7 @@ class Compass(game.Mode):
 
             if self.balls_locked<2:
                 #stop the spinning wheels
-                self.cancel_delayed('spin_wheels_repeat')
+                self.spin_wheels(False)
 
                 self.game.sound.stop_music()
                 self.game.sound.play_music('general_play',-1)
@@ -337,7 +341,7 @@ class Compass(game.Mode):
 
 
         def progress(self,num):
-            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started')  and not self.game.get_player_stats('qm_lock_lit'):
+            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started')  and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_multiball_started')  and not self.game.get_player_stats('war_lock_lit'):
                 self.flags[num]=2
                 self.log.debug('Compasss Flags Status:%s',self.flags)
 
@@ -455,7 +459,7 @@ class Compass(game.Mode):
 
         #lock and start multiball via eject
         def sw_topRightEject_active_for_250ms(self, sw):
-            if self.lock_lit and not self.game.get_player_stats('qm_lock_lit'):
+            if self.lock_lit and not self.game.get_player_stats('quick_multiball_ready') and not self.game.get_player_stats('war_multiball_ready'):
                 self.virtual_lock = True
                 self.lock_manager()
 #                self.delay(name='release_ball',delay=2,handler=lambda:self.game.switched_coils.drive('topEject'))

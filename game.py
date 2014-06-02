@@ -4,6 +4,7 @@ import procgame
 import pinproc
 import string
 import time
+import datetime
 import locale
 import math
 import copy
@@ -13,6 +14,7 @@ import logging
 import audits
 import diagnostics
 
+from utility import boolean_format
 from ac_relay import *
 from switched_coils import *
 from scoredisplay.alphanumeric import *
@@ -22,6 +24,7 @@ from extra_ball import *
 from service import *
 from attract import *
 from base import *
+from moonlight import *
 from match import *
 from tilt import *
 from trough import *
@@ -130,7 +133,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.15'
+                self.system_version='0.2.17'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -154,7 +157,12 @@ class Game(game.BasicGame):
 		for sw in self.switches:
 			self.log.info("  %s:\t%s" % (sw.name, sw.state_str()))
 
+                #balls per game setup
                 self.balls_per_game = self.user_settings['Standard']['Balls Per Game']
+                #moonlight setup
+                self.moonlight_minutes = self.user_settings['Feature']['Moonlight Mins to Midnight']
+                self.moonlight_flag = False
+
 		self.setup_ball_search()
                 #self.score_display.set_left_players_justify(self.user_settings['Display']['Left side score justify'])
 
@@ -178,6 +186,9 @@ class Game(game.BasicGame):
 		self.trough.ball_save_callback = self.ball_save.launch_callback
 		self.trough.num_balls_to_save = self.ball_save.get_num_balls_to_save
 		self.ball_save.trough_enable_ball_save = self.trough.enable_ball_save
+
+                #setup auto launcher
+                self.auto_launch_enabled = boolean_format(self.user_settings['Feature']['Auto Launcher Installed'])
 
 		# Setup and instantiate service mode
                 #move all this to my own service mode class
@@ -225,6 +236,33 @@ class Game(game.BasicGame):
                 cat.game_data_key = 'ClassicHighScoreData'
 		self.highscore_categories.append(cat)
 
+                #skyway tolls
+                cat = highscore.HighScoreCategory()
+		cat.game_data_key = 'SkywayChampion'
+		cat.titles = ['Skyway Champion']
+		cat.score_suffix_singular = ' Toll'
+		cat.score_suffix_plural = ' Tolls'
+		cat.score_for_player = lambda player: player.player_stats['skyway_tolls'] #this is what sets the score to be checked for a qualifying entry
+		self.highscore_categories.append(cat)
+                
+                #super jets
+                cat = highscore.HighScoreCategory()
+		cat.game_data_key = 'SuperJetsChampion'
+		cat.titles = ['Super Jets Champ']
+		cat.score_suffix_singular = ' Thump'
+		cat.score_suffix_plural = ' Thumps'
+		cat.score_for_player = lambda player: player.player_stats['lower_super_pops_collected']+player.player_stats['upper_super_pops_collected'] #this is what sets the score to be checked for a qualifying entry
+		self.highscore_categories.append(cat)
+
+
+
+                #moonlight madness
+                cat = highscore.HighScoreCategory()
+		cat.game_data_key = 'MoonlightChampion'
+		cat.titles = ['Moonlight Master']
+		cat.score_for_player = lambda player: player.player_stats['moonlight_total'] #this is what sets the score to be checked for a qualifying entry
+		self.highscore_categories.append(cat)
+
                 for category in self.highscore_categories:
 			category.load_from_game(self)
 
@@ -241,6 +279,8 @@ class Game(game.BasicGame):
 		self.attract_mode = Attract(self,1)
                 #basic game control mode
 		self.base_game_mode = BaseGameMode(self,2)
+                #moonlight mode - special
+                self.moonlight = Moonlight(self,100)
 
                 #device modes
                 #ac_relay
@@ -295,11 +335,9 @@ class Game(game.BasicGame):
                 self.modes.add(self.effects)
                 self.modes.add(self.extra_ball)
                 self.modes.add(self.attract_mode)
-                
-    
+                 
 		# Make sure flippers are off, especially for user initiated resets.
 		self.enable_flippers(enable=False)
-
 
 
 	# Empty callback just incase a ball drains into the trough before another
@@ -308,7 +346,7 @@ class Game(game.BasicGame):
 		pass
 
 
-        def start_game(self):
+        def start_game(self,force_moonlight=False):
 		super(Game, self).start_game()
 
                 #reset the score display
@@ -320,11 +358,41 @@ class Game(game.BasicGame):
                 if self.user_settings['Standard']['Free Play'].startswith('N'):
                     credits =  audits.display(self,'general','creditsCounter')
                     audits.update_counter(self,'credits',credits-1)
-                
+
+
+                #moonlight check - from Eric P of CCC fame
+                #-----------------------------------------
+                # Check the time
+                now = datetime.datetime.now()
+                self.log.info("Hour:%s Minutes:%s",now.hour,now.minute)
+                # subtract the window minutes from 60
+                window = 60 - self.moonlight_minutes
+                self.log.info("Moonlight window time:%s",window)
+                # check for moonlight - always works at straight up midnight
+                if now.hour == 0 and now.minute == 0:
+                    self.moonlight_flag = True
+                # If not exactly midnight - check to see if we're within the time window
+                elif now.hour == 23 and now.minute >= window:
+                    self.moonlight_flag = True
+                # if force was passed - start it no matter what
+                elif force_moonlight:
+                    self.moonlight_flag = True
+                else:
+                    self.moonlight_flag = False
+
+                self.log.info("Moonlight Flag:%s",self.moonlight_flag)
+                #-----------------------------------------
                 
 	def ball_starting(self):
 		super(Game, self).ball_starting()
-		self.modes.add(self.base_game_mode)
+
+                #check for moonlight
+                self.moonlight_flag=True #temp TODO:remove this!
+                if self.moonlight_flag and not self.get_player_stats('moonlight_status'):
+                    self.modes.add(self.moonlight)
+                #else add normal base mode
+                else:
+                    self.modes.add(self.base_game_mode)
 
                 #update the display
                 self.score_display.update_layer()
