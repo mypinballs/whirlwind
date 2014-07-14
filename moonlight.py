@@ -24,8 +24,8 @@ class Moonlight(game.Mode):
             self.log = logging.getLogger('whirlwind.moonlight_madness')
 
             self.game.sound.register_music('lock_lit', music_path+"lock_lit.ogg")
-            self.game.sound.register_music('end', music_path+"lock_lit_end.ogg")
             self.game.sound.register_music('multiball_play', music_path+"multiball_play.ogg")
+            self.game.sound.register_music('multiball_end', music_path+"multiball_end.aiff")
 
             self.game.sound.register_sound('take_cover_now', speech_path+"take_cover_now.ogg")
             self.game.sound.register_sound('multiball_eject_speech', speech_path+"here_it_comes.ogg")
@@ -37,11 +37,14 @@ class Moonlight(game.Mode):
             self.game.sound.register_sound('random_sound3', sound_path+"pop_3.ogg")
             self.game.sound.register_sound('random_sound4', sound_path+"pop_4.ogg")
             self.game.sound.register_sound('random_sound5', sound_path+"pop_5.ogg")
-            self.game.sound.register_sound('random_sound6', sound_path+"super_pop_1.ogg")
-            self.game.sound.register_sound('random_sound7', sound_path+"super_pop_2.ogg")
-            self.game.sound.register_sound('random_sound8', sound_path+"super_pop_3.ogg")
-            self.game.sound.register_sound('random_sound9', sound_path+"super_pop_4.ogg")
-            self.game.sound.register_sound('random_sound10', sound_path+"super_pop_5.ogg")
+            self.game.sound.register_sound('random_sound6', sound_path+"drop_target_hit.ogg")
+            self.game.sound.register_sound('random_sound7', sound_path+"drop_target_sweep.ogg")
+            self.game.sound.register_sound('random_sound8', sound_path+"inlane_1.ogg")
+            self.game.sound.register_sound('random_sound9', sound_path+"inlane_2.ogg")
+            self.game.sound.register_sound('random_sound10', sound_path+"compass_target_lit.ogg")
+            self.game.sound.register_sound('random_sound11', sound_path+"cow_3.aiff")
+            self.game.sound.register_sound('random_sound12', sound_path+"glass_smash.aiff")
+
             self.game.sound.register_sound('saucer_eject', sound_path+"saucer_eject.aiff")
 
 
@@ -59,12 +62,12 @@ class Moonlight(game.Mode):
             self.million_timer = 30 #change to setting
             self.base_value = 250000
 
-            self.balls_needed = 2
+            self.balls_needed = 3
             self.next_ball_ready = False
             self.virtual_lock = False
             self.multiball_info_text_flag = 0
             self.end_callback= None
-            self.played_flag = False
+            
 
             self.moonlight_switchnames = []
             for switch in self.game.switches.items_tagged('moonlight'):
@@ -77,16 +80,25 @@ class Moonlight(game.Mode):
 
         
         def reset(self):
-            self.reset_combos()
             self.count = 0
             self.million_count = 0
+            self.total = 0
+            self.played_flag = False
+            self.start_finish = False
+            self.ball_ejected = False
+
+            self.reset_display_flag()
+            self.reset_combos()
             
 
         def reset_combos(self):
             self.combo = False
             self.super_combo = False
 
-        
+        def reset_display_flag(self):
+            self.progress_text_runnning = False
+
+
 #        def update_lamps(self):
 #            for i in range(self.lamps):
 #                self.game.effects.drive_lamp(self.lamps[i],'on')
@@ -112,6 +124,7 @@ class Moonlight(game.Mode):
             #setup
             self.game.enable_flippers(True)
             self.game.tilt.reset()
+            self.game.ball_search.enable()
 
             #set gi
             self.game.coils.upperPlayfieldGIOff.enable()
@@ -130,6 +143,7 @@ class Moonlight(game.Mode):
             self.game.modes.add(self.tornado)
             self.game.modes.add(self.cellar)
 
+
             
         def mode_stopped(self):
             #tidy up
@@ -140,7 +154,7 @@ class Moonlight(game.Mode):
             self.played_flag = True
             self.game.set_player_stats('moonlight_status',self.played_flag)
             #store the total value for the round
-            self.game.set_player_stats('moonlight_total',(self.count*self.base_value)+(self.million_count*self.million_value))
+            self.game.set_player_stats('moonlight_total',self.total)
 
             #remove other modes
             self.game.modes.remove(self.drops)
@@ -171,7 +185,9 @@ class Moonlight(game.Mode):
 
 
                 if self.multiball_running:
+                    self.cancel_delayed('display_multiball_info_repeat')
                     self.multiball_tracking()
+
 
 
         def million_speech(self,enable=True):
@@ -207,17 +223,23 @@ class Moonlight(game.Mode):
 
             if self.multiball_info_text_flag<10:
                 self.multiball_info_text_flag+=1
-                self.delay(name='display_multiball_info_repeat',delay=time,handler=self.display_multiball_info,param=time)
+                self.cancel_delayed('display_multiball_info_repeat')
+                self.delay(name='display_multiball_info_repeat',delay=time+1,handler=self.display_multiball_info,param=time)
             else:
                 self.multiball_info_text_flag = 0
                 self.cancel_delayed('display_multiball_info_repeat')
 
             
         def display_progress_text(self,time=3):
-            text=['***Pow***','***Wham***','***Kepow***','***Doho***','***Cow***','***Slam***','***Crash***','***Boom***','***Bang***']
+            text=['***Pow***','***Wham***','***Kepow***','***Doho***','***Cow***','***Slam***','***Crash***','***Boom***','***Bang***','***Kezamm***']
             num = random.randint(0,len(text)-1)
             self.display(top=text[num],bottom=text[num],seconds=time)
+            self.progress_text_runnning = True
+            self.delay(name='clear_progress_display_flag_timer',delay=time+1,handler=self.reset_display_flag)
 
+
+        def display_total_text(self,time=0):
+             self.display(top='Moonlight Total',bottom=locale.format("%d", self.total, True),seconds=time)
 
         def display_finish_text(self,time=0):
              self.display(top='And Now',bottom='Back To The Game',seconds=time)
@@ -264,7 +286,7 @@ class Moonlight(game.Mode):
 
         def play_sound(self):
 
-            list =["random_sound1","random_sound2","random_sound3","random_sound4","random_sound5","random_sound6","random_sound7","random_sound8","random_sound9","random_sound10"]
+            list =["random_sound1","random_sound2","random_sound3","random_sound4","random_sound5","random_sound6","random_sound7","random_sound8","random_sound9","random_sound10","random_sound11","random_sound12"]
             i= random.randint(0, len(list)-1)
             self.game.sound.play(list[i])
 
@@ -278,6 +300,9 @@ class Moonlight(game.Mode):
 
             #display help info
             self.display_multiball_info(3)
+
+            #ramp down
+            self.game.coils['rampDown'].pulse()
 
             #play speech
             start_speech_length = self.game.sound.play_voice('multiball_eject_speech')
@@ -295,10 +320,10 @@ class Moonlight(game.Mode):
             self.log.debug('multiball eject reached')
 
             #make sure ramp is up
-            self.game.switched_coils.drive('rampLifter')
+            self.skyway_entrance('up')
 
             #launch balls
-            self.game.trough.launch_balls(2,stealth=False) #launch remaining balls
+            self.game.trough.launch_balls(3,stealth=False) #launch balls
 
             #queue multiball effects
             self.delay(name='multiball_effects_delay',delay=0.5, handler=self.multiball_effects)
@@ -323,8 +348,11 @@ class Moonlight(game.Mode):
 
         def multiball_tracking(self):
             #end check
-            if self.balls_in_play==1:
-                
+            if self.balls_in_play==1 and not self.start_finish:
+
+                #update flag
+                self.start_finish = True
+
                 #stop spinning wheels
                 self.cancel_delayed('spin_wheels_repeat')
 
@@ -335,14 +363,22 @@ class Moonlight(game.Mode):
                 for lamp in self.game.lamps:
                     lamp.disable()
 
-
                 #stop music
                 self.game.sound.stop_music()
+                self.game.sound.play_music('multiball_end',loops=0)
+
+                #multiball ended callback
+                if self.end_callback:
+                    self.log.debug('Moonlight Multiball End Callback Called')
+                    self.end_callback()
 
                 #disable flippers
                 self.game.enable_flippers(enable=False)
-    
-                self.finish()
+
+                #calc total & display
+                self.total = (self.count*self.base_value)+(self.million_count*self.million_value)
+                self.display_total_text()
+
 
             elif self.balls_in_play==0: #all balls now drained
 
@@ -355,17 +391,16 @@ class Moonlight(game.Mode):
                 self.game.set_player_stats('multiball_started',self.multiball_started)
                 self.game.set_player_stats('multiball_ready',self.multiball_ready)
                 
-                #mulitball ended callback
-                if self.end_callback:
-                    self.log.debug('Moonlight Multiball End Callback Called')
-                    self.end_callback()
+                #zero score
+                self.game.current_player().score = 0
 
-                self.game.modes.remove(self)
-
+                wait =3
+                self.display_finish_text(wait)
+                self.delay(delay=wait,handler=self.finish)     
+    
 
         def finish(self):
-            self.display_finish_text()
-
+            self.game.modes.remove(self)
 
 
         def spin_wheels(self):
@@ -421,14 +456,24 @@ class Moonlight(game.Mode):
             audits.record_value(self.game,'millionCollected')
 
 
+        def skyway_entrance(self,dirn):
+            if dirn=='up' and self.game.switches.rightRampDown.is_active():
+                self.game.switched_coils.drive('rightRampLifter')
+            elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
+                self.game.coils['rampDown'].pulse()
+
+
         def saucer_eject(self):
             self.game.sound.play('saucer_eject')
             self.game.switched_coils.drive('topEject')
+            if not self.ball_ejected:
+                self.delay(name='saucer_eject_repeat',delay=1.5,handler=self.saucer_eject)
 
 
         def progress(self,sw):
-            if self.multiball_running:
-                self.display_progress_text()
+            if self.multiball_running and not self.start_finish:
+                if not self.progress_text_runnning:
+                    self.display_progress_text()
                 self.game.score(self.base_value)
                 self.progress_flashers()
                 self.play_sound()
@@ -450,12 +495,18 @@ class Moonlight(game.Mode):
 
         def sw_topRightEject_active_for_200ms(self, sw):
             if self.multiball_running:
+                self.ball_ejected = False
                 self.saucer_eject()
 
+
+        def sw_topRightEject_inactive_for_200ms(self, sw):
+            self.ball_ejected =True
+            self.cancel_delayed('saucer_eject_repeat')
+
                 
-        def sw_shooterLane_open_for_1s(self,sw):
-            if not self.multiball_running:
-                self.multiball_start()
+#        def sw_shooterLane_open_for_1s(self,sw):
+#            if not self.multiball_running:
+#                self.multiball_start()
 
 
         def sw_shooterLane_active_for_500ms(self,sw):

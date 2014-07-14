@@ -208,7 +208,7 @@ class Skyway(game.Mode):
         def sw_rightRampMadeTop_active(self, sw):
             self.progress()
 
-        def sw_topRightEject_active_for_250ms(self, sw):
+        def sw_topRightEject_active_for_250ms(self, sw): #should this be where all saucer control is handled from? TODO:check this
             if not self.game.get_player_stats('quick_multiball_ready') and not self.game.get_player_stats('war_multiball_ready'):
                 self.alt_progress()
 

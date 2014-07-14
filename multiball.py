@@ -62,7 +62,7 @@ class Multiball(game.Mode):
             self.multiball_started = False
             self.multiball_running = False
             self.end_callback = None
-
+            self.end_callback2 = None
             
             self.reset()
 
@@ -275,6 +275,9 @@ class Multiball(game.Mode):
                     self.log.debug('Multiball End Callback Called')
                     self.end_callback()
 
+                if self.end_callback2:
+                    self.end_callback2()
+
 
         def jackpot_helper_display(self):
             time=3
@@ -368,6 +371,13 @@ class Multiball(game.Mode):
             num=random.randint(50,200)
             self.game.coils.spinWheelsMotor.pulse(num)
             self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
+
+
+        def skyway_entrance(self,dirn):
+            if dirn=='up' and self.game.switches.rightRampDown.is_active():
+                self.game.switched_coils.drive('rightRampLifter')
+            elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
+                self.game.coils['rampDown'].pulse()
 
 
         #switch handlers

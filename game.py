@@ -133,7 +133,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.17'
+                self.system_version='0.2.18'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -280,7 +280,7 @@ class Game(game.BasicGame):
                 #basic game control mode
 		self.base_game_mode = BaseGameMode(self,2)
                 #moonlight mode - special
-                self.moonlight = Moonlight(self,100)
+                self.moonlight = Moonlight(self,2)
 
                 #device modes
                 #ac_relay

@@ -138,6 +138,13 @@ class Trough(procgame.game.Mode):
             #if self.game.switches[self.outhole_switchname].is_active(seconds=1.0):
             self.game.switched_coils.drive(self.outhole_coilname)
 
+            self.delay(name='outhole_kick_repeat',delay=2,handler=self.check_outhole)
+
+        def check_outhole(self):
+            if self.game.switches[self.outhole_switchname].is_active(1):
+                self.outhole_switch_handler(self.outhole_switchname)
+
+          
 
 	# Switches will change states a lot as balls roll down the trough.
 	# So don't go through all of the logic every time.  Keep resetting a

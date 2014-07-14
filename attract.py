@@ -232,7 +232,7 @@ class Attract(game.Mode):
 
                         else:
                             text1 = category.titles[0]
-                            text2 = str(score.score)+" "+category.score_suffix_plural
+                            text2 = locale.format("%d", score.score, True)+" "+category.score_suffix_plural
 
                         script.append({'top':text1.upper(),'bottom':text2.upper(),'timer':5,'transition':1})
 

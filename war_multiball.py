@@ -314,8 +314,8 @@ class WarMultiball(game.Mode):
         def multiball_eject(self):
             self.log.debug('multiball eject reached')
 
-            #make sure ramp is up
-            self.game.switched_coils.drive('rampLifter')
+            #make sure ramp is down
+            self.skyway_entrance('down')
 
             #kick out ball
             self.game.switched_coils.drive('topEject')
@@ -408,6 +408,12 @@ class WarMultiball(game.Mode):
 
             self.delay(delay=3,handler=self.set_lamps_help)
 
+        
+        def skyway_entrance(self,dirn):
+            if dirn=='up' and self.game.switches.rightRampDown.is_active():
+                self.game.switched_coils.drive('rightRampLifter')
+            elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
+                self.game.coils['rampDown'].pulse()
 
         def eject(self):
             self.game.switched_coils.drive('topEject')

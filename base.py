@@ -171,6 +171,7 @@ class BaseGameMode(game.Mode):
             self.cellar.upper_pops = self.pops.max_upper_pops
             self.tornado.quick_multiball = self.quick_multiball.lock_ready
 
+
             #start modes        
             self.game.modes.add(self.spinner)
             self.game.modes.add(self.pops)
@@ -290,7 +291,7 @@ class BaseGameMode(game.Mode):
         
         def sw_outhole_active(self,sw):
             if not self.game.get_player_stats('multiball_running') and not self.game.ball_save.is_active():
-                self.game.sound.stop_music();
+                self.game.sound.stop_music()
                 self.game.sound.play_music('end',loops=0)
                 
 

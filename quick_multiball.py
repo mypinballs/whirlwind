@@ -280,7 +280,7 @@ class QuickMultiball(game.Mode):
             self.log.debug('multiball eject reached')
 
             #make sure ramp is up
-            self.game.switched_coils.drive('rampLifter')
+            self.skyway_entrance('up')
 
             #kick out ball
             self.game.switched_coils.drive('topEject')
@@ -360,6 +360,17 @@ class QuickMultiball(game.Mode):
             self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
 
 
+        def skyway_entrance(self,dirn):
+            if dirn=='up' and self.game.switches.rightRampDown.is_active():
+                self.game.switched_coils.drive('rightRampLifter')
+            elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
+                self.game.coils['rampDown'].pulse()
+
+
+        def eject(self):
+            self.game.switched_coils.drive('topEject')
+
+
         def lite_million(self,enable=True):
             if enable:
                 self.million_lit=True
@@ -399,6 +410,7 @@ class QuickMultiball(game.Mode):
             audits.record_value(self.game,'millionCollected')
 
 
+
         #switch handlers
         #-------------------------
 
@@ -414,9 +426,12 @@ class QuickMultiball(game.Mode):
         def sw_topRightEject_active_for_200ms(self, sw):
             if self.lock_lit and not self.multiball_running:
                 self.ball_locked()
+                return procgame.game.SwitchStop
+            elif self.multiball_running:
+                self.eject()
+                return procgame.game.SwitchStop
 
                 
         def sw_shooterLane_open_for_1s(self,sw):
             if self.multiball_ready and not self.multiball_running:
                 self.multiball_start()
-

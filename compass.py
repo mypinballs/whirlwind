@@ -131,13 +131,15 @@ class Compass(game.Mode):
             #self.multiball_started = False
             self.multiball_ready = self.game.get_player_stats('multiball_ready')
 
-            #check for lock lit from previous ball
-            #and check and best restore in case physical locked balls were stolen from a multiplayer game, will be changed when autolauncher added
+            #check for lock lit from previous ball and determine if 2 balls locked
+            #check and best restore in case physical locked balls were stolen from a multiplayer game, will be changed when autolauncher added
             #otherwise reset compass at stored level
-            if self.lock_lit or self.balls_locked>self.game.trough.num_balls_locked:
+            if (self.lock_lit and self.balls_locked<2) or self.balls_locked>self.game.trough.num_balls_locked:
                 self.lock_ready()
                 if self.balls_locked>self.game.trough.num_balls_locked: #restore lock logic
                     self.balls_locked=self.game.trough.num_balls_locked
+            elif self.lock_lit and self.balls_locked==2:
+                self.multiball_start_ready()
             else:
                 #setup the compass - flags are reset here so partial set completion is lost
                 self.reset()
@@ -149,6 +151,7 @@ class Compass(game.Mode):
             self.game.set_player_stats('compass_sets_complete',self.set_complete)
             self.game.set_player_stats('lock_lit',self.lock_lit)
             self.game.set_player_stats('multiball_ready',self.multiball_ready)
+            self.game.set_player_stats('balls_locked',self.balls_locked)
 
             #stop the spinning wheels
             self.spin_wheels(False)
@@ -206,6 +209,28 @@ class Compass(game.Mode):
                 self.game.coils['rampDown'].pulse()
 
 
+        def multiball_start_ready(self):
+            self.multiball_ready = True
+            self.log.info('Multiball Ready: Compass Level:%s',self.compass_level)
+            if self.compass_level==2: #allow start via saucer for first multiball
+                #add delay here to ramp lifter because of skyway flashers not ending soon enough after lock
+                self.delay(name='lift ramp',delay=1,handler=self.ramp_lifter,param='up')
+            else:
+                self.delay(name='lift ramp',delay=1,handler=self.ramp_lifter,param='down')
+                self.game.effects.drive_lamp('lock','off')
+
+            #self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming'))
+            self.game.sound.play_voice('storm_coming')
+
+            #set release lamp
+            self.game.effects.drive_lamp('release','fast')
+            #set million lamp
+            self.game.effects.drive_lamp('million','fast')
+
+            #queue million flasher
+            #self.delay(delay=1,handler=self.million_flasher)
+
+
         def spin_wheels(self, enable=True):
             if enable:
                 num=random.randint(50,150)
@@ -228,10 +253,10 @@ class Compass(game.Mode):
 
         
         def ramp_lifter(self,dirn):
-            if dirn=='up':
+            if dirn=='up' and self.game.switches.rightRampDown.is_active():
                 self.game.switched_coils.drive('rightRampLifter')
                 self.log.debug('ramp up')
-            elif dirn=='down':
+            elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
                 self.game.coils['rampDown'].pulse()
                 self.log.debug('ramp down')
             
@@ -253,25 +278,7 @@ class Compass(game.Mode):
                 self.game.set_player_stats('lock_lit',self.lock_lit)
                 self.game.effects.drive_lamp('lock','off')
             else:
-                self.multiball_ready = True
-                self.log.info('Multiball Ready: Compass Level:%s',self.compass_level)
-                if self.compass_level==2: #allow start via saucer for first multiball
-                    #add delay here to ramp lifter because of skyway flashers not ending soon enough after lock
-                    self.delay(name='lift ramp',delay=1,handler=self.ramp_lifter,param='up')
-                else:
-                    self.delay(name='lift ramp',delay=1,handler=self.ramp_lifter,param='down')
-                    self.game.effects.drive_lamp('lock','off')
-
-                #self.delay(name='ball_locked_announce',delay=1,handler=lambda:self.game.sound.play_voice('storm_coming'))
-                self.game.sound.play_voice('storm_coming')
-
-                #set release lamp
-                self.game.effects.drive_lamp('release','fast')
-                #set million lamp
-                self.game.effects.drive_lamp('million','fast')
-
-                #queue million flasher
-                #self.delay(delay=1,handler=self.million_flasher)
+                self.multiball_start_ready()
 
             #queue the next ball launch
             self.delay(name='launch_next_ball',delay=0.5,handler=self.launch_next_ball)

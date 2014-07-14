@@ -37,38 +37,52 @@ class SwitchedCoils(game.Mode):
             self.c_coils = ['bottomRightFlasher','spinnerFlasher','rampTopFlasher','rampUMFlasher','rampLMFlasher','rampBottomFlasher','dropTargetFlasher','compassFlasher']
 
             self.switched_flag = False
-
+            self.blocking_flag = False
 
         def mode_started(self):
             pass
 
-        
+
+        def set_block(self,value):
+            self.blocking_flag = value
+          
         def drive(self,name,style='medium',cycle=0,time=2):
             for i in range(len(self.a_coils)):
                 if name==self.a_coils[i]:
 
                     #clear all active devices - the easy way
-                    for coil in self.a_coils:
-                        self.game.coils[coil].disable()
+                    if self.switched_flag: #only disable the drives if set as c side
+                        for coil in self.a_coils:
+                            self.game.coils[coil].disable()
 
-                    #experimental a side - allow for switching of relay and restore (for flashers that are previously scheduled)
+                    if name=='outhole':
+                        self.set_block(True)
+
+                    #coil control
                     self.game.coils.acSelect.disable()
                     wait=0.05 #50ms
                     self.delay(delay=wait,handler=self.game.coils[self.a_coils[i]].pulse)
                     wait+=0.05
                     wait+=self.game.coils[self.a_coils[i]].default_pulse_time
                     self.delay(delay=wait,handler=self.game.coils.acSelect.enable)
+                    if name=='outhole':
+                         self.delay(delay=wait,handler=lambda:self.set_block(False))
 
                     self.log.debug('Switched Coil Pulsed:%s',name)
 
                 elif name==self.c_coils[i]:
-                    self.game.coils.acSelect.enable()
-                    if self.game.ac_relay.is_working():
-                        self.switch_tries=0
-                        data = [self.a_coils[i],style,cycle,time]
-                        self.flasher(data)
 
-                    self.log.debug('Flasher Scheduled:%s',name)
+                    if not self.blocking_flag:
+                        self.game.coils.acSelect.enable()
+                        if self.game.ac_relay.is_working():
+                            self.switch_tries=0
+                            data = [self.a_coils[i],style,cycle,time]
+                            self.flasher(data)
+
+                        self.log.debug('Flasher Scheduled:%s',name)
+                    else:
+                        self.log.debug('Flasher Ingored:%s',name)
+               
 
         #flasher control - check that ac relay is switched before starting effect
         #try 10 times before giving up  - TODO - inform ac relay mode that relay is bust in this case

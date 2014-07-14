@@ -16,6 +16,6 @@ SkywayChampion:
 MultiBallChampion:
 - {date: 'Sun Oct  3 17:38:46 2010', inits: TOM, score: 200}
 MoonlightChampion:
-- {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 500000}
+- {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 35000000}
 Hidden:
   Total Score: 0

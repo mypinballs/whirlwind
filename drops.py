@@ -29,6 +29,8 @@ class Drops(game.Mode):
             self.inc_value = 10000
             self.max_value = 100000
 
+            self.reset_try = 0
+
 
         def reset(self):
             self.flags = [False,False,False]
@@ -36,6 +38,22 @@ class Drops(game.Mode):
             self.value = self.base_value
             self.sweeping=False
             self.game.switched_coils.drive('dropTargetReset')
+
+            self.delay(name='reset_retry',delay=2,handler=self.check_reset)
+
+
+        def check_reset(self):
+            if self.game.switches.bottomDropTarget.is_active() and self.game.switches.middleDropTarget.is_active() and self.game.switches.topDropTarget.is_active():
+                if self.reset_try<10:
+                    self.reset()
+                    self.reset_try+=1
+                else:
+                    #TODO: log device error in diagnostics mode
+                    pass
+            else:
+                self.cancel_delayed('reset_retry')
+                self.reset_try = 0
+
 
 
         def at_max(self):

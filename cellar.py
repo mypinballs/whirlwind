@@ -63,7 +63,7 @@ class Cellar(game.Mode):
             self.super_door_score = 500000
             self.big_points = 250000
             self.cellar_lit = False
-            self.skyway_open = True
+            #self.skyway_open = True
             self.award_id = 0
             self.secret_mode = False
 
@@ -232,12 +232,14 @@ class Cellar(game.Mode):
 
         def toggle_skyway_entrance(self):
             if not self.game.get_player_stats('multiball_running'):
-                if self.skyway_open:
+                #if self.skyway_open:
+                if self.game.switches.rightRampDown.is_inactive():
+                    self.game.coils['rampDown'].pulse()
                     self.game.switched_coils.drive('rampLifter')
-                    self.skyway_open = False
+                    #self.skyway_open = False
                 else:
                     self.game.coils['rampDown'].pulse()
-                    self.skyway_open = True
+                    #self.skyway_open = True
 
 
 
@@ -272,14 +274,9 @@ class Cellar(game.Mode):
                         wait=self.game.sound.play_voice('cellar_unlit')
                     self.delay(name='eject_delay',delay=wait, handler=self.eject)
             else:
-                if self.game.get_player_stats('multiball_running') or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('war_multiball_running'): #add extra wait before kickout when multiballs running
-                    wait=wait+6
-                    self.game.effects.drive_lamp('leftCellarSign','timeout',wait)
-
                 self.delay(name='eject_delay',delay=wait, handler=self.eject)
 
             
-
 
         def sw_rightInlane_active(self, sw):
             if not self.game.get_player_stats('multiball_running') and not self.hurryup_lit:

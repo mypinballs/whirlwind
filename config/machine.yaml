@@ -456,7 +456,7 @@ PRCoils:
         label: 'Spin Wheels Motor'
     autoLaunch:
         number: S36
-        pulseTime: 50
+        pulseTime: 60
         label: 'Auto Launcher'
         
 PRLamps:
