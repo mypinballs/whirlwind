@@ -90,14 +90,17 @@ class Trough(procgame.game.Mode):
 
                 # Install outhole switch handler.
 		self.add_switch_handler(name=self.outhole_switchname, event_type='active', \
-				delay=0.75, handler=self.outhole_switch_handler)
-	
+				delay=1.25, handler=self.outhole_switch_handler) #0.75
+                               	
 		# Reset variables
 		self.num_balls_in_play = 0
 		self.num_balls_locked = 0
 		self.num_balls_to_launch = 0
 		self.num_balls_to_stealth_launch = 0
+                self.num_balls_pre_launch = 0
+                self.eject_success = False
 		self.launch_in_progress = False
+                self.launch_check_delay = 1
 
 		self.ball_save_active = False
 
@@ -143,9 +146,9 @@ class Trough(procgame.game.Mode):
         def check_outhole(self):
             if self.game.switches[self.outhole_switchname].is_active(1):
                 self.outhole_switch_handler(self.outhole_switchname)
-
+                
+       
           
-
 	# Switches will change states a lot as balls roll down the trough.
 	# So don't go through all of the logic every time.  Keep resetting a
 	# delay function when switches change state.  When they're all settled,
@@ -155,7 +158,7 @@ class Trough(procgame.game.Mode):
 		self.delay(name='check_switches', event_type=None, delay=0.50, handler=self.check_switches)
 
 	def check_switches(self):
-		if self.num_balls_in_play > 0:
+		if self.num_balls_in_play > 0 and self.eject_success:
 			# Base future calculations on how many balls the machine 
 			# thinks are currently installed.
        	         	num_current_machine_balls = self.game.num_balls_total
@@ -227,6 +230,26 @@ class Trough(procgame.game.Mode):
 						self.num_balls_in_play -= 1
 					if self.drain_callback:
 						self.drain_callback()
+                                                
+        def check_trough_eject(self):
+            #cancel any queued reset of the tracking count
+            self.cancel_delayed('check_eject_delay')
+
+            current_num_balls = self.num_balls()
+            if current_num_balls==self.num_balls_pre_launch:
+                self.log.debug( "Trough is same as before launch, Ball fell back in")
+                self.eject_success = False
+                self.retry_launch()
+            else:
+                self.eject_success = True
+                self.log.debug( "That's one")
+                
+            
+
+        def retry_launch(self):
+            self.launch_balls(1)
+            
+
 
 	# Count the number of balls in the trough by counting active trough switches.
 	def num_balls(self):
@@ -259,7 +282,11 @@ class Trough(procgame.game.Mode):
 			being launched to keep only 1 active ball in play,
 			stealth should be used.
 		"""
-
+                #reset the eject success flag
+                self.eject_success = False
+                #update the pre launch ball number
+                self.num_balls_pre_launch = self.num_balls()
+                
 		self.num_balls_to_launch += num
 		if stealth:
 			self.num_balls_to_stealth_launch += num
@@ -268,6 +295,7 @@ class Trough(procgame.game.Mode):
 			if callback:
 				self.launch_callback = callback
 			self.common_launch_code()
+                
 
 	# This is the part of the ball launch code that repeats for multiple launches.
 	def common_launch_code(self):
@@ -277,6 +305,7 @@ class Trough(procgame.game.Mode):
 			self.num_balls_to_launch -= 1
                         #pulse coil
 			self.game.switched_coils.drive(self.eject_coilname)
+                        self.delay(name='check_eject_delay',delay=self.launch_check_delay,handler=self.check_trough_eject) #setup a time delay to reset the eject count
                         
 			# Only increment num_balls_in_play if there are no more 
 			# stealth launches to complete.
@@ -299,3 +328,10 @@ class Trough(procgame.game.Mode):
 
         def mode_stopped(self):
 		self.cancel_delayed('check_switches')
+                
+                
+        #def sw_shooterLane_active_for_150ms(self,sw): 
+            #launch is good, reset tracking now and cancel the catch all as shootlane switch is working
+        #    self.cancel_delayed('check_eject_delay')
+        #   self.eject_success = True
+        

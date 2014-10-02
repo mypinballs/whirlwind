@@ -120,7 +120,7 @@ class QuickMultiball(game.Mode):
             self.lock_lit=True
             self.game.set_player_stats('qm_lock_lit',self.lock_lit)
 
-            self.display(top='Quick Mulitball',bottom='Is Lit',seconds=5)
+            self.display(top='Quick Multiball',bottom='Is Lit',seconds=5)
 
             self.game.sound.stop_music()
             self.game.sound.play_music('lock_lit',-1)
@@ -141,6 +141,7 @@ class QuickMultiball(game.Mode):
 
             #set multiball ready flag
             self.multiball_ready = True
+            self.game.set_player_stats('quick_multiball_ready',self.multiball_ready)
             self.log.info('Quick Multiball Ready')
 
             #update lock lit flag
@@ -173,10 +174,14 @@ class QuickMultiball(game.Mode):
 
         def launch_next_ball(self):
             if not self.virtual_lock: #skyway should handle the eject saucer with corect delay if virtual lock
-                self.game.trough.launch_balls(1,stealth=False) #stealth false, bip +1
+                self.game.trough.launch_balls(1,callback=self.launch_callback,stealth=False) #stealth false, bip +1
             self.next_ball_ready = True
             self.virtual_lock = False
             self.game.ball_save.start(time=10)
+            
+        
+        def launch_callback(self):
+            pass
 
 
         def spin_wheels(self):
@@ -362,7 +367,7 @@ class QuickMultiball(game.Mode):
 
         def skyway_entrance(self,dirn):
             if dirn=='up' and self.game.switches.rightRampDown.is_active():
-                self.game.switched_coils.drive('rightRampLifter')
+                self.game.switched_coils.drive('rampLifter')
             elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
                 self.game.coils['rampDown'].pulse()
 

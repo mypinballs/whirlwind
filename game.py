@@ -133,7 +133,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.18'
+                self.system_version='0.2.19'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -387,7 +387,6 @@ class Game(game.BasicGame):
 		super(Game, self).ball_starting()
 
                 #check for moonlight
-                self.moonlight_flag=True #temp TODO:remove this!
                 if self.moonlight_flag and not self.get_player_stats('moonlight_status'):
                     self.modes.add(self.moonlight)
                 #else add normal base mode
@@ -484,7 +483,7 @@ def main():
         #setup logging to file
         datetime = str(time.strftime("%Y-%m-%d %H-%M-%S"))
         file_handler = logging.FileHandler(game_path +'var/logs/'+serial+' Game Log '+datetime+'.log')
-        file_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
         root_logger.addHandler(handler)
@@ -495,10 +494,13 @@ def main():
         logging.getLogger('whirlwind.switched_coils').setLevel(logging.DEBUG)
         logging.getLogger('whirlwind.multiball').setLevel(logging.DEBUG)
         logging.getLogger('whirlwind.compass').setLevel(logging.DEBUG)
+        logging.getLogger('whirlwind.chaser_multiball').setLevel(logging.DEBUG)
+        logging.getLogger('whirlwind.trough').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.INFO)
         logging.getLogger('game.driver').setLevel(logging.INFO)
         logging.getLogger('game.sound').setLevel(logging.DEBUG)
-
+        logging.getLogger('scoredisplay.alpha_display').setLevel(logging.ERROR)
+        
 
         config = yaml.load(open(machine_config_path, 'r'))
         print("Using config at: %s "%(machine_config_path))

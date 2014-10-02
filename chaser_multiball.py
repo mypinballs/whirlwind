@@ -1,6 +1,4 @@
-#War Multiball
-#Secret Mode
-#Homage to Black Knight 2000
+#Upper Left Ramp Mode
 
 import procgame
 import locale
@@ -15,33 +13,30 @@ speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
 
-class WarMultiball(game.Mode):
+class ChaserMultiball(game.Mode):
 
 	def __init__(self, game, priority):
-            super(WarMultiball, self).__init__(game, priority)
+            super(ChaserMultiball, self).__init__(game, priority)
 
-            self.log = logging.getLogger('whirlwind.war_multiball')
+            self.log = logging.getLogger('whirlwind.chaser_multiball')
 
+            self.game.sound.register_sound('shot_lit', sound_path+"compass_target_lit.ogg")
+            self.game.sound.register_sound('shot_unlit', sound_path+"thunder_crack.ogg")
             self.game.sound.register_music('lock_lit', music_path+"lock_lit.ogg")
             self.game.sound.register_music('end', music_path+"lock_lit_end.ogg")
-            self.game.sound.register_music('war_multiball_play', music_path+"war_multiball_play.aiff")
-            self.game.sound.register_music('war_multiball_intro', music_path+"war_multiball_intro.aiff")
+            self.game.sound.register_music('multiball_play', music_path+"multiball_play.ogg")
 
-            self.game.sound.register_sound('war_lane_lit', sound_path+"war_lane_lit.aiff")
-            self.game.sound.register_sound('war_lane_unlit', sound_path+"war_lane_unlit.aiff")
-            self.game.sound.register_sound('war_lane_fanfare', sound_path+"war_lane_fanfare.aiff")
-            self.game.sound.register_sound('war_ball_locked', sound_path+"war_ball_locked.aiff")
-            self.game.sound.register_sound('war_mb_start', sound_path+"war_mb_start.aiff")
-
-            self.game.sound.register_sound('bk_announce', speech_path+"bk_announce.aiff")
-            self.game.sound.register_sound('bk_laugh', speech_path+"bk_laugh.aiff")
-            self.game.sound.register_sound('bk_fight', speech_path+"bk_fight.aiff")
+            self.game.sound.register_sound('take_cover_now', speech_path+"take_cover_now.ogg")
+            self.game.sound.register_sound('multiball_eject_speech', speech_path+"here_it_comes.ogg")
+            self.game.sound.register_sound('million_speech', speech_path+"ooh_million.ogg")
+            self.game.sound.register_sound('whirlwind_speech', speech_path+"whirlwind.ogg")
 
             self.flashers = ['rampBottomFlasher','rampLMFlasher','rampUMFlasher','rampTopFlasher','spinnerFlasher','bottomRightFlasher']
             self.lightning_flashers = ['lightningLeftFlasher','lightningMiddleFlasher','lightningRightFlasher']
+            
+            self.lamps = ['swBottom','swTop','2tolls','seTop']
+            self.jackpot_lit_lamp_data = ['millionPlus','million','release']
 
-           
-            self.lamps = ['middleStandup','nwTop','neTop']
 
             self.enter_value = 10
             self.made_value_base = 50000
@@ -52,7 +47,8 @@ class WarMultiball(game.Mode):
             self.combo_multiplier = 2
             self.million_value = 1000000
             self.million_timer = 30 #change to setting
-
+            self.jackpots_collected = 0
+            
             self.lane_unlit_value = 5000
             self.lane_lit_value = 1000
 
@@ -63,32 +59,33 @@ class WarMultiball(game.Mode):
             self.end_callback= None
 
             
-        
         def reset(self):
             self.reset_combos()
-            self.letters_spotted = 0
-            self.lane_flag = [False,False,False]
+            self.shots_made = 0
+            self.lane_flag = [False,False,False,False]
+            self.lite_million(False)
+            self.lock_lit=False
+            self.reset_lamps()
+            
 
         def reset_combos(self):
             self.combo = False
             self.super_combo = False
 
         
-#        def update_lamps(self):
-#            for i in range(self.lamps):
-#                self.game.effects.drive_lamp(self.lamps[i],'on')
-#
         def update_lamps(self):
-            self.log.info("Updating WAR lane Lamps")
+            self.log.info("Updating Storm Chaser Shot Lamps")
             for i in range(len(self.lamps)):
                 if self.lane_flag[i]:
                     self.game.effects.drive_lamp(self.lamps[i],'on')
                 else:
-                    self.game.effects.drive_lamp(self.lamps[i],'superfast')
+                    self.game.effects.drive_lamp(self.lamps[i],'fast')
+
 
         def set_lamps_help(self):
             for i in range(len(self.lamps)):
-                self.game.effects.drive_lamp(self.lamps[i],'superfast')
+                self.game.effects.drive_lamp(self.lamps[i],'fast')
+
 
         def completed_lamps(self):
             for i in range(len(self.lamps)):
@@ -98,8 +95,8 @@ class WarMultiball(game.Mode):
         def reset_lamps(self):
             for i in range(len(self.lamps)):
                 self.game.effects.drive_lamp(self.lamps[i],'off')
-
-
+                
+        
         def compass_lamps(self, enable=True):
             # Start the lamps doing a crazy rotating sequence:
             schedules = [0xffff000f, 0xfff000ff, 0xff000fff, 0xf000ffff, 0x000fffff, 0x00fffff0, 0x0fffff00, 0xfffff000]
@@ -109,23 +106,36 @@ class WarMultiball(game.Mode):
                     lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
                 else:
                     lamp.disable()
+        
+        def jackpot_lit_lamps(self,enable=True):
+            schedule = [0x0000000f, 0x000000f0, 0x000ccc00]
+            for i in range(len(self.jackpot_lit_lamp_data)):
+                lamp = self.jackpot_lit_lamp_data[i]
+		if enable:
+                    #sched = schedules[index%len(schedules)]
+                    self.game.lamps[lamp].schedule(schedule=schedule[i], cycle_seconds=0, now=False)
+		else:
+                    self.game.lamps[lamp].disable()
+            
+            
 
             
-        def mode_started(self):
-            self.shots_made = 0
-            self.lock_lit=False
-            self.multiball_ready = self.game.get_player_stats('war_multiball_ready')
-            self.multiball_started = self.game.get_player_stats('war_multiball_started')
-            self.multiball_running = self.game.get_player_stats('war_multiball_running')
+        def mode_started(self):            
+            self.multiball_ready = self.game.get_player_stats('quick_multiball_ready')
+            self.multiball_started = self.game.get_player_stats('quick_multiball_started')
+            self.multiball_running = self.game.get_player_stats('quick_multiball_running')
+            self.million_lit = self.game.get_player_stats('million_lit')
 
             self.reset()
+            
             
         def mode_stopped(self):
             self.lock_lit=False
             self.multiball_ready = False
-            self.game.set_player_stats('war_lock_lit',self.lock_lit)
-            self.game.set_player_stats('war_multiball_ready',self.multiball_ready)
-
+            self.game.set_player_stats('qm_lock_lit',self.lock_lit)
+            self.game.set_player_stats('quick_multiball_ready',self.multiball_ready)
+            self.game.set_player_stats('quick_jackpots_collected',self.jackpots_collected)
+            
 
         def mode_tick(self):
             if self.multiball_started:
@@ -161,15 +171,18 @@ class WarMultiball(game.Mode):
         #this is called by other modes to start the qm process
         def lock_ready(self):
             self.lock_lit=True
-            self.game.set_player_stats('war_lock_lit',self.lock_lit)
+            self.game.set_player_stats('qm_lock_lit',self.lock_lit)
 
-            self.display(top='WAR Multiball',bottom='Is Lit',seconds=5)
+            self.display(top='Storm Chaser',bottom='Multiball Is Lit',seconds=5)
 
             self.game.sound.stop_music()
             self.game.sound.play_music('lock_lit',-1)
-            self.delay(name='lock_lit_announce',delay=1,handler=lambda:self.game.sound.play_voice('bk_announce'))
+            self.delay(name='lock_lit_announce',delay=1,handler=lambda:self.game.sound.play_voice('take_cover_now'))
 
             self.game.effects.drive_lamp('lock','fast')
+            self.game.effects.drive_lamp('topDropQuickMB','fast')
+
+            self.spin_wheels()
 
             #lift ramp with delay
             self.delay(name='lift_ramp_delay',delay=0.5,handler=lambda:self.game.switched_coils.drive('rampLifter'))
@@ -177,32 +190,31 @@ class WarMultiball(game.Mode):
 
         def ball_locked(self):
 
-            self.display(top='WAR Multiball',bottom='Ready',seconds=3)
+            self.display(top='Storm Chaser',bottom='Multiball Ready',seconds=6)
 
             #set multiball ready flag
             self.multiball_ready = True
-            self.game.set_player_stats('war_multiball_ready',self.multiball_ready)
-            self.log.info('War Multiball Ready')
+            self.game.set_player_stats('quick_multiball_ready',self.multiball_ready)
+            self.log.info('Storm Chaser Multiball Ready')
 
             #update lock lit flag
             self.lock_lit=False
-            self.game.set_player_stats('war_lock_lit',self.lock_lit)
+            self.game.set_player_stats('qm_lock_lit',self.lock_lit)
 
-            self.game.sound.play_voice('bk_laugh')
+            self.game.sound.play_voice('whirlwind_speech')
             
             #flasher effect
             self.lock_flashers()
 
             #cancel lock lamp
             self.game.effects.drive_lamp('lock','off')
-
-
+            
             #queue the next ball launch
             self.delay(name='launch_next_ball',delay=0.5,handler=self.launch_next_ball)
-
-
             audits.record_value(self.game,'ballLocked')
-
+            
+            #queue multiball effects
+            self.delay(name='multiball_effects_delay',delay=1, handler=self.multiball_effects)
 
 
         def launch_next_ball(self):
@@ -212,9 +224,15 @@ class WarMultiball(game.Mode):
             self.virtual_lock = False
             self.game.ball_save.start(time=10)
             
-        
+            
         def launch_callback(self):
             pass
+        
+            
+        def spin_wheels(self):
+            num=random.randint(50,150)
+            self.game.coils.spinWheelsMotor.pulse(num)
+            self.delay(name='spin_wheels_repeat',delay=0.8,handler=self.spin_wheels)
 
 
         def display(self, top, bottom, seconds, opaque=True, repeat=False, hold=False, frame_time=3):
@@ -223,7 +241,7 @@ class WarMultiball(game.Mode):
 
         
         def display_lock_ready_text(self,time=3):
-           self.display(top='War Multiball',bottom='Is Lit',seconds=time)
+           self.display(top='Storm Chaser',bottom='Multiball Is Lit',seconds=time)
 
 
         def display_million_text(self,time=2):
@@ -232,25 +250,25 @@ class WarMultiball(game.Mode):
 
         def display_multiball_info(self,time=3):
             if self.multiball_info_text_flag%2==0:
-                self.display(top='Double Knights ',bottom='War = Million',seconds=time)
+                self.display(top='Shoot Lit Shots',bottom='To Chase Storm',seconds=time)
             else:
-                self.display(top='Black Knight',bottom='2000 Homage',seconds=time)
+                self.display(top='All Shots Lit',bottom='Lites Jackpot',seconds=time)
 
             if self.multiball_info_text_flag<10:
                 self.multiball_info_text_flag+=1
-                self.delay(name='display_multiball_info_repeat',delay=time,handler=self.display_multiball_info,param=time)
+                self.cancel_delayed('display_multiball_info_repeat')
+                self.delay(name='display_multiball_info_repeat',delay=time+0.5,handler=self.display_multiball_info,param=time)
             else:
                 self.multiball_info_text_flag = 0
                 self.cancel_delayed('display_multiball_info_repeat')
 
-            
 
         def strobe_flashers(self,time=0.1):
             timer = 0
-            repeats = 4
+            repeats = 6
 
             #lightning flashers
-            #self.game.effects.strobe_flasher_set(self.lightning_flashers,time=time,overlap=0.2,repeats=repeats)
+            self.game.effects.strobe_flasher_set(self.lightning_flashers,time=time,overlap=0.2,repeats=repeats)
 
             #playfield flashers
             sequence=[]
@@ -283,6 +301,23 @@ class WarMultiball(game.Mode):
 
                 flash(i,time,timer)
                 timer+=time
+                
+                
+        def multiball_effects(self):
+
+            #spin wheels
+            self.spin_wheels()
+
+            #run flasher effects
+            self.strobe_flashers()
+
+            #disable all regular lamps
+            for lamp in self.game.lamps:
+		lamp.disable()
+            
+            #start lamp effects
+            self.set_lamps_help()
+            self.compass_lamps()
 
 
         def multiball_start(self):
@@ -290,64 +325,37 @@ class WarMultiball(game.Mode):
 
             #update the flag
             self.multiball_started = True
-            self.game.set_player_stats('war_multiball_started',self.multiball_started)
+            self.game.set_player_stats('quick_multiball_started',self.multiball_started)
 
             #display help info
             self.display_multiball_info(3)
-
-            #start lamp and flasher effects
-            self.multiball_effects()
-
-            #play speech
-            length = self.game.sound.play('war_ball_locked')
-            self.delay(delay=length, handler=lambda:self.game.sound.play('war_mb_start'))
             
+            #make sure ramp is down
+            self.skyway_entrance('down')
+            
+            #play speech
+            start_speech_length = self.game.sound.play_voice('multiball_eject_speech')
+
             #change music
             self.game.sound.stop_music()
-            music_intro_length = self.game.sound.play_voice('war_multiball_intro')
+            self.game.sound.play_music('multiball_play',-1)
 
-            self.delay(name='multiball_music_delay',delay=music_intro_length, handler=lambda:self.game.sound.play_music('war_multiball_play',-1))
-            self.delay(name='multiball_eject_delay',delay=3, handler=self.multiball_eject)
+            self.delay(name='multiball_eject_delay',delay=start_speech_length+0.5, handler=self.multiball_eject)
 
-            #ramp down
-            self.game.coils['rampDown'].pulse()
-
-            audits.record_value(self.game,'warMultiballStarted')
+            audits.record_value(self.game,'quickMultiballStarted')
 
 
         def multiball_eject(self):
             self.log.debug('multiball eject reached')
-
-            #make sure ramp is down
-            self.skyway_entrance('down')
-
+            
             #kick out ball
             self.game.switched_coils.drive('topEject')
-
-            #speech
-            self.game.sound.play_voice('bk_fight')
 
             #update trough tracking
             #self.game.trough.num_balls_locked = 0
             #self.balls_locked = 0
             self.game.trough.num_balls_in_play+=1
-
-            #queue multiball effects
-            self.delay(name='multiball_effects_delay',delay=0.5, handler=self.multiball_effects)
-
-
-        def multiball_effects(self):
-            #disable all regular lamps
-            for lamp in self.game.lamps:
-		lamp.disable()
-
-            #set mode lamps
-            self.set_lamps_help()
-            self.compass_lamps()
-
-            #run flasher effects
-            self.strobe_flashers()
-
+            
             #turn on ball save
             self.game.ball_save.start(num_balls_to_save=2,allow_multiple_saves=True,time=10)
 
@@ -360,10 +368,17 @@ class WarMultiball(game.Mode):
                 self.multiball_started = False
                 self.multiball_ready = False
                 
-                self.game.set_player_stats('war_multiball_running',self.multiball_running)
-                self.game.set_player_stats('war_multiball_started',self.multiball_started)
-                self.game.set_player_stats('war_multiball_ready',self.multiball_ready)
+                self.game.set_player_stats('quick_multiball_running',self.multiball_running)
+                self.game.set_player_stats('quick_multiball_started',self.multiball_started)
+                self.game.set_player_stats('quick_multiball_ready',self.multiball_ready)
                
+                
+                #stop spinning wheels
+                self.cancel_delayed('spin_wheels_repeat')
+
+                #cancel award
+                self.lite_million(False)
+                #stop compass
                 self.compass_lamps(False)
                 
                 #disable all lamps
@@ -379,49 +394,84 @@ class WarMultiball(game.Mode):
 
                 #mulitball ended callback
                 if self.end_callback:
-                    self.log.debug('War Multiball End Callback Called')
+                    self.log.debug('Quick Multiball End Callback Called')
                     self.end_callback()
-           
 
 
-        def award_million(self):
+        def spin_wheels(self):
+            range=[]
+            delay=0
+            if self.multiball_started:
+                range=[50,200]
+                delay=0.7
+            else:
+                range=[50,150]
+                delay=0.8
 
-            #update display
-            self.display_million_text()
+            num=random.randint(range[0],range[1])
+            self.game.coils.spinWheelsMotor.pulse(num)
+            self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
 
-            #set lamps
-            self.completed_lamps()
-            
-            #update score
-            self.game.score(self.million_value)
 
-            #fanfare
-            self.game.sound.play('war_lane_fanfare')
-
-            #flashers
-            self.strobe_flashers()
-
-            #queue the reset of lamps
-            self.delay(name='multiball_award_reset',delay=1, handler=self.award_reset)
-
-            #update audits
-            audits.record_value(self.game,'warMillionCollected')
-
-        def award_reset(self):
-            self.reset()
-            self.reset_lamps()
-
-            self.delay(delay=3,handler=self.set_lamps_help)
-
-        
         def skyway_entrance(self,dirn):
             if dirn=='up' and self.game.switches.rightRampDown.is_active():
                 self.game.switched_coils.drive('rampLifter')
             elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
                 self.game.coils['rampDown'].pulse()
 
+
         def eject(self):
             self.game.switched_coils.drive('topEject')
+
+
+        def lite_million(self,enable=True):
+            if enable:
+                self.million_lit=True
+                self.log.debug('Million is Lit')
+                
+                self.skyway_entrance('up') #raise ramp
+
+                self.game.switched_coils.drive(name='rampUMFlasher',style='fast') #schedule million flasher for unlimited time
+                self.jackpot_lit_lamps()
+
+                if self.jackpots_collected>=3: #setup a timeout for jackpots after first few
+                    self.delay(name='million_timer',delay=self.million_timer,handler=self.timeout_million)
+            else:
+                self.million_lit=False
+                self.skyway_entrance('down') #lower ramp
+                self.game.switched_coils.drive(name='rampUMFlasher',style='off')
+                self.jackpot_lit_lamps(False)
+
+            self.million_speech(enable)
+            self.game.set_player_stats('million_lit',self.million_lit)
+           
+
+        def timeout_million(self):
+            self.lite_million(False)
+            self.reset()
+
+
+        def award_million(self):
+            self.cancel_delayed('million_timer')
+            self.cancel_delayed('million_speech')
+            
+            self.display_million_text()
+            self.game.score(self.million_value)
+            #self.game.sound.play_voice('whirlwind_speech')
+            self.delay(name='award_speech_delay',delay=1,handler=lambda:self.game.sound.play_voice('whirlwind_speech'))
+            self.game.switched_coils.drive(name='rampUMFlasher',style='fast',time=1)
+
+            #queue the reset to setup next jackpot
+            self.delay(name='multiball_award_reset',delay=2, handler=self.award_reset)
+
+            self.jackpots_collected+=1
+            #update audits
+            audits.record_value(self.game,'chaserJackpotCollected')
+
+
+        def award_reset(self):
+            self.reset()
+            self.set_lamps_help()
 
 
         def progress(self,id):
@@ -429,86 +479,36 @@ class WarMultiball(game.Mode):
 
             if self.lane_flag[id] == False:
 
-                self.letters_spotted +=1
+                self.shots_made +=1
                 self.lane_flag[id]=True;
                 #update player stats var
-                #self.game.set_player_stats('war_lanes_flag',self.lane_flag)
-                #print("indy lamp lit: %s "%(self.lamps[id]))
+                #self.game.set_player_stats('chaser_shot_flag',self.lane_flag)
+                self.log.debug("chaser shot made: %s",self.lamps[id])
                 self.game.score(self.lane_unlit_value)
 
                 #play sounds
-                if self.letters_spotted ==3:
-                    self.award_million()
+                if self.shots_made ==4:
+                    self.lite_million()
                 else:
-                    self.game.sound.play('war_lane_unlit')
+                    self.game.sound.play('shot_unlit')
                     self.game.effects.drive_lamp(self.lamps[id],'smarton')
 
             else:
                 self.game.score(self.lane_lit_value)
                 #play sounds
-                self.game.sound.play('war_lane_lit')
+                self.game.sound.play('shot_lit')
 
-            print(self.lane_flag)
-            print(self.letters_spotted)
-
-
-        def lane_change(self,direction):
-            list = ['middleStandup','nwTop','neTop']
-            flag_orig = self.lane_flag #[self.indyI_lit,self.indyN_lit,self.indyD_lit,self.indyY_lit]
-            flag_new = [False,False,False] #[self.indyI_lit,self.indyN_lit,self.indyD_lit,self.indyY_lit]
-            carry = False
-            j=0
-
-            if direction=='left':
-                start = 0
-                end = len(list)
-                inc =1
-            elif direction=='right':
-                start = len(list)-1
-                end = -1
-                inc =-1
-
-            for i in range(start,end,inc):
-                if flag_orig[i]:
-
-                    if direction=='left':
-                        j=i-1
-                        if j<0:
-                            j=2
-                            carry = True
-                    elif direction=='right':
-                        j=i+1
-                        if j>2:
-                            j=0
-                            carry = True
-
-                    flag_new[i] = False
-                    flag_new[j]= True
-
-                    #self.game.effects.drive_lamp(list[i],'off')
-                    #self.game.effects.drive_lamp(list[j],'on')
-
-            #update the carry index if required
-            if carry:
-                if direction=='left':
-                    flag_new[2]= True
-                    #self.game.effects.drive_lamp(list[3],'on')
-                elif direction=='right':
-                    flag_new[0]= True
-                    #self.game.effects.drive_lamp(list[0],'on')
-
-            #update main var
-            self.lane_flag=flag_new
-            #update lamps
-            self.update_lamps()
-            #debug log
-            self.log.info('New Lane order is:%s',self.lane_flag)
-
+            self.log.debug(self.lane_flag)
+            self.log.debug(self.shots_made)
 
 
 
         #switch handlers
-        #-------------------------
+        #------------------------
+        def sw_leftRampMadeTop_active(self, sw):
+            if self.multiball_running and self.million_lit:
+                self.award_million()
+                
 
         def sw_topRightEject_active_for_200ms(self, sw):
             if self.lock_lit and not self.multiball_running:
@@ -519,35 +519,32 @@ class WarMultiball(game.Mode):
                 return procgame.game.SwitchStop
 
                 
-        def sw_shooterLane_open_for_250ms(self,sw):
+        def sw_shooterLane_open_for_1s(self,sw):
             if self.multiball_ready and not self.multiball_running:
                 self.multiball_start()
-
-
-        def sw_middleStandup_active(self,sw):
-            if self.multiball_running:
+        
+        
+        def sw_leftLoopTop_active(self,sw):
+            if self.game.switches.leftLoopBottom.time_since_change()<=0.5 and self.multiball_running:
                 self.progress(0)
 
                 return procgame.game.SwitchStop
-
-        def sw_leftStandupRightRamp_active(self, sw):
+        
+        def sw_innerLoop_active(self, sw):
             if self.multiball_running:
                 self.progress(1)
 
                 return procgame.game.SwitchStop
-
-        def sw_rightStandupRightRamp_active(self, sw):
+            
+        def sw_rightRampMadeTop_active(self, sw):
             if self.multiball_running:
                 self.progress(2)
 
                 return procgame.game.SwitchStop
+            
+        def sw_rightLoopTop_active(self,sw):
+            if self.game.switches.rightLoopBottom.time_since_change()<=0.5 and self.multiball_running:
+                self.progress(3)
 
-#        def sw_flipperLwL_active(self, sw):
-#            if self.multiball_started:
-#                self.lane_change('left')
-#
-#
-#        def sw_flipperLwR_active(self, sw):
-#            if self.multiball_started:
-#                self.lane_change('right')
-
+                return procgame.game.SwitchStop
+            

@@ -458,7 +458,7 @@ class Moonlight(game.Mode):
 
         def skyway_entrance(self,dirn):
             if dirn=='up' and self.game.switches.rightRampDown.is_active():
-                self.game.switched_coils.drive('rightRampLifter')
+                self.game.switched_coils.drive('rampLifter')
             elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
                 self.game.coils['rampDown'].pulse()
 

@@ -178,6 +178,9 @@ Feature:
     options: [5,30]
     increments: 5
     default: 15
+  'Tornado Difficulty':
+    options: ['Easy', 'Medium','Hard']
+    default: 'Hard'
 Network:
   'IP Address':
     options: [0,255]

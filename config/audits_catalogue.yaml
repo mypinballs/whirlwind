@@ -113,6 +113,8 @@ featureAudits:
     label: 'Tornado Target Quick Multiball'
   moonlightMultiballStarted:
     label: 'Moonlight Multiball Started'
+  chaserJackpotCollected:
+    label: 'Chaser Jackpot Collected'
 #this section is for items that o a value against them i.e read and write not just read
 counters:
   credits:

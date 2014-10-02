@@ -302,7 +302,7 @@ class Multiball(game.Mode):
          
                 if status=='lit':
                     #lift ramp for timed period to allow easier jackpot shot
-                    self.game.switched_coils.drive('rightRampLifter')
+                    self.skyway_entrance('up')
                     self.delay(name='ramp_down_timer',delay=self.ramp_lift_timer,handler=self.game.coils['rampDown'].pulse)
                     
                     #set lamps
@@ -375,7 +375,7 @@ class Multiball(game.Mode):
 
         def skyway_entrance(self,dirn):
             if dirn=='up' and self.game.switches.rightRampDown.is_active():
-                self.game.switched_coils.drive('rightRampLifter')
+                self.game.switched_coils.drive('rampLifter')
             elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
                 self.game.coils['rampDown'].pulse()
 

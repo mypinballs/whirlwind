@@ -254,7 +254,7 @@ class Compass(game.Mode):
         
         def ramp_lifter(self,dirn):
             if dirn=='up' and self.game.switches.rightRampDown.is_active():
-                self.game.switched_coils.drive('rightRampLifter')
+                self.game.switched_coils.drive('rampLifter')
                 self.log.debug('ramp up')
             elif dirn=='down' and self.game.switches.rightRampDown.is_inactive():
                 self.game.coils['rampDown'].pulse()
@@ -289,10 +289,13 @@ class Compass(game.Mode):
 
         def launch_next_ball(self):
             if not self.virtual_lock: #skyway should handle the eject saucer with corect delay if virtual lock
-                self.game.trough.launch_balls(1,stealth=False) #stealth false, bip +1
+                self.game.trough.launch_balls(1,callback=self.launch_callback,stealth=False) #stealth false, bip +1
             self.next_ball_ready = True
             self.virtual_lock = False
             self.game.ball_save.start(time=5)
+            
+        def launch_callback(self):
+            pass
             
 
         def display_text(self, count, value, opaque=True, repeat=False, hold=False, frame_time=3):
@@ -348,7 +351,7 @@ class Compass(game.Mode):
 
 
         def progress(self,num):
-            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started')  and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_multiball_started')  and not self.game.get_player_stats('war_lock_lit'):
+            if self.flags[num]==1 and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_started')  and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_multiball_started')  and not self.game.get_player_stats('war_lock_lit') and not self.game.get_player_stats('chaser_multiball_started')  and not self.game.get_player_stats('chaser_lock_lit'):
                 self.flags[num]=2
                 self.log.debug('Compasss Flags Status:%s',self.flags)
 

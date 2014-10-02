@@ -53,6 +53,7 @@ class Cellar(game.Mode):
             self.lite_million = None
             self.quick_multiball = None
             self.war_multiball = None
+            self.chase_multiball = None
             self.drops = None
             self.lower_pops = None
             self.upper_pops = None
@@ -63,7 +64,7 @@ class Cellar(game.Mode):
             self.super_door_score = 500000
             self.big_points = 250000
             self.cellar_lit = False
-            #self.skyway_open = True
+            self.skyway_open = True
             self.award_id = 0
             self.secret_mode = False
 
@@ -101,7 +102,11 @@ class Cellar(game.Mode):
             if self.award_id==0:
                 self.upper_pops()
             elif self.award_id==1:
-                self.score(self.big_points)
+                if self.secret_mode:
+                    self.chaser_multiball()
+                    self.secret_mode_unlocked = True
+                else:
+                    self.score(self.big_points)
             elif self.award_id==2:
                 self.game.extra_ball.lit()
                 audits.record_value(self.game,'cellarExtraBall')
@@ -110,7 +115,7 @@ class Cellar(game.Mode):
             elif self.award_id==4:
                 if self.secret_mode:
                     self.war_multiball()
-                    self.secret_mode_unlocked = False
+                    self.secret_mode_unlocked = True
                 else:
                     self.quick_multiball()
                     audits.record_value(self.game,'cellarQuickMultiball')
@@ -231,16 +236,15 @@ class Cellar(game.Mode):
 
 
         def toggle_skyway_entrance(self):
-            if not self.game.get_player_stats('multiball_running'):
-                #if self.skyway_open:
-                if self.game.switches.rightRampDown.is_inactive():
-                    self.game.coils['rampDown'].pulse()
-                    self.game.switched_coils.drive('rampLifter')
-                    #self.skyway_open = False
-                else:
-                    self.game.coils['rampDown'].pulse()
-                    #self.skyway_open = True
-
+            self.log.debug('Toggling Skyway Entrance')
+            if self.game.switches.rightRampDown.is_active():
+                self.log.debug('Ramp is Down, lifting up')
+                self.game.switched_coils.drive('rampLifter')
+                self.skyway_open = False
+            elif self.game.switches.rightRampDown.is_inactive():
+                self.log.debug('Ramp is Up, putting down')
+                self.game.coils['rampDown'].pulse()
+                self.skyway_open = True
 
 
         #switch handlers
@@ -259,8 +263,8 @@ class Cellar(game.Mode):
             self.log.debug('Cellar Lit Status:%s',self.cellar_lit)
             self.log.debug('Secret Mode Enabled: %s',self.secret_mode)
 
-            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_multiball_running') and not self.game.get_player_stats('war_lock_lit'):
-                if not self.game.get_player_stats('lock_lit') and not self.game.get_player_stats('qm_lock_lit'):
+            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_multiball_running') and not self.game.get_player_stats('war_lock_lit') and not self.game.get_player_stats('chaser_multiball_running') and not self.game.get_player_stats('chaser_lock_lit'):
+                if not self.game.get_player_stats('lock_lit') and not self.game.get_player_stats('qm_lock_lit') and not self.game.get_player_stats('war_lock_lit') and not self.game.get_player_stats('chaser_lock_lit'):
                     self.toggle_skyway_entrance()
 
                 if self.hurryup_lit: #check for hurry up made
@@ -279,7 +283,7 @@ class Cellar(game.Mode):
             
 
         def sw_rightInlane_active(self, sw):
-            if not self.game.get_player_stats('multiball_running') and not self.hurryup_lit:
+            if not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('war_multiball_running') and not self.game.get_player_stats('chaser_multiball_running') and not self.hurryup_lit:
                 self.lite_cellar(20)
 
 

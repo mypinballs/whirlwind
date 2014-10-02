@@ -44,6 +44,11 @@ class Player(procgame.game.Player):
                 self.player_stats['war_multiball_ready']=False
                 self.player_stats['war_multiball_started']=False
                 self.player_stats['war_multiball_running']=False
+                self.player_stats['chaser_lock_lit']=False
+                self.player_stats['chaser_multiball_ready']=False
+                self.player_stats['chaser_multiball_started']=False
+                self.player_stats['chaser_multiball_running']=False
+                self.player_stats['chaser_jackpots_collected']=0
                 self.player_stats['ball_start_time']=0
                 self.player_stats['drop_banks_completed']=0
                 self.player_stats['skillshot_level']=1
@@ -52,5 +57,7 @@ class Player(procgame.game.Player):
                 self.player_stats['spinner_level']=0
                 self.player_stats['moonlight_total']=0
                 self.player_stats['moonlight_status']=False
+                self.player_stats['extra_ball_status']=0
+                
 
 		

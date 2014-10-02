@@ -31,19 +31,27 @@ class Extra_Ball(game.Mode):
 
         def schedule_all_lamps(self, enable=True, timer=2):
 		# Start the lamps doing a crazy rotating sequence:
-		schedules = [0xf0f0f0f0, 0x0f0f0f0f]
+		schedules = [0x55555555, 0xaaaaaaaa]
 		for index, lamp in enumerate(sorted(self.game.lamps, key=lambda lamp: lamp.number)):
 			if enable:
 				sched = schedules[index%len(schedules)]
-				lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
-                                self.delay(delay=timer,handler=lambda:self.schedule_all_lamps(enable=False))
+				lamp.schedule(schedule=sched, cycle_seconds=timer, now=False)
 			else:
 				lamp.disable()
-                                self.game.update_lamps()
+                                
+                #self.delay(name='disable_eb_lamp_show',delay=timer,handler=lambda:self.schedule_all_lamps(enable=False))
 
+                
+        def update_lamps(self):
+            if self.game.get_player_stats("extra_ball_status")==1:
+                self.game.effects.drive_lamp('scExtraBall','on')
+            elif self.game.get_player_stats("extra_ball_status")==2:
+                self.game.effects.drive_lamp('shootAgain','on')
+                
             
         def collect(self):
-            print("Extra Ball Collected")
+            self.log.info("Extra Ball Collected")
+            self.game.set_player_stats("extra_ball_status",2)
             self.display(top='Extra Ball',bottom='',seconds=3)
             self.game.sound.play('extra_ball_collected')
             #self.game.sound.play_voice('extra_ball_speech')
@@ -56,6 +64,7 @@ class Extra_Ball(game.Mode):
 
         def lit(self):
             timer=3
+            self.game.set_player_stats("extra_ball_status",1)
             self.display(top='Extra Ball',bottom='Lit',seconds=timer)
             self.game.sound.play('extra_ball_lit')
             self.schedule_all_lamps(timer-1)
@@ -63,8 +72,9 @@ class Extra_Ball(game.Mode):
 
 
         def lit_finish(self):
+            self.game.update_lamps()
             self.game.effects.drive_lamp('scExtraBall','smarton')
             audits.record_value(self.game,'extraBallLit')
+        
 
-
-
+                

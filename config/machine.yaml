@@ -92,18 +92,18 @@ PRSwitches:
         number: S22
         tags: outhole,early_save
         label: 'Outhole'
-    trough1:
+    trough3:
         number: S23
-        tags: trough
-        label: 'Ball Trough 1 (Left)'
+        tags: trough,trough_eject
+        label: 'Ball Trough 3 (Right)'
     trough2:
         number: S24
         tags: trough
         label: 'Ball Trough 2 (Middle)'
-    trough3:
+    trough1:
         number: S25
-        tags: trough,trough_eject
-        label: 'Ball Trough 3 (Right)'
+        tags: trough
+        label: 'Ball Trough 1 (Left)'
     rightInlane:
         number: S27
         tags: moonlight
@@ -456,7 +456,7 @@ PRCoils:
         label: 'Spin Wheels Motor'
     autoLaunch:
         number: S36
-        pulseTime: 60
+        pulseTime: 80
         label: 'Auto Launcher'
         
 PRLamps:

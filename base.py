@@ -14,6 +14,7 @@ from cellar import *
 from ramp import *
 from quick_multiball import *
 from war_multiball import *
+from chaser_multiball import *
 from compass import *
 from multiball import *
 from skillshot import *
@@ -59,14 +60,10 @@ class BaseGameMode(game.Mode):
                 self.game.sound.register_sound('ball_save_speech', speech_path+"well_lucky_here.ogg")
                 self.game.sound.register_sound('big_thunder', sound_path+"thunder_crack.ogg")
 
-                self.ball_saved = False
-
+                
 
 
 	def mode_started(self):
-
-                
-
                 #debug
                 self.log.info("Basic Game Mode Started, Ball "+str(self.game.ball))
               
@@ -93,6 +90,7 @@ class BaseGameMode(game.Mode):
 
                 # Each time this mode is added to game Q, set this flag true.
 		self.ball_starting = True
+                self.ball_saved = False
 
                 #setup basic modes
                 self.add_basic_modes(self);
@@ -155,6 +153,7 @@ class BaseGameMode(game.Mode):
             #medium priority basic modes
             self.quick_multiball = QuickMultiball(self.game,50)
             self.war_multiball = WarMultiball(self.game,50)
+            self.chaser_multiball = ChaserMultiball(self.game,50)
             self.multiball = Multiball(self.game,51)
             self.compass = Compass(self.game,52,self.multiball)
             
@@ -166,6 +165,7 @@ class BaseGameMode(game.Mode):
             self.cellar.lite_million = self.ramp.lite_million
             self.cellar.quick_multiball = self.quick_multiball.lock_ready
             self.cellar.war_multiball = self.war_multiball.lock_ready
+            self.cellar.chaser_multiball = self.chaser_multiball.lock_ready
             self.cellar.drops = self.drops.max
             self.cellar.lower_pops = self.pops.max_lower_pops
             self.cellar.upper_pops = self.pops.max_upper_pops
@@ -182,6 +182,7 @@ class BaseGameMode(game.Mode):
             self.game.modes.add(self.ramp)
             self.game.modes.add(self.quick_multiball)
             self.game.modes.add(self.war_multiball)
+            self.game.modes.add(self.chaser_multiball)
             self.game.modes.add(self.multiball)
             self.game.modes.add(self.compass)
             self.game.modes.add(self.skillshot)     
@@ -244,6 +245,8 @@ class BaseGameMode(game.Mode):
                 self.game.modes.remove(self.tornado)
                 self.game.modes.remove(self.ramp)
                 self.game.modes.remove(self.quick_multiball)
+                self.game.modes.remove(self.war_multiball)
+                self.game.modes.remove(self.chaser_multiball)
                 self.game.modes.remove(self.multiball)
                 self.game.modes.remove(self.compass)
 
@@ -256,6 +259,7 @@ class BaseGameMode(game.Mode):
 		if self.game.trough.num_balls_in_play == 0:
                     # End the ball
                     self.finish_ball()
+                    
 
 	def finish_ball(self):
 
@@ -290,9 +294,13 @@ class BaseGameMode(game.Mode):
 
         
         def sw_outhole_active(self,sw):
-            if not self.game.get_player_stats('multiball_running') and not self.game.ball_save.is_active():
+            self.log.info('Ball Saved Flag:%s',self.ball_saved)
+            if not self.game.get_player_stats('multiball_running') and not self.ball_saved: #and not self.game.ball_save.is_active()
                 self.game.sound.stop_music()
                 self.game.sound.play_music('end',loops=0)
+            
+            if self.ball_saved:
+                self.ball_saved=False # reset flag for next time around
                 
 
 
@@ -342,7 +350,7 @@ class BaseGameMode(game.Mode):
         def sw_shooterLane_active_for_500ms(self,sw):
             if self.ball_saved and self.game.auto_launch_enabled:
                 self.game.coils.autoLaunch.pulse()
-                self.ball_saved = False
+                #self.ball_saved = False
                 
 #        def sw_shooterLane_active_for_500ms(self,sw):
 #                if self.ball_saved:
