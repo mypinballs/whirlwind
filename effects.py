@@ -115,6 +115,23 @@ class Effects(game.Mode):
                     else:
                         self.cancel_delayed(fname+'strobe')
                         self.game.coils[fname].disable()
+                
+                
+        def strobe_controlled_flasher_set(self,flasher_list,time=0.1,overlap=0.2,repeats=1,enable=True):
+            timer = 0
+
+            #playfield flashers
+            sequence=[]
+            for j in range(repeats):
+                sequence += flasher_list
+
+            for i in range(len(sequence)):
+
+                def flash(i,time,delay):
+                    self.delay(delay=delay,handler=lambda:self.game.switched_coils.drive(name=sequence[i],style='fast',time=time+0.1))
+
+                flash(i,time,timer)
+                timer+=time
 
 
         def drive_led(self,lamp_name,colour):

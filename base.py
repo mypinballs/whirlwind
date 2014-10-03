@@ -72,6 +72,7 @@ class BaseGameMode(game.Mode):
                 #set player status
                 self.game.set_player_stats('status','general')
                 self.game.set_player_stats('ball_start_time',time.time())
+                self.game.set_player_stats("extra_ball_status",0) #reset eb status
                 
 		#Disable any previously active lamp
 		for lamp in self.game.lamps:

@@ -6,6 +6,7 @@ __date__ ="$Jan 18, 2011 1:36:37 PM$"
 
 import procgame
 import locale
+import logging
 import audits
 from procgame import *
 
@@ -19,10 +20,15 @@ class Extra_Ball(game.Mode):
 
 	def __init__(self, game,priority):
             super(Extra_Ball, self).__init__(game, priority)
+            
+            self.log = logging.getLogger('whirlwind.extra_ball')
 
-            self.game.sound.register_sound('extra_ball_collected', sound_path+"extra_ball_lit_ff.ogg")
-            self.game.sound.register_sound('extra_ball_lit', sound_path+"extra_ball_lit_ff.ogg")
+            self.game.sound.register_sound('extra_ball_collected', sound_path+"extra_ball_collected_ff.aiff")
+            self.game.sound.register_sound('extra_ball_lit', sound_path+"extra_ball_lit_ff.aiff")
             self.game.sound.register_sound('extra_ball_speech', speech_path+"extra_ball_speech.ogg")
+            
+            self.flashers = ['rampBottomFlasher','rampLMFlasher','rampUMFlasher','rampTopFlasher','spinnerFlasher','bottomRightFlasher']
+            self.lightning_flashers = ['lightningLeftFlasher','lightningMiddleFlasher','lightningRightFlasher']
 
 
         def display(self, top, bottom, seconds, opaque=True, repeat=False, hold=False, frame_time=3):
@@ -44,23 +50,27 @@ class Extra_Ball(game.Mode):
                 
         def update_lamps(self):
             if self.game.get_player_stats("extra_ball_status")==1:
-                self.game.effects.drive_lamp('scExtraBall','on')
+                self.game.effects.drive_lamp('topDropEB','on')
             elif self.game.get_player_stats("extra_ball_status")==2:
                 self.game.effects.drive_lamp('shootAgain','on')
                 
+                
             
         def collect(self):
+            timer=4
             self.log.info("Extra Ball Collected")
             self.game.set_player_stats("extra_ball_status",2)
             self.display(top='Extra Ball',bottom='',seconds=3)
             self.game.sound.play('extra_ball_collected')
             #self.game.sound.play_voice('extra_ball_speech')
-            self.game.effects.drive_lamp('scExtraBall','off')
-            self.game.effects.drive_lamp('shootAgain','smarton')
+            self.game.effects.strobe_flasher_set(self.lightning_flashers,time=0.1,overlap=0.1,repeats=4)
+            self.game.effects.strobe_controlled_flasher_set(self.flashers,time=0.1,overlap=0.1,repeats=8)
+            self.schedule_all_lamps(timer-1)
+            self.delay(delay=timer,handler=self.collect_finish)
+            
             self.game.extra_ball_count()
 
-            audits.record_value(self.game,'extraBallAwarded')
-
+            
 
         def lit(self):
             timer=3
@@ -73,8 +83,12 @@ class Extra_Ball(game.Mode):
 
         def lit_finish(self):
             self.game.update_lamps()
-            self.game.effects.drive_lamp('scExtraBall','smarton')
+            self.game.effects.drive_lamp('topDropEB','smarton')
             audits.record_value(self.game,'extraBallLit')
-        
-
+            
+        def collect_finish(self):
+            self.game.update_lamps()
+            self.game.effects.drive_lamp('topDropEB','off')
+            self.game.effects.drive_lamp('shootAgain','smarton')
+            audits.record_value(self.game,'extraBallAwarded')
                 

@@ -133,7 +133,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.19'
+                self.system_version='0.2.20'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -477,13 +477,13 @@ def main():
         #setup console logging
         from colorlogging import ColorizingStreamHandler
         handler = ColorizingStreamHandler()
-        handler.setLevel(logging.DEBUG)
+        handler.setLevel(logging.INFO)
 	handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
         #setup logging to file
         datetime = str(time.strftime("%Y-%m-%d %H-%M-%S"))
         file_handler = logging.FileHandler(game_path +'var/logs/'+serial+' Game Log '+datetime+'.log')
-        file_handler.setLevel(logging.DEBUG)
+        file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
         root_logger.addHandler(handler)

@@ -67,8 +67,9 @@ class Tornado(game.Mode):
 
 
         def set_level(self,num):
-            self.level = num
-            self.set_lamps()
+            if num<len(self.lamps):
+                self.level = num
+                self.set_lamps()
 
 
         def update_lamps(self):
@@ -114,9 +115,11 @@ class Tornado(game.Mode):
             if self.level==4 and not self.qm_activated:
                 self.qm_activated=True
                 self.quick_multiball()
+            
+            if self.game.get_player_stats("extra_ball_status")==1:
+                self.game.extra_ball.collect()
                 
 
-            
 
         def sw_topSingleDropTarget_active_for_250ms(self, sw):
             if self.game.ball>0:
