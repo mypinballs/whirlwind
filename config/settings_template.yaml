@@ -102,33 +102,33 @@ Replay:
     default: 10
   'Replay Award':
     options: ['Audit', 'Extra Ball', 'Replay']
-    default: 'Audit'
+    default: 'Replay'
   'Replay Levels':
     options: [1,2,3,4]
     default: 2
   'Replay Level 1':
-    options: [50000,5000000]
-    increments: 50000
-    default: 100000
+    options: [5000000,50000000]
+    increments: 500000
+    default: 10000000
   'Replay Level 2':
-    options: [100000,5000000]
-    increments: 50000
-    default: 200000
+    options: [10000000,50000000]
+    increments: 500000
+    default: 20000000
   'Replay Level 3':
-    options: [150000,5000000]
-    increments: 50000
-    default: 300000
+    options: [15000000,50000000]
+    increments: 500000
+    default: 30000000
   'Replay Level 4':
-    options: [200000,5000000]
-    increments: 50000
-    default: 400000
+    options: [20000000,50000000]
+    increments: 500000
+    default: 40000000
   'Replay Boost':
-    options: [50000,5000000]
-    increments: 50000
-    default: 100000
+    options: [500000,5000000]
+    increments: 500000
+    default: 1000000
   'Special':
     options: ['Audit', 'Extra Ball','Points']
-    default: 'Audit'
+    default: 'Points'
 Highscore:
   'Grand Champion':
     options: [50000000,500000000]
