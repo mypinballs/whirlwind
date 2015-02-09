@@ -300,8 +300,8 @@ class BaseGameMode(game.Mode):
                 self.game.sound.stop_music()
                 self.game.sound.play_music('end',loops=0)
             
-            if self.ball_saved:
-                self.ball_saved=False # reset flag for next time around
+            #if self.ball_saved:
+             #   self.ball_saved=False # reset flag for next time around
                 
 
 
@@ -351,7 +351,7 @@ class BaseGameMode(game.Mode):
         def sw_shooterLane_active_for_500ms(self,sw):
             if self.ball_saved and self.game.auto_launch_enabled:
                 self.game.coils.autoLaunch.pulse()
-                #self.ball_saved = False
+                self.ball_saved = False # reset flag for next drain
                 
 #        def sw_shooterLane_active_for_500ms(self,sw):
 #                if self.ball_saved:
@@ -431,3 +431,6 @@ class BaseGameMode(game.Mode):
         def outlane(self):
             self.game.score(200)
             self.game.sound.play("outlane")
+            if not self.game.ball_save.is_active():
+                #lamp show
+                self.game.lampctrl.play_show('sweep_down', repeat=False,callback=self.game.update_lamps)

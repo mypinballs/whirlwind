@@ -27,7 +27,9 @@ lampshow_files = [game_path +"lamps/general/colours.lampshow", \
                   game_path +"lamps/general/quickwindmills.lampshow", \
                   game_path +"lamps/general/windmills.lampshow", \
                   game_path +"lamps/general/rollleft.lampshow", \
-                  game_path +"lamps/general/rollright.lampshow"]
+                  game_path +"lamps/general/rollright.lampshow",\
+                  game_path +"lamps/general/sweep_up.lampshow", \
+                  game_path +"lamps/general/sweep_down.lampshow"]
                   
 class Attract(game.Mode):
 	"""docstring for AttractMode"""
@@ -81,13 +83,12 @@ class Attract(game.Mode):
                 #self.change_lampshow()
                 self.schedule_all_lamps()
 
-                #check for stuck balls
-                #self.release_stuck_balls()
-                self.delay(name='stuck_balls', event_type=None, delay=2, handler=self.release_stuck_balls)
-
                 #check trough status
                 self.log.info("Trough is full:" +str(self.game.trough.is_full()))
-
+                
+                #check for stuck balls
+                self.delay(name='stuck_balls', event_type=None, delay=2, handler=self.release_stuck_balls)
+                    
                 #run attract screens
                 self.attract_display()
 
@@ -118,8 +119,8 @@ class Attract(game.Mode):
             if self.game.switches.topSingleDropTarget.is_active(0.5):
                 self.game.switched_coils.drive('singleDropTargetReset')
 
-            if self.game.switches.rightRampDown.is_inactive(0.5):
-                self.game.coils.rampDown.pulse()
+            if self.game.switches.rightRampDown.is_active(0.5):
+                self.game.switched_coils.drive('rampLifter')
 
             if self.game.switches.topRightEject.is_active(0.5):
                 self.game.switched_coils.drive('topEject')
@@ -341,7 +342,7 @@ class Attract(game.Mode):
 	# as lost?
 	def sw_start_active(self, sw):
             if self.game.user_settings['Standard']['Free Play'].startswith('Y') or audits.display(self.game,'general','creditsCounter') >0:
-		if self.game.trough.is_full:
+		if self.game.trough.is_full():
 			# Remove attract mode from mode queue
 			self.game.modes.remove(self)
 			# Initialize game
@@ -362,9 +363,13 @@ class Attract(game.Mode):
                         self.game.coils.upperPlayfieldGIOff.enable()
                         #self.game.coils.lowerPlayfieldGIOff.disable()
 		else:
-
-			self.game.set_status("BALL MISSING!")
-			self.game.ball_search.perform_search(5)
+                        self.game.score_display.cancel_script()
+                        time = 5
+			self.game.score_display.set_text("LOOKING",0,'center',seconds=time)
+                        self.game.score_display.set_text("FOR BALLS",1,'center',seconds=time)
+			self.game.ball_search.perform_search(time)
+                        self.delay(name='restart_attract_display', event_type=None, delay=time, handler=self.attract_display)
+                        
 		
             else:
                 self.show_pricing()

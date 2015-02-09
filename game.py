@@ -94,6 +94,15 @@ class Game(game.BasicGame):
                     self.log.info("Game Config:"+str(coil.name)+" "+str(coil.number))
                 for lamp in self.lamps:
                     self.log.info("Game Config:"+str(lamp.name)+" "+str(lamp.number))
+                    
+                # check for the use_desktop flag and load up the virtual display if present
+                self.draw_desktop = config.value_for_key_path(keypath='use_desktop', default=False)
+                if self.draw_desktop:
+                    from scoredisplay.desktop import Desktop
+                    self.desktop = Desktop()
+                    self.desktop.draw_window()
+                    self.desktop.load_images(game_path+"scoredisplay/alpha_display/")
+
 
                 #setup score display
                 self.alpha_display = AlphanumericDisplay(self.aux_port)
@@ -133,7 +142,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.20'
+                self.system_version='0.2.21'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time
@@ -224,10 +233,12 @@ class Game(game.BasicGame):
                 self.paths['music'] = music_path
 
                 #register game play lamp show
-#                self.lampctrl.register_show('success', game_path +"lamps/game/success.lampshow")
-#                self.lampctrl.register_show('ball_lock', game_path +"lamps/game/ball_lock.lampshow")
-#                self.lampctrl.register_show('hit', game_path +"lamps/game/success.lampshow")
-                self.lampctrl.register_show('jackpot', game_path +"lamps/game/jackpot.lampshow")
+                self.lampctrl.register_show('success', game_path +"lamps/game/success.lampshow")
+                #self.lampctrl.register_show('ball_lock', game_path +"lamps/game/ball_lock.lampshow")
+                #self.lampctrl.register_show('hit', game_path +"lamps/game/success.lampshow")
+                #self.lampctrl.register_show('jackpot', game_path +"lamps/game/jackpot.lampshow")
+                self.lampctrl.register_show('sweep_up', game_path +"lamps/general/sweep_up.lampshow")
+                self.lampctrl.register_show('sweep_down', game_path +"lamps/general/sweep_down.lampshow")
 
                 #setup high scores
 		self.highscore_categories = []
@@ -443,7 +454,7 @@ class Game(game.BasicGame):
                 self.score_display.update_layer()
 
 	def set_status(self, text):
-		self.dmd.set_message(text, 3)
+		#self.dmd.set_message(text, 3)
 		self.log.info("Status Text:"+text)
 
 	def extra_ball_count(self):
@@ -473,6 +484,7 @@ def main():
 
         root_logger = logging.getLogger()
 	root_logger.setLevel(logging.DEBUG)
+    
 
         #setup console logging
         from colorlogging import ColorizingStreamHandler
@@ -500,6 +512,7 @@ def main():
         logging.getLogger('game.driver').setLevel(logging.INFO)
         logging.getLogger('game.sound').setLevel(logging.DEBUG)
         logging.getLogger('scoredisplay.alpha_display').setLevel(logging.ERROR)
+        logging.getLogger('scoredisplay.virtual_display').setLevel(logging.ERROR)
         
 
         config = yaml.load(open(machine_config_path, 'r'))

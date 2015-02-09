@@ -271,6 +271,7 @@ class Cellar(game.Mode):
                     self.hurryup_collected()
                 elif self.cellar_lit and self.game.switches.rightCellar.time_since_change()<=1.2:
                     wait =self.game.sound.play('door_knock')
+                    self.game.lampctrl.play_show('sweep_up', repeat=False,callback=self.game.update_lamps)
                     self.delay(name='award_delay',delay=wait+0.2, handler=self.cellar_award_part1)
                 else:
                     num = random.randint(0,10)

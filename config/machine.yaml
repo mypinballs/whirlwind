@@ -296,7 +296,7 @@ PRCoils:
     #switched
     outhole:
         number: C01
-        pulseTime: 30
+        pulseTime: 35
         tags: A,outhole
         label: 'Outhole'
 #    bottomRightFlasher:
@@ -334,7 +334,7 @@ PRCoils:
         number: C05
         pulseTime: 50
         tags: A
-        label: 'Left Lock Kickback'
+        label: 'Top Eject'
 #    rampLMFlasher:
 #        number: C05
 #        tags: C
@@ -343,7 +343,7 @@ PRCoils:
         number: C06
         pulseTime: 30
         tags: A
-        label: 'Left Lock Kickback'
+        label: 'Knocker'
 #    rampBottomFlasher:
 #        number: C06
 #        tags: C
@@ -673,7 +673,7 @@ PRLamps:
         label: 'Right Spinner'
 
 PRBallSave:
-    pulseCoils: [leftSlingshot, rightSlingshot, lowerLeftJet, lowerRightJet, lowerTopJet, upperLeftJet, upperRightJet, upperBottomJet, topEject, cellarKickout]
+    pulseCoils: [leftSlingshot, rightSlingshot, lowerLeftJet, lowerRightJet, lowerTopJet, upperLeftJet, upperRightJet, upperBottomJet, rampLifter, topEject, cellarKickout, leftLockKickback, autoLaunch]
     resetSwitches:
         leftSlingshot: open
         rightSlingshot: open

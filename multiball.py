@@ -370,6 +370,7 @@ class Multiball(game.Mode):
         def spin_wheels(self):
             num=random.randint(50,200)
             self.game.coils.spinWheelsMotor.pulse(num)
+            self.game.coils.blowerMotor.pulse(200)
             self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
 
 
