@@ -235,7 +235,7 @@ class Compass(game.Mode):
             if enable:
                 num=random.randint(50,150)
                 self.game.coils.spinWheelsMotor.pulse(num)
-                self.game.coils.blowerMotor.pulse(100)
+                self.game.coils.blowerMotor.patter(original_on_time=150,on_time=10, off_time=10)
                 self.delay(name='spin_wheels_repeat',delay=0.8,handler=self.spin_wheels)
             else:
                 self.game.coils.spinWheelsMotor.disable()

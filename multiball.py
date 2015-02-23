@@ -253,7 +253,7 @@ class Multiball(game.Mode):
                 #add reset mode call to compass here to set next chase sequence
 
                 #stop spinning wheels
-                self.cancel_delayed('spin_wheels_repeat')
+                self.spin_wheels(False)
 
                 #stop lamp strobes
                 self.multiball_lamps(False)
@@ -365,13 +365,18 @@ class Multiball(game.Mode):
             pass
             #reset jackpot count to start again
             self.jackpot_collected=0
-
-
-        def spin_wheels(self):
-            num=random.randint(50,200)
-            self.game.coils.spinWheelsMotor.pulse(num)
-            self.game.coils.blowerMotor.pulse(200)
-            self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
+            
+            
+        def spin_wheels(self, enable=True):
+            if enable:
+                num=random.randint(50,200)
+                self.game.coils.spinWheelsMotor.pulse(num)
+                self.game.coils.blowerMotor.enable()
+                self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.spin_wheels)
+            else:
+                self.game.coils.spinWheelsMotor.disable()
+                self.game.coils.blowerMotor.disable()
+                self.cancel_delayed('spin_wheels_repeat')
 
 
         def skyway_entrance(self,dirn):

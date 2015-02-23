@@ -32,6 +32,7 @@ class Tornado(game.Mode):
             self.score_value=[50000,75000,100000,150000,200000]
 
             self.timeout_time = 10 # add a setting for this
+            self.timeout_start_delay = 10
             
              #defs for mode linkup
             self.quick_multiball = None
@@ -70,8 +71,14 @@ class Tornado(game.Mode):
             if num<len(self.lamps):
                 self.level = num
                 self.set_lamps()
-
-
+                
+                
+        def advance_level(self,num):
+            if self.level+num<len(self.lamps):
+                self.level+=num
+                self.set_lamps()
+            
+            
         def update_lamps(self):
             for i in range(self.level):
                 self.game.effects.drive_lamp(self.lamps[i],'on')
@@ -82,7 +89,7 @@ class Tornado(game.Mode):
                 self.game.effects.drive_lamp(self.lamps[i],'smarton')
 
             self.cancel_delayed('start_timeout')
-            self.delay(name='start_timeout',delay=1, handler=self.timeout)
+            self.delay(name='start_timeout',delay=self.timeout_start_delay, handler=self.timeout)
 
             
         def mode_started(self):

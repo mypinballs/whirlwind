@@ -119,14 +119,16 @@ class Skyway(game.Mode):
         
         def progress(self):
             self.toll(1)
-            if self.ramp_level>1:
-                self.toll(1)
+            
+            self.combo()
+            
             self.play_sound()
             self.score()
             self.play_animation(self.skyway_tolls)
             self.strobe_ramp_flashers(0.2)
             self.set_lamps()
-            self.combo()
+            self.advance_ramp()
+            self.tornado.advance_level(1)
 
             if self.skyway_tolls>=self.extra_ball_tolls:
                 self.game.extra_ball.lit()
@@ -150,16 +152,19 @@ class Skyway(game.Mode):
             self.delay(name='eject_ball',delay=2,handler=self.eject)
 
 
-        def combo(self):
+        def advance_ramp(self):
             self.ramp_level+=1
             self.game.effects.drive_lamp('2tolls','fast')
-            self.tornado.set_level(self.ramp_level)
 
             self.cancel_delayed('skyway_reset')
             self.delay(name='skyway_reset',delay=5, handler=self.reset)
 
-            #update audits
-            audits.record_value(self.game,'skywayComboMade')
+            
+        def combo(self):
+            if self.ramp_level>1:
+                self.toll(1)
+                #update audits
+                audits.record_value(self.game,'skywayComboMade')
 
 
         def score(self):
