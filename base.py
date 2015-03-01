@@ -92,6 +92,7 @@ class BaseGameMode(game.Mode):
                 # Each time this mode is added to game Q, set this flag true.
 		self.ball_starting = True
                 self.ball_saved = False
+                self.outlane_ball_save_in_progress = False
 
                 #setup basic modes
                 self.add_basic_modes(self);
@@ -190,13 +191,12 @@ class BaseGameMode(game.Mode):
 
 
         def ball_save_callback(self):
-            #anim = dmd.Animation().load(game_path+"dmd/eternal_life.dmd")
-            #self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False)
             self.game.sound.play_voice('ball_save_speech')
-            #self.game.sound.play('ball_save')
 
+            #self.game.ball_save.is_active() is set to false before this callback is called, therefore do not use it as a flag for after early saves are initiated
+            #use this flag
             self.ball_saved = True
-
+            
             #update audits
             audits.record_value(self.game,'ballSaved')
 
@@ -294,18 +294,20 @@ class BaseGameMode(game.Mode):
 		self.game.end_ball()
 
         
-        def sw_outhole_active(self,sw):
+        def sw_outhole_active_for_250ms(self,sw):
             self.log.info('Ball Saved Flag:%s',self.ball_saved)
-            if not self.game.get_player_stats('multiball_running') and not self.ball_saved: #and not self.game.ball_save.is_active()
+            #list all the flags that must be false for the end of ball music to play
+            if not self.game.get_player_stats('multiball_running') and not self.ball_saved and not self.outlane_ball_save_in_progress and not self.game.ball_save.is_active():
                 self.game.sound.stop_music()
                 self.game.sound.play_music('end',loops=0)
             
-            #if self.ball_saved:
-             #   self.ball_saved=False # reset flag for next time around
+            #reset flags if active
+            if self.outlane_ball_save_in_progress:
+                self.outlane_ball_save_in_progress = False
                 
 
 
-	def sw_start_active(self, sw):
+	def sw_start_active_for_250ms(self, sw):
                 #adding multiple players to game
 		if self.game.ball == 1 and len(self.game.players)<self.game.max_players:
 			p = self.game.add_player()
@@ -430,7 +432,11 @@ class BaseGameMode(game.Mode):
 
         def outlane(self):
             self.game.score(200)
-            self.game.sound.play("outlane")
-            if not self.game.ball_save.is_active():
+            if self.ball_saved: #self.game.ball_save.is_active():
+                self.outlane_ball_save_in_progress = True
+            else:
+                self.game.sound.play("outlane")
                 #lamp show
                 self.game.lampctrl.play_show('sweep_down', repeat=False,callback=self.game.update_lamps)
+            
+                

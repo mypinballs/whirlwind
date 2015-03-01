@@ -142,7 +142,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.22'
+                self.system_version='0.2.23'
                 self.system_name='Whirlwind 2'.upper()
 
                 #update audit data on boot up time

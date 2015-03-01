@@ -1,5 +1,5 @@
 #Whirlwind P-ROC Game Description file
-#Using Atom Motherboard, Marks Sys 11 Driver board and myPinballs Display Interface Driver
+#Using Shuttle DS61 Barebones, Marks Sys 11 Driver board and myPinballs Display Interface Driver
 #Configured as a WPC Alphanumeric type game
 
 PRGame:

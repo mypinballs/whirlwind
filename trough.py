@@ -85,8 +85,12 @@ class Trough(procgame.game.Mode):
 
 		# Install early ball_save switch handlers.
                 for switch in self.early_save_switchnames:
-			self.add_switch_handler(name=switch, event_type='active', \
-				delay=None, handler=self.early_save_switch_handler)
+                        if switch==self.outhole_switchname: #cehck for outhole switch so that a small settle delay can be added
+                                self.add_switch_handler(name=switch, event_type='active', \
+                                        delay=0.25, handler=self.early_save_switch_handler)
+                        else:
+                                self.add_switch_handler(name=switch, event_type='active', \
+                                        delay=0, handler=self.early_save_switch_handler)
 
                 # Install outhole switch handler.
 		self.add_switch_handler(name=self.outhole_switchname, event_type='active', \
@@ -102,6 +106,7 @@ class Trough(procgame.game.Mode):
 		self.launch_in_progress = False
                 self.launch_check_delay = 1
 
+                #ball save variables
 		self.ball_save_active = False
 
 		""" Callback called when a ball is saved.  Used optionally only when ball save is enabled (by a call to :meth:`Trough.enable_ball_save`).  Set externally if a callback should be used. """
@@ -126,7 +131,8 @@ class Trough(procgame.game.Mode):
 	def enable_ball_save(self, enable=True):
 		"""Used to enable/disable ball save logic."""
 		self.ball_save_active = enable
-
+                
+                
 	def early_save_switch_handler(self, sw):
 		if self.ball_save_active:
 			# Only do an early ball save if a ball is ready to be launched.
