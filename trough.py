@@ -134,16 +134,18 @@ class Trough(procgame.game.Mode):
                 
                 
 	def early_save_switch_handler(self, sw):
+                self.log.debug( "early save handler called")
 		if self.ball_save_active:
 			# Only do an early ball save if a ball is ready to be launched.
 			# Otherwise, let the trough switches take care of it.
 			if self.game.switches[self.eject_switchname].is_active():
+                                self.log.debug( "launching ball from early save method, trough eject switch is loaded")
 				self.launch_balls(1, self.ball_save_callback, \
 						  stealth=True)
 
         #add handler for outhole
         def outhole_switch_handler(self,sw):
-            self.log.info('outhole switch handler called')
+            self.log.debug('outhole switch handler called')
             #if self.game.switches[self.outhole_switchname].is_active(seconds=1.0):
             self.game.switched_coils.drive(self.outhole_coilname)
 

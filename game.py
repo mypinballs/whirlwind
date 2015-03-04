@@ -142,8 +142,9 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.23'
+                self.system_version='0.2.24'
                 self.system_name='Whirlwind 2'.upper()
+                self.log.info("System Version is:%s",self.system_version)
 
                 #update audit data on boot up time
 #                self.game_data['Time Stamps']['Last Boot-Up'] =str(strftime("%d %b %Y %H:%M"))
@@ -495,18 +496,18 @@ def main():
         #setup logging to file
         datetime = str(time.strftime("%Y-%m-%d %H-%M-%S"))
         file_handler = logging.FileHandler(game_path +'var/logs/'+serial+' Game Log '+datetime+'.log')
-        file_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
         root_logger.addHandler(handler)
         root_logger.addHandler(file_handler)
 
         #set invidivual log levels here
-        logging.getLogger('whirlwind.alpha_display').setLevel(logging.DEBUG)
-        logging.getLogger('whirlwind.switched_coils').setLevel(logging.DEBUG)
-        logging.getLogger('whirlwind.multiball').setLevel(logging.DEBUG)
-        logging.getLogger('whirlwind.compass').setLevel(logging.DEBUG)
-        logging.getLogger('whirlwind.chaser_multiball').setLevel(logging.DEBUG)
+        logging.getLogger('whirlwind.alpha_display').setLevel(logging.INFO)
+        logging.getLogger('whirlwind.switched_coils').setLevel(logging.INFO)
+        logging.getLogger('whirlwind.multiball').setLevel(logging.INFO)
+        logging.getLogger('whirlwind.compass').setLevel(logging.INFO)
+        logging.getLogger('whirlwind.chaser_multiball').setLevel(logging.INFO)
         logging.getLogger('whirlwind.trough').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.INFO)
         logging.getLogger('game.driver').setLevel(logging.INFO)
