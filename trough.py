@@ -105,6 +105,7 @@ class Trough(procgame.game.Mode):
                 self.eject_success = False
 		self.launch_in_progress = False
                 self.launch_check_delay = 1
+                self.pause_outhole = False
 
                 #ball save variables
 		self.ball_save_active = False
@@ -140,14 +141,15 @@ class Trough(procgame.game.Mode):
 			# Otherwise, let the trough switches take care of it.
 			if self.game.switches[self.eject_switchname].is_active():
                                 self.log.debug( "launching ball from early save method, trough eject switch is loaded")
-				self.launch_balls(1, self.ball_save_callback, \
-						  stealth=True)
+				self.launch_balls(1, self.ball_save_callback, stealth=True)
 
         #add handler for outhole
         def outhole_switch_handler(self,sw):
             self.log.debug('outhole switch handler called')
-            #if self.game.switches[self.outhole_switchname].is_active(seconds=1.0):
-            self.game.switched_coils.drive(self.outhole_coilname)
+            self.log.debug('outhole paused flag:%s',self.pause_outhole)
+
+            if not self.pause_outhole:
+                self.game.switched_coils.drive(self.outhole_coilname)
 
             self.delay(name='outhole_kick_repeat',delay=2,handler=self.check_outhole)
 
@@ -250,6 +252,7 @@ class Trough(procgame.game.Mode):
                 self.retry_launch()
             else:
                 self.eject_success = True
+                self.pause_outhole = False
                 self.log.debug( "That's one")
                 
             
@@ -311,6 +314,8 @@ class Trough(procgame.game.Mode):
 		# shooter lane.	
 		if self.game.switches[self.shooter_lane_switchname].is_inactive():
 			self.num_balls_to_launch -= 1
+                        #pause outhole  - until trough ejects a ball sucessfully
+                        self.pause_outhole = True
                         #pulse coil
 			self.game.switched_coils.drive(self.eject_coilname)
                         self.delay(name='check_eject_delay',delay=self.launch_check_delay,handler=self.check_trough_eject) #setup a time delay to reset the eject count
