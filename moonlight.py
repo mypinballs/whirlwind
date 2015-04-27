@@ -61,6 +61,7 @@ class Moonlight(game.Mode):
             self.million_value = 1000000
             self.million_timer = 30 #change to setting
             self.base_value = 250000
+            self.great_harm_value = 11177*10
 
             self.balls_needed = 3
             self.next_ball_ready = False
@@ -231,13 +232,25 @@ class Moonlight(game.Mode):
 
             
         def display_progress_text(self,time=3):
-            text=['***Pow***','***Wham***','***Kepow***','***Doho***','***Cow***','***Slam***','***Crash***','***Boom***','***Bang***','***Kezamm***']
+            text=['***Pow***','***Wham***','***Kepow***','***Doho***','***Cow***','***Slam***','***Crash***','***Boom***','***Bang***','***Kezamm***','***Jpoped***']
             num = random.randint(0,len(text)-1)
             self.display(top=text[num],bottom=text[num],seconds=time)
             self.progress_text_runnning = True
             self.delay(name='clear_progress_display_flag_timer',delay=time+1,handler=self.reset_display_flag)
 
 
+        def display_totals(self,wait):
+            self.display_great_harm_text()
+            self.delay(delay=wait,handler=self.display_total_text)
+            
+        def display_finished_totals(self,wait,time):
+            self.display_total_text()
+            self.delay(delay=wait,handler=self.display_finish_text,param=time)
+            
+
+        def display_great_harm_text(self,time=0):
+             self.display(top='Great Harm Bonus',bottom=locale.format("%d", self.great_harm_value, True),seconds=time)
+              
         def display_total_text(self,time=0):
              self.display(top='Moonlight Total',bottom=locale.format("%d", self.total, True),seconds=time)
 
@@ -376,8 +389,8 @@ class Moonlight(game.Mode):
                 self.game.enable_flippers(enable=False)
 
                 #calc total & display
-                self.total = (self.count*self.base_value)+(self.million_count*self.million_value)
-                self.display_total_text()
+                self.total = (self.count*self.base_value)+(self.million_count*self.million_value)+self.great_harm_value
+                self.display_totals(wait=2)
 
 
             elif self.balls_in_play==0: #all balls now drained
@@ -394,9 +407,10 @@ class Moonlight(game.Mode):
                 #zero score
                 self.game.current_player().score = 0
 
-                wait =3
-                self.display_finish_text(wait)
-                self.delay(delay=wait,handler=self.finish)     
+                wait=2
+                time=1.5
+                self.display_finished_totals(wait,time)
+                self.delay(delay=wait+time,handler=self.finish)     
     
 
         def finish(self):

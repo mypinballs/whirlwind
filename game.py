@@ -142,7 +142,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.25'
+                self.system_version='0.2.26'
                 self.system_name='Whirlwind 2'.upper()
                 self.log.info("System Version is:%s",self.system_version)
 
