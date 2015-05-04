@@ -199,7 +199,7 @@ featureAudits:
     label: 'Total Cellar Quick Multiballs Started'
   totalDropTarget3BanksCompleted:
     type: sum
-    cid1: dropTarget3Bank
+    cid1: dropTarget3BankCompleted
     label: 'Total Drop Target 3-Banks Completed'
   totalMultiballsStarted:
     type: sum
@@ -213,10 +213,14 @@ featureAudits:
     type: sum
     cid1: skywayRampMade
     label: 'Total Skyway Ramps Made'
-  totalSuperPopsCollected:
+  totalLowerSuperPopsCollected:
     type: sum
-    cid1: superPopCollected
-    label: 'Total Super Pops Collected'
+    cid1: lowerSuperPopCollected
+    label: 'Total Lower Super Pops Collected'
+  totalUpperSuperPopsCollected:
+    type: sum
+    cid1: upperSuperPopCollected
+    label: 'Total Upper Super Pops Collected'
   totalSkillshotsMade:
     type: sum
     cid1: skillshotMade
@@ -231,5 +235,5 @@ featureAudits:
     label: 'Total Tornado Target Quick Multiballs Started'
   totalMoonlightMultiballsStarted:
     type: sum
-    cid1: moonlightMulitball
+    cid1: moonlightMultiballStarted
     label: 'Total Moonlight Multiballs Started'

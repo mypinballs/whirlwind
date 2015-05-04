@@ -37,3 +37,4 @@ def boolean_format(value):
             return True
         else:
             return False
+        

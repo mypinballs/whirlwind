@@ -311,29 +311,38 @@ class Attract(game.Mode):
              if time.time()-self.sound_timestamp>5:
                 self.game.sound.play_voice('flipperAttract')
                 self.sound_timestamp=time.time()
+                
+        
+        #coin door mode control
+        def sw_coinDoorClosed_inactive(self, sw):
+		self.game.modes.add(self.game.coin_door)
 
 	# Enter service mode when the enter button is pushed.
 	def sw_enter_active(self, sw):
+            if self.game.switches.direction.is_active():
 		for lamp in self.game.lamps:
 			lamp.disable()
 
                 #self.service_mode = ServiceMode(self,100,font_07x5,[])
 		self.game.modes.add(self.game.service_mode)
-		return True
+                return True
+            elif self.game.switches.direction.is_inactive():
+                return True
 
-	def sw_exit_active(self, sw):
-		return True
+#	def sw_exit_active(self, sw):
+#		return True
 
 	# Outside of the service mode, up/down control audio volume.
-	def sw_down_active(self, sw):
+	def sw_step_active(self, sw):
+            if self.game.switches.direction.is_active():
+                volume = self.game.sound.volume_up()
+		self.game.set_status("Volume Up : " + str(volume))
+		return True
+            else:
 		volume = self.game.sound.volume_down()
 		self.game.set_status("Volume Down : " + str(volume))
 		return True
 
-	def sw_up_active(self, sw):
-		volume = self.game.sound.volume_up()
-		self.game.set_status("Volume Up : " + str(volume))
-		return True
 
 	# Start button starts a game if the trough is full.  Otherwise it
 	# initiates a ball search.
@@ -377,7 +386,7 @@ class Attract(game.Mode):
             return True
 
 
-        def sw_coin_active(self, sw):
+        def sw_leftCoinChute_active(self, sw):
             self.credits =  audits.display(self.game,'general','creditsCounter')
             audits.update_counter(self.game,'credits',self.credits+1)
             self.show_pricing()

@@ -158,19 +158,6 @@ Feature:
   'Super Jets Enabled':
     options: ['Yes', 'No']
     default: 'Yes'
-  'Magnet Installed':
-    options: ['Yes', 'No']
-    default: 'No'
-  'Motor Installed':
-    options: ['Yes', 'No']
-    default: 'No'
-  'Stepper Installed':
-    options: ['Yes', 'No']
-    default: 'No'
-  'Stepper Speed':
-    options: [10,110]
-    increments: 10
-    default: 50
   'Auto Launcher Installed':
     options: ['Yes', 'No']
     default: 'Yes'
@@ -180,7 +167,17 @@ Feature:
     default: 15
   'Tornado Difficulty':
     options: ['Easy', 'Medium','Hard']
-    default: 'Hard'
+    default: 'Medium'
+  'Jackpot Ramp Lift Timer':
+    options: [5,25]
+    increments: 1
+    default: 10
+  'Enable Multiball Stacking':
+    options: ['Yes', 'No']
+    default: 'Yes' 
+  'Compass Progress Memory':
+    options: ['Yes', 'No']
+    default: 'No' 
 Network:
   'IP Address':
     options: [0,255]

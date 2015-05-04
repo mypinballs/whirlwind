@@ -116,6 +116,7 @@ class QuickMultiball(game.Mode):
 
 
         #this is called by other modes to start the qm process
+        #needs to add in awareness for previous locked balls here and set a 'stacked mulitball' flag - raise jackpot by 1mill
         def lock_ready(self):
             self.lock_lit=True
             self.game.set_player_stats('qm_lock_lit',self.lock_lit)

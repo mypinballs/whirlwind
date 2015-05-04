@@ -83,7 +83,7 @@ class Tilt(game.Mode):
         def clear(self):
             self.layer = None
 
-        def sw_tilt_active(self, sw):
+        def sw_plumbBobTilt_active(self, sw):
             if self.times_warned == self.game.user_settings['Standard']['Tilt Warnings']:
 		self.tilt()
             else:

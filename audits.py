@@ -4,6 +4,7 @@ import os
 import logging
 import json
 import yaml
+import locale
 
 AUDITS_PATH = './var/audits_store.db'
 AUDITS_SCHEMA_PATH = './config/audits_catalogue.yaml'
@@ -336,7 +337,7 @@ class AuditStore(object):
              if 'Time' in str(item):
                     value = self.format_time(value)
              elif 'Score' in str(item):
-                    value = util.commatize(value)
+                    value = self.commatize(value)
 
              #self.log.debug("value returned is:%s",value)
              return value
@@ -351,6 +352,11 @@ class AuditStore(object):
                 return str(hrs)+" Hrs "+str(mins)+" Mins"
             else:
                 return str(mins)+" Mins "+str(secs)+" Secs"
+            
+            
+        def commatize(self,n):
+            return locale.format("%d", n, True)
+
             
             
         def iter_time_period(self, period, max_count, start=None):

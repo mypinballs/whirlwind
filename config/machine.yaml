@@ -30,36 +30,15 @@ PRSwitches:
     #    'NC' (normally closed.  Common for optos)
 
     #dedicated
-    flipperLwL:
-        number: SD1
-        label: 'LL Flipper'
-    flipperLwR:
-        number: SD2
-        label: 'LR Flipper'
-    coinDoor:
-        number: SD5
-        label: 'Coin Door'
-    flipperUpR:
-        number: SD6
-        label: 'UR Flipper'
-    tilt:
-        number: SD7
-        label: 'Tilt'
-    coin:
+    coinDoorClosed:
         number: SD8
-        label: 'Coin'
-    enter:
+        label: 'Coin Door'
+    step:
         number: SD9
-        label: 'Diag Enter'
-    up:
+        label: 'Diag Step'
+    direction:
         number: SD10
-        label: 'Diag Up'
-    down:
-        number: SD11
-        label: 'Diag Down'
-    exit:
-        number: SD12
-        label: 'Diag Exit'
+        label: 'Diag Direction'
 
     #matrix
     #col1
@@ -72,9 +51,11 @@ PRSwitches:
     start:
         number: S13
         label: 'Start Button'
-    rightCoinChute:
+    #rightCoinChute:
+    exit:
         number: S14
-        label: 'Right Coin Chute'
+        #label: 'Right Coin Chute'
+        label: 'Diag Exit'
     centerCoinChute:
         number: S15
         label: 'Center Coin Chute'
@@ -84,9 +65,9 @@ PRSwitches:
     slamTilt:
         number: S17
         label: 'Slam Tilt'
-    highScoreReset:
+    enter:
         number: S18
-        label: 'High Score Reset'
+        label: 'Diag Enter'
     #col2
     outhole:
         number: S22
@@ -287,12 +268,16 @@ PRCoils:
     #virtual
     flipperLwRMain:
         number: FLRM
+        label: 'Lower Right Flipper Main'
     flipperLwRHold:
         number: FLRH
+        label: 'Lower Right Flipper Hold'
     flipperLwLMain:
         number: FLLM
+        label: 'Lower Left Flipper Main'
     flipperLwLHold:
         number: FLLH
+        label: 'Lower Left Flipper Hold'
     #switched
     outhole:
         number: C01

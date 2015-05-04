@@ -54,7 +54,7 @@ class Multiball(game.Mode):
             self.super_jackpot_enabled = False
             self.super_jackpot_value = 2000000
             self.next_ball_ready = False
-            self.ramp_lift_timer = 10
+            self.ramp_lift_timer = self.game.user_settings['Feature']['Jackpot Ramp Lift Timer'] #10
 
             #self.lock_lit = False
             self.mode_running = False

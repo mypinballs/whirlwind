@@ -142,7 +142,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.26'
+                self.system_version='0.3.0'
                 self.system_name='Whirlwind 2'.upper()
                 self.log.info("System Version is:%s",self.system_version)
 
@@ -210,9 +210,9 @@ class Game(game.BasicGame):
 		self.sound.register_sound('service_save', sound_path+"save.wav")
 		self.sound.register_sound('service_cancel', sound_path+"cancel.wav")
 
-                #change this to my own version
-		#self.service_mode = procgame.service.ServiceMode(self,100,font_tiny7,[])
+                #setup service mode
                 self.service_mode = ServiceMode(self,100,font_07x5,font_09Bx7,[])
+                self.coin_door = CoinDoor(self)
 
 		# Setup fonts
 		self.fonts = {}
