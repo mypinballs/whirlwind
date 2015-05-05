@@ -31,14 +31,15 @@ PRSwitches:
 
     #dedicated
     coinDoorClosed:
-        number: SD8
+        number: SD1
         label: 'Coin Door'
     step:
-        number: SD9
+        number: SD2
         label: 'Diag Step'
     direction:
-        number: SD10
+        number: SD3
         label: 'Diag Direction'
+        type: 'NC'
 
     #matrix
     #col1

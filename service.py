@@ -26,13 +26,13 @@ class ServiceModeSkeleton(game.Mode):
 	def mode_started(self):
 		#self.title_layer.set_text(str(self.name))
                 self.game.score_display.cancel_script()
-                self.game.score_display.set_text(text=str(self.name),row=0,justify='left',opaque=True)
+                self.game.score_display.set_text(text=str(self.name).upper(),row=0,justify='left',opaque=True)
 		self.game.sound.play('service_enter')
 
 	def mode_stopped(self):
 		self.game.sound.play('service_exit')
-                #self.game.score_display.reset()
-                self.game.coin_door.load_messages()
+                self.game.score_display.reset()
+               
 
 	def disable(self):
 		pass
@@ -45,6 +45,7 @@ class ServiceModeSkeleton(game.Mode):
 #	def sw_exit_active(self, sw):
 #		self.game.modes.remove(self)
 #		return True
+
         def sw_enter_active(self,sw):
             if self.game.switches.direction.is_inactive():
                 self.game.modes.remove(self)
@@ -71,7 +72,7 @@ class ServiceModeList(ServiceModeSkeleton):
 			ctr += 1
 		self.max = ctr - 1
 		#self.item_layer.set_text(self.item.name)
-                self.game.score_display.set_text(text=str(self.item.name)[:16],row=0,justify='left',opaque=True)
+                self.game.score_display.set_text(text=str(self.item.name[:16]).upper(),row=0,justify='left',opaque=True)
 
 	def sw_step_active(self,sw):
 		if self.game.switches.direction.is_active():
@@ -134,6 +135,10 @@ class ServiceMode(ServiceModeList):
 		if len(self.game.game_data) > 0: 
 			self.statistics = Statistics(self.game, self.priority+1, font, big_font, 'Statistics', self.game.game_data)
 			self.items.append(self.statistics)
+                        
+        def mode_stopped(self):
+            super(ServiceMode, self).mode_stopped()
+            self.game.coin_door.load_messages()
 
 
 class Tests(ServiceModeList):
@@ -196,11 +201,12 @@ class LampTest(ServiceModeList):
 		super(LampTest, self).mode_started()
 		self.action = 'repeat'
                 #self.instruction_layer.set_text(' - Repeat')
-                self.game.score_display.set_text(text=str(' - Repeat'),row=0,justify='right',opaque=False)
+                self.game.score_display.set_text(text=str(' - Repeat').upper(),row=0,justify='right',opaque=False)
 
                 #self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_repeat)
 
         def mode_stopped(self):
+                super(LampTest, self).mode_stopped()
                 self.game.score_display.cancel_script()
 
 	def change_item(self):
@@ -223,9 +229,9 @@ class LampTest(ServiceModeList):
                 #script.append({'top':str(self.item.yaml_number+' '+self.item.label),'timer':3,'transition':3})
                 
                 #self.row_layer.set_text(self.base_colour[0]+' '+self.row_colour[self.lamp_row])
-                script.append({'top':str(self.item.yaml_number+' '+self.item.label[:12]).upper(),'bottom':str('Row: '+self.base_colour[0]+'/'+self.row_colour[self.lamp_row]),'timer':3,'transition':2})
+                script.append({'top':str(self.item.yaml_number+' '+self.item.label[:12]).upper(),'bottom':str('Row: '+self.base_colour[0]+'/'+self.row_colour[self.lamp_row]).upper(),'timer':3,'transition':2})
                 #self.column_layer.set_text(self.base_colour[1]+' '+self.col_colour[self.lamp_col])
-                script.append({'top':str(self.item.yaml_number+' '+self.item.label[:12]).upper(),'bottom':str('Col: '+self.base_colour[1]+'/'+self.col_colour[self.lamp_col]),'timer':3,'transition':2})
+                script.append({'top':str(self.item.yaml_number+' '+self.item.label[:12]).upper(),'bottom':str('Col: '+self.base_colour[1]+'/'+self.col_colour[self.lamp_col]).upper(),'timer':3,'transition':2})
                
                 #set the display text script
                 self.game.score_display.set_script(script)
@@ -237,7 +243,11 @@ class LampTest(ServiceModeList):
 	def sw_enter_active(self,sw):
                 if self.game.switches.direction.is_active():
                     return True
-
+                elif self.game.switches.direction.is_inactive():
+                    self.item.disable()
+                    self.game.modes.remove(self)
+                    return True
+		
 
 class CoilTest(ServiceModeList):
 	"""Coil Test"""
@@ -276,15 +286,19 @@ class CoilTest(ServiceModeList):
 		super(CoilTest, self).mode_started()
 		self.action = 'manual'
                 #self.instruction_layer.set_text(' - Manual')
-                self.game.score_display.set_text(text=str(' - Manual'),row=0,justify='right',opaque=False)
+                self.game.score_display.set_text(text=str(' - Manual').upper(),row=0,justify='right',opaque=False)
 
                 #check this line is needed
 		if self.game.lamps.has_key('start'): self.game.lamps.start.schedule(schedule=0xff00ff00, cycle_seconds=0, now=False)
 
                 self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
+
         def mode_stopped(self):
+                super(CoilTest, self).mode_stopped()
                 self.cancel_delayed('repeat')
+                self.game.score_display.cancel_script()
+
 
         def change_item(self):
                 self.log.info("items total:"+str(len(self.items)))
@@ -301,8 +315,8 @@ class CoilTest(ServiceModeList):
                 self.game.score_display.cancel_script()
                 script=[]
                 if len(self.transistors)>coil_num:
-                    script.append({'top':str(self.item.yaml_number+' '+self.item.label[:10]),'bottom':str("Q"+str(self.transistors[coil_num-1])+" Sol "+str(coil_num)),'timer':3,'transition':2})                  
-                    script.append({'top':str(self.item.yaml_number+' '+self.item.label[:10]),'bottom':str(self.connections[coil_num-1]),'timer':3,'transition':2})
+                    script.append({'top':str(self.item.yaml_number+' '+self.item.label[:10]).upper(),'bottom':str("Q"+str(self.transistors[coil_num-1])+" Sol "+str(coil_num)).upper(),'timer':3,'transition':2})                  
+                    script.append({'top':str(self.item.yaml_number+' '+self.item.label[:10]).upper(),'bottom':str(self.connections[coil_num-1]).upper(),'timer':3,'transition':2})
                
                 #set the display text script
                 self.game.score_display.set_script(script)
@@ -347,19 +361,23 @@ class CoilTest(ServiceModeList):
 			self.action = 'repeat'
 			if self.game.lamps.has_key('start'): self.game.lamps.start.disable()
 			#self.instruction_layer.set_text(' - Repeat')
-                        self.game.score_display.set_text(text=str(' - Repeat'),row=0,justify='right',opaque=False)
+                        self.game.score_display.set_text(text=str(' - Repeat').upper(),row=0,justify='right',opaque=False)
 		elif (self.action == 'repeat'):
 			self.action = 'auto'
 			if self.game.lamps.has_key('start'): self.game.lamps.start.disable()
 			#self.instruction_layer.set_text(' - Auto')
-                        self.game.score_display.set_text(text=str(' - Auto'),row=0,justify='right',opaque=False)
+                        self.game.score_display.set_text(text=str(' - Auto').upper(),row=0,justify='right',opaque=False)
                 elif (self.action == 'auto'):
 			self.action = 'manual'
 			if self.game.lamps.has_key('start'): self.game.lamps.start.schedule(schedule=0xff00ff00, cycle_seconds=0, now=False)
 			#self.instruction_layer.set_text(' - Manual')
-                        self.game.score_display.set_text(text=str(' - Manual'),row=0,justify='right',opaque=False)
+                        self.game.score_display.set_text(text=str(' - Manual').upper(),row=0,justify='right',opaque=False)
                         #self.cancel_delayed('repeat')
 		return True
+            elif self.game.switches.direction.is_inactive():
+                self.item.disable()
+                self.game.modes.remove(self)
+                return True
 
 
 	def sw_start_active(self,sw):
@@ -440,8 +458,8 @@ class SwitchTest(ServiceModeSkeleton):
                     #self.column_layer.set_text(col_colour)
                     #self.number_layer.set_text(sw.yaml_number)
                     
-                    script.append({'top':str(sw.yaml_number+' '+sw.label[:12]).upper(),'bottom':str('Row: '+row_colour),'timer':3,'transition':2})
-                    script.append({'top':str(sw.yaml_number+' '+sw.label[:12]).upper(),'bottom':str('Col: '+col_colour),'timer':3,'transition':2})
+                    script.append({'top':str(sw.yaml_number+' '+sw.label[:12]).upper(),'bottom':str('Row: '+row_colour).upper(),'timer':3,'transition':2})
+                    script.append({'top':str(sw.yaml_number+' '+sw.label[:12]).upper(),'bottom':str('Col: '+col_colour).upper(),'timer':3,'transition':2})
                     
                 
 #                    if sw.state:
@@ -457,15 +475,24 @@ class SwitchTest(ServiceModeSkeleton):
                     #self.row_layer.set_text(row_colour)
                     #self.column_layer.set_text("")
                     #self.number_layer.set_text("sd"+str(sw_num))
-                    script.append({'top':('SD'+str(sw_num)+' '+sw.label[:12]).upper(),'bottom':str('Row: '+row_colour),'timer':3,'transition':2})
+                    script.append({'top':('SD'+str(sw_num)+' '+sw.label[:12]).upper(),'bottom':str('Row: '+row_colour).upper(),'timer':3,'transition':2})
 
                 #set the display text script
                 self.game.score_display.set_script(script)
 		return True
 
+
+        def mode_stopped(self):
+                super(SwitchTest, self).mode_stopped()
+                self.game.score_display.cancel_script()
+                
+                
 	def sw_enter_active(self,sw):
             if self.game.switches.direction.is_active():
 		return True
+            elif self.game.switches.direction.is_inactive():
+                self.game.modes.remove(self)
+                return True
 
 
 class Statistics(ServiceModeList):
@@ -495,7 +522,7 @@ class AuditDisplay(ServiceModeList):
                     if item!='label':
                         self.log.info("Stats Item:"+str(item))
                         audit_value = audits.display(self.game,section_key,item) #calc the required value from the audits database. formating is also handled in the audits class
-                        self.items.append( AuditItem(str(itemlist[item]['label']), audit_value))
+                        self.items.append( AuditItem(str(itemlist[item]['label']).upper(), audit_value))
 
 
 	def mode_started(self):
@@ -509,6 +536,10 @@ class AuditDisplay(ServiceModeList):
 	def sw_enter_active(self, sw):
             if self.game.switches.direction.is_active():
 		return True
+            elif self.game.switches.direction.is_inactive():
+                self.item.disable()
+                self.game.modes.remove(self)
+                return True
 
 
             
@@ -689,6 +720,11 @@ class StatsDisplay(ServiceModeList):
 	def sw_enter_active(self, sw):
             if self.game.switches.direction.is_active():
 		return True
+            elif self.game.switches.direction.is_inactive():
+                self.item.disable()
+                self.game.modes.remove(self)
+                return True
+            
 
 class AuditItem:
 	"""Service Mode."""
@@ -958,8 +994,8 @@ class CoinDoor(game.Mode):
                 #set text for the layers
                 script.append({'top':'Coin Door Open'.upper(),'bottom':'High Voltage Off'.upper(),'timer':5,'transition':3})
                 
-                script.append({'top':str(self.game.system_name),'bottom':'OCS Ltd 2015','timer':3,'transition':2})
-                script.append({'top':str(self.game.system_name),'bottom':str('v'+self.game.system_version),'timer':3,'transition':2})
+                script.append({'top':str(self.game.system_name),'bottom':'OCS Ltd 2015'.upper(),'timer':3,'transition':2})
+                script.append({'top':str(self.game.system_name),'bottom':str('v'+self.game.system_version).upper(),'timer':3,'transition':2})
                 script.append({'top':str(self.game.system_name),'bottom':'Press "ENTER"'.upper(),'timer':3,'transition':2})
                
                 if self.game.health_status =='OK' or self.game.health_status =='':
