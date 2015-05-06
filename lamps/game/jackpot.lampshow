@@ -3,7 +3,7 @@ lamp:scUpperJetsOn                 | ..     ..   ..     ..   ..
 lamp:sc500k                        | ...      ..  ..      ..  ..
 lamp:sc3Bank100k                   | ..    .     ..   ..     ..   ..
 lamp:sc3Bank100k                   |     ..      .   ..      .   ..
-lamp:scQuickMultiball                        |       ..    .     ..    .     .
+lamp:scQuickMultiball              |       ..    .     ..    .     .
 lamp:scMillion                     |    ..   ..     ..   ..     ..
 lamp:scLowerJetsOn                 |     ..    ..    ..    ..    ..
 lamp:specialLeftOutlane            |      ..     .    .     ..    .
